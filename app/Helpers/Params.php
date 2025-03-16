@@ -55,7 +55,7 @@ class Params
         $params["coletaneas_online"] = "https://params.louvorja.com.br/baixa_coletaneas_web.php";
         $params["embed_youtube"] = "https://www.youtube.com/embed/{videoID}";
         $params["ftp"] = "https://api.louvorja.com.br/ftp"; // REMOVER DEPOIS PARA MANTER A FORMA SEGURA (COM TOKEN)
-        $params["helpPT"] = $params["help"];
+        $params["helpPT"] = $params["help"] . "?lang=pt";
         $params["helpES"] = $params["help"] . "?lang=es";
         $params["logs_versao"] = $params["version_log"];
 
