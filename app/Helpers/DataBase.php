@@ -358,10 +358,11 @@ class DataBase
         $mysqlConnection = DB::connection('mysql');
         $tables = $mysqlConnection->getDoctrineSchemaManager()->listTableNames();
 
-        $exclude = ["migrations", "configs", "users", "download_logs", "ftp_logs"]; // Não copiar essas tabelas
+        $exclude = ["migrations", "configs", "users", "download_logs", "ftp_logs", "ftp", "migrations", "logs"]; // Não copiar essas tabelas
         $log = [];
         foreach ($tables as $table) {
             if (in_array($table, $exclude)) {
+                DB::connection('sqlite')->statement('DROP TABLE IF EXISTS ' . $table);
                 continue;
             }
 
@@ -383,7 +384,6 @@ class DataBase
                 $log[$table]["status"] = "error";
             }
         }
-
 
         /*
         DB::connection('sqlite')->statement("CREATE VIEW hymnal AS"
