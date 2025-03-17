@@ -4,21 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class OnlineVideoChannel extends Model
+class OnlineVideoPlaylist extends Model
 {
-    protected $table = 'online_videos_channels';
-    protected $primaryKey = 'id_online_video_channel';
+    protected $table = 'online_videos_playlists';
+    protected $primaryKey = 'id_online_video_playlist';
     protected $fillable = [
+        'channel_id',
         'name',
         'description',
+        'custom_url',
         'default_image',
         'medium_image',
         'high_image',
-        'standard_image',
-        'maxres_image',
         'default_image_base64',
         'error',
         'status',
+        'playlists',
         'id_language',
     ];
 }
