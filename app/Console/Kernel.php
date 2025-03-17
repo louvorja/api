@@ -74,9 +74,24 @@ class Kernel extends ConsoleKernel
 
         $schedule->call(function () {
             $controller = new TaskController();
-            Configs::set('schedule:07.export_database.start', date('Y-m-d H:i:s'), 'datetime');
+            Configs::set('schedule:07.refresh_online_videos.start', date('Y-m-d H:i:s'), 'datetime');
+            $ret = $controller->refresh_online_videos();
+            Configs::set('schedule:08.refresh_online_videos.end', date('Y-m-d H:i:s'), 'datetime', $ret);
+
+            echo "Tarefa: refresh_files_duration" . PHP_EOL;
+            if ($ret) {
+                echo "Executado!" . PHP_EOL;
+                $telegramService = new TelegramService();
+                $telegramService->sendMessage("⏰ Rotina executada: Atualização de duração de arquivos no Banco de Dados!");
+                $telegramService->sendMessage("<pre>" . json_encode($ret, JSON_PRETTY_PRINT) . "</pre>");
+            }
+        })->hourly();
+
+        $schedule->call(function () {
+            $controller = new TaskController();
+            Configs::set('schedule:09.export_database.start', date('Y-m-d H:i:s'), 'datetime');
             $ret = $controller->export_database();
-            Configs::set('schedule:08.export_database.end', date('Y-m-d H:i:s'), 'datetime', $ret);
+            Configs::set('schedule:10.export_database.end', date('Y-m-d H:i:s'), 'datetime', $ret);
 
             echo "Tarefa: export_database" . PHP_EOL;
             if ($ret) {
@@ -89,9 +104,9 @@ class Kernel extends ConsoleKernel
 
         $schedule->call(function () {
             $controller = new TaskController();
-            Configs::set('schedule:09.export_database_json.start', date('Y-m-d H:i:s'), 'datetime');
+            Configs::set('schedule:11.export_database_json.start', date('Y-m-d H:i:s'), 'datetime');
             $ret = $controller->export_database_json();
-            Configs::set('schedule:10.export_database_json.end', date('Y-m-d H:i:s'), 'datetime', $ret);
+            Configs::set('schedule:12.export_database_json.end', date('Y-m-d H:i:s'), 'datetime', $ret);
 
             echo "Tarefa: export_database_json" . PHP_EOL;
             if ($ret) {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Configs;
 use App\Helpers\Files;
+use App\Helpers\OnlineVideos;
 use App\Helpers\DataBase;
 use Illuminate\Http\Request;
 
@@ -40,6 +41,12 @@ class TaskController extends Controller
         }
         $ret = Files::refresh_duration();
         Configs::set("version_files_duration", $version);
+        return $ret;
+    }
+
+    public function refresh_online_videos()
+    {
+        $ret = OnlineVideos::refresh();
         return $ret;
     }
 
