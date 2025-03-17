@@ -100,7 +100,7 @@ class Kernel extends ConsoleKernel
                 $telegramService->sendMessage("⏰ Rotina executada: Exportação de Banco de Dados!");
                 $telegramService->sendMessage("<pre>" . json_encode($ret, JSON_PRETTY_PRINT) . "</pre>");
             }
-        })->daily();
+        })->hourly();
 
         $schedule->call(function () {
             $controller = new TaskController();
