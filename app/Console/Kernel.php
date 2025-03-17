@@ -82,7 +82,7 @@ class Kernel extends ConsoleKernel
             if ($ret) {
                 echo "Executado!" . PHP_EOL;
                 $telegramService = new TelegramService();
-                $telegramService->sendMessage("⏰ Rotina executada: Atualização de duração de arquivos no Banco de Dados!");
+                $telegramService->sendMessage("⏰ Rotina executada: Atualização de vídeos online!");
                 $telegramService->sendMessage("<pre>" . json_encode($ret, JSON_PRETTY_PRINT) . "</pre>");
             }
         })->hourly();

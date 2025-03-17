@@ -10,11 +10,18 @@ class OnlineVideos
 
     public static function refresh()
     {
+        $channels = self::refresh_channels();
+
+        return [
+            "channels" => $channels
+        ];
+    }
+    public static function refresh_channels()
+    {
         $logs = [];
 
         $youtube = new YoutubeService();
 
-        $logs["channels"] = [];
         $channels = OnlineVideoChannel::where('status', 'pending')->get();
         foreach ($channels as $channel) {
             $data = $youtube->channel($channel->channel_id);
@@ -38,10 +45,10 @@ class OnlineVideos
                     $channel->status = "error";
                 }
             }
-            $logs["channels"][] = ["channel_id" => $channel->channel_id, "status" => $channel->status];
+            $logs[] = ["channel_id" => $channel->channel_id, "status" => $channel->status];
 
             $channel->save();
         }
-        return ["logs" => $logs];
+        return $logs;
     }
 }
