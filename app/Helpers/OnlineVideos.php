@@ -26,10 +26,6 @@ class OnlineVideos
                 $channel->medium_image = $data["snippet"]["thumbnails"]["medium"]["url"];
                 $channel->high_image = $data["snippet"]["thumbnails"]["high"]["url"];
                 $image_data = file_get_contents($data["snippet"]["thumbnails"]["default"]["url"]);
-                dd(
-                    $data["snippet"]["thumbnails"]["default"]["url"],
-                    $image_data
-                );
                 $channel->default_image_base64 = 'data:image/png;base64,' . base64_encode($image_data);
             }
             $channel->save();
