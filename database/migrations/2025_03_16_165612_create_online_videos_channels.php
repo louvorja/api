@@ -23,6 +23,8 @@ class CreateOnlineVideosChannels extends Migration
             $table->string('medium_image', 200)->nullable();
             $table->string('high_image', 200)->nullable();
             $table->text('default_image_base64')->nullable();
+            $table->string('error')->nullable();
+            $table->enum('status', ['pending', 'validated', 'error'])->default('pending');
             $table->string('id_language', 5);
             $table->timestamps();
 

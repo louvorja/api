@@ -17,6 +17,8 @@ class OnlineVideoChannel extends Model
         'medium_image',
         'high_image',
         'default_image_base64',
+        'error',
+        'status',
         'id_language',
     ];
 }
