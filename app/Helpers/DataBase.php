@@ -358,8 +358,13 @@ class DataBase
         $mysqlConnection = DB::connection('mysql');
         $tables = $mysqlConnection->getDoctrineSchemaManager()->listTableNames();
 
+        $exclude = ["migrations", "configs", "users", "download_logs", "ftp_logs"]; // Não copiar essas tabelas
         $log = [];
         foreach ($tables as $table) {
+            if (in_array($table, $exclude)) {
+                continue;
+            }
+
             try {
                 $log[$table]["table_name"] = $table;
 

@@ -7,3 +7,4 @@ Homestead.yaml
 /public/db
 /public/import
 /db
+.db
