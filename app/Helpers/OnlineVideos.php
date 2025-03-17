@@ -28,10 +28,9 @@ class OnlineVideos
                 $image_data = file_get_contents($data["snippet"]["thumbnails"]["default"]["url"]);
                 dd(
                     $data["snippet"]["thumbnails"]["default"]["url"],
-                    mime_content_type($data["snippet"]["thumbnails"]["default"]["url"]),
                     $image_data
                 );
-                $channel->default_image_base64 = 'data:image/' . explode('/', mime_content_type($data["snippet"]["thumbnails"]["default"]["url"]))[1] . ';base64,' . base64_encode($image_data);
+                $channel->default_image_base64 = 'data:image/png;base64,' . base64_encode($image_data);
             }
             $channel->save();
             //            $channel->description = $youtube->channel($channel->channel_id)['snippet']['description'];
