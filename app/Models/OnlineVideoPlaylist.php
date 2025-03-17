@@ -11,7 +11,7 @@ class OnlineVideoPlaylist extends Model
     protected $fillable = [
         'id_online_video_channel',
         'playlist_id',
-        'name',
+        'title',
         'description',
         'default_image',
         'medium_image',
@@ -24,9 +24,9 @@ class OnlineVideoPlaylist extends Model
         'id_language',
     ];
 
-    public function setNameAttribute($value)
+    public function setTitleAttribute($value)
     {
         $maxLength = 100;
-        $this->attributes['name'] = substr($value, 0, $maxLength);
+        $this->attributes['title'] = substr($value, 0, $maxLength);
     }
 }

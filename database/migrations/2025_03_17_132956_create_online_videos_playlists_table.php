@@ -17,7 +17,7 @@ class CreateOnlineVideosPlaylistsTable extends Migration
             $table->increments('id_online_video_playlist');
             $table->unsignedInteger('id_online_video_channel');
             $table->string('playlist_id', 50)->unique();
-            $table->string('name', 100)->nullable();
+            $table->string('title', 100)->nullable();
             $table->text('description')->nullable();
             $table->string('default_image', 200)->nullable();
             $table->string('medium_image', 200)->nullable();
