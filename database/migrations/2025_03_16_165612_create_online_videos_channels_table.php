@@ -16,7 +16,7 @@ class CreateOnlineVideosChannelsTable extends Migration
         Schema::create('online_videos_channels', function (Blueprint $table) {
             $table->increments('id_online_video_channel');
             $table->string('channel_id', 50)->unique();
-            $table->string('name', 50)->nullable();
+            $table->string('name', 100)->nullable();
             $table->text('description')->nullable();
             $table->string('custom_url', 50)->nullable();
             $table->string('default_image', 200)->nullable();

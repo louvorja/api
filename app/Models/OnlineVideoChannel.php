@@ -26,4 +26,10 @@ class OnlineVideoChannel extends Model
     protected $casts = [
         'playlists' => 'array',
     ];
+
+    public function setNameAttribute($value)
+    {
+        $maxLength = 100;
+        $this->attributes['name'] = substr($value, 0, $maxLength);
+    }
 }

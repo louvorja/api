@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class OnlineVideosPlaylistsTable extends Migration
+class CreateOnlineVideosPlaylistsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -17,7 +17,7 @@ class OnlineVideosPlaylistsTable extends Migration
             $table->increments('id_online_video_playlist');
             $table->unsignedInteger('id_online_video_channel');
             $table->string('playlist_id', 50)->unique();
-            $table->string('name', 50)->nullable();
+            $table->string('name', 100)->nullable();
             $table->text('description')->nullable();
             $table->string('default_image', 200)->nullable();
             $table->string('medium_image', 200)->nullable();
