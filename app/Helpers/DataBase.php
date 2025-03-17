@@ -331,7 +331,7 @@ class DataBase
     {
 
         $database = env('DB_SQLITE_DATABASE');
-        $url_database = url(DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $database;
+        $url_database = app()->basePath('public/db/' . $database);
 
         if (File::exists($database)) {
             unlink($database);
