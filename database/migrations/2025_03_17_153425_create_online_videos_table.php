@@ -16,7 +16,7 @@ class CreateOnlineVideosTable extends Migration
         Schema::create('online_videos', function (Blueprint $table) {
             $table->increments('id_online_video');
             $table->unsignedInteger('id_online_video_playlist');
-            $table->string('video_id', 50)->unique();
+            $table->string('video_id', 50);
             $table->string('title', 100)->nullable();
             $table->text('description')->nullable();
             $table->integer('sequence')->nullable();
@@ -30,6 +30,8 @@ class CreateOnlineVideosTable extends Migration
             $table->enum('status', ['pending', 'validated', 'error'])->default('pending');
             $table->string('id_language', 5);
             $table->timestamps();
+
+            $table->unique(['id_online_video_playlist', 'video_id']);
 
             $table->foreign('id_online_video_playlist')->references('id_online_video_playlist')->on('online_videos_playlists')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_language')->references('id_language')->on('languages');

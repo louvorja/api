@@ -132,11 +132,11 @@ class OnlineVideos
 
         $playlists = OnlineVideoPlaylist::get();
         foreach ($playlists as $playlist) {
-            $data = $youtube->playlistItems($playlist->playlist_id);
+            $list = $youtube->playlistItems($playlist->playlist_id);
             if (!isset($data["error"])) {
                 $ids = array_map(function ($item) {
                     return $item['snippet']['resourceId']['videoId'];
-                }, $data);
+                }, $list);
 
                 OnlineVideo::where('id_online_video_playlist', $playlist->id_online_video_playlist)
                     ->whereNotIn('video_id', $ids)->delete();
@@ -148,15 +148,17 @@ class OnlineVideos
                     ->toArray();
 
                 $videos = array_diff($ids, $ids_exists);
-                /*     foreach ($videos as $video) {
-                    $video_data = array_filter($data, function ($item) use ($video) {
+                foreach ($videos as $video) {
+                    $data = array_filter($list, function ($item) use ($video) {
                         return $item['snippet']['resourceId']['videoId'] == $video;
                     });
-                    $video_data = array_shift($video_data);
+                    $data = array_shift($data);
 
                     $video = new OnlineVideo();
 
                     $video->error = null;
+                    $video->id_online_video_playlist = $playlist->id_online_video_playlist;
+                    $video->id_language = $playlist->id_language;
                     $video->video_id = $data["snippet"]["resourceId"]["videoId"];
                     $video->title = $data["snippet"]["title"];
                     $video->description = $data["snippet"]["description"];
@@ -175,12 +177,11 @@ class OnlineVideos
                         $video->error = $e->getMessage();
                         $video->status = "error";
                     }
-                    dd($video_data);
-                    $logs[] = ["video_id" => $video->video_id, "name" => $video->name, "status" => $video->status];
-                }*/
-            }
 
-            $playlist->save();
+                    $logs[] = ["video_id" => $video->video_id, "title" => $video->title, "status" => $video->status];
+                    $video->save();
+                }
+            }
         }
         return $logs;
     }
