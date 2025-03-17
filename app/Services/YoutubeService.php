@@ -35,8 +35,35 @@ class YoutubeService
                 return ['error' => 'Canal não encontrado'];
             }
 
-            $channelInfo = $data['items'][0];
-            return $channelInfo;
+            $info = $data['items'][0];
+            return $info;
+        } catch (\Exception $e) {
+            return ['error' => 'Erro ao buscar dados do canal: ' . $e->getMessage()];
+        }
+    }
+
+    public function playlist($id)
+    {
+        $client = new Client();
+
+        try {
+            $response = $client->get("https://www.googleapis.com/youtube/v3/playlists", [
+                'query' => [
+                    'part' => 'snippet',
+                    'id' => $id,
+                    'key' => $this->key,
+                ],
+                'verify' => !$this->isLocalhost
+            ]);
+
+            $data = json_decode($response->getBody(), true);
+
+            if (empty($data['items'])) {
+                return ['error' => 'Canal não encontrado'];
+            }
+
+            $info = $data['items'][0];
+            return $info;
         } catch (\Exception $e) {
             return ['error' => 'Erro ao buscar dados do canal: ' . $e->getMessage()];
         }

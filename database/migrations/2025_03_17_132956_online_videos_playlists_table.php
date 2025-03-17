@@ -16,6 +16,7 @@ class OnlineVideosPlaylistsTable extends Migration
         Schema::create('online_videos_playlists', function (Blueprint $table) {
             $table->increments('id_online_video_playlist');
             $table->unsignedInteger('id_online_video_channel');
+            $table->string('playlist_id', 50)->unique();
             $table->string('name', 50)->nullable();
             $table->text('description')->nullable();
             $table->string('default_image', 200)->nullable();
@@ -29,7 +30,7 @@ class OnlineVideosPlaylistsTable extends Migration
             $table->string('id_language', 5);
             $table->timestamps();
 
-            $table->foreign('id_online_video_channel')->references('id_online_video_channel')->on('online_videos_channels');
+            $table->foreign('id_online_video_channel')->references('id_online_video_channel')->on('online_videos_channels')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_language')->references('id_language')->on('languages');
         });
     }
