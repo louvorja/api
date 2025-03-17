@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
+use GuzzleHttp\Client;
 
 class YoutubeService
 {
@@ -15,7 +15,28 @@ class YoutubeService
 
     public function channel($id)
     {
-        $url = "https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=$id&key={$this->key}";
-        return Http::get($url);
+        $client = new Client();
+
+        try {
+            $response = $client->get("https://www.googleapis.com/youtube/v3/channels", [
+                'query' => [
+                    'part' => 'snippet,statistics',
+                    'id' => $id,
+                    'key' => $this->key,
+                ],
+            ]);
+
+            $data = json_decode($response->getBody(), true);
+
+            if (empty($data['items'])) {
+                return response()->json(['error' => 'Canal não encontrado'], 404);
+            }
+
+            $channelInfo = $data['items'][0];
+            return response()->json($channelInfo);
+        } catch (\Exception $e) {
+            // Trata erros de requisição
+            return response()->json(['error' => 'Erro ao buscar dados do canal: ' . $e->getMessage()], 500);
+        }
     }
 }
