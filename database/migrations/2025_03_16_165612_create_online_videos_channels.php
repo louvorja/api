@@ -25,6 +25,7 @@ class CreateOnlineVideosChannels extends Migration
             $table->text('default_image_base64')->nullable();
             $table->string('error')->nullable();
             $table->enum('status', ['pending', 'validated', 'error'])->default('pending');
+            $table->json('playlists');
             $table->string('id_language', 5);
             $table->timestamps();
 

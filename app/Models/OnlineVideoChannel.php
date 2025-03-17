@@ -19,6 +19,7 @@ class OnlineVideoChannel extends Model
         'default_image_base64',
         'error',
         'status',
+        'playlists',
         'id_language',
     ];
 }
