@@ -65,10 +65,16 @@ class OnlineVideos
 
     public static function refresh_playlists()
     {
+        $logs = [];
+
         $channels = OnlineVideoChannel::select('id_online_video_channel', 'playlists', 'id_language')->get();
         foreach ($channels as $channel) {
-            OnlineVideoPlaylist::where('id_online_video_channel', $channel->id_online_video_channel)
+            $delete = OnlineVideoPlaylist::where('id_online_video_channel', $channel->id_online_video_channel)
                 ->whereNotIn('playlist_id', $channel->playlists)->delete();
+
+            if ($delete > 0) {
+                $logs[] = ["id_online_video_channel" => $channel->id_online_video_channel, "removed" => $delete];
+            }
 
             $playlists_exists = OnlineVideoPlaylist::select('playlist_id')
                 ->where('id_online_video_channel', $channel->id_online_video_channel)
@@ -88,8 +94,6 @@ class OnlineVideos
         }
 
         /* ------------------------------------------------------------------------------ */
-
-        $logs = [];
 
         $youtube = new YoutubeService();
 
@@ -128,7 +132,6 @@ class OnlineVideos
 
     public static function refresh_videos()
     {
-
         $logs = [];
 
         $youtube = new YoutubeService();
@@ -148,11 +151,13 @@ class OnlineVideos
                     return $item !== null;
                 });
 
-                //dd($ids, $list);
 
-
-                OnlineVideo::where('id_online_video_playlist', $playlist->id_online_video_playlist)
+                $delete = OnlineVideo::where('id_online_video_playlist', $playlist->id_online_video_playlist)
                     ->whereNotIn('video_id', $ids)->delete();
+
+                if ($delete > 0) {
+                    $logs[] = ["playlist_id" => $playlist->playlist_id, "removed" => $delete];
+                }
 
                 $ids_exists = OnlineVideo::select('video_id')
                     ->where('id_online_video_playlist', $playlist->id_online_video_playlist)
