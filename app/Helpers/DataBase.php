@@ -696,46 +696,7 @@ class DataBase
             WHERE 1=1
                 AND ((PERMITE_DESATIVAR = 'N') OR (PERMITE_DESATIVAR = 'S' AND ID NOT IN (SELECT ID FROM _ALBUM_IGNORAR)))
                 AND TRIM(IMAGEM) <> ''
-            
-            UNION
-            
-            SELECT 'IMAGEM_ONL_CANAL' AS TIPO,
-                CANAL_ID || '.jpg' AS ARQUIVO,
-                'config'||'\'||'imagens_onl'||'\'||'canais'||'\' || CANAL_ID || '.jpg' AS URL,
-                0 AS TAMANHO,
-                '' AS TABELA,
-                '' AS CAMPO_ARQ,
-                '' AS CAMPO_ARQ_TAM,
-                '' AS CHAVE
-            FROM ONL_CANAIS
-            WHERE TRIM(CANAL_ID) <> ''
-            
-            UNION
-            
-            SELECT 'IMAGEM_ONL_PLAYLIST' AS TIPO,
-                PLAYLIST_ID || '.jpg' AS ARQUIVO,
-                'config'||'\'||'imagens_onl'||'\'||'playlists'||'\' || PLAYLIST_ID || '.jpg' AS URL,
-                0 AS TAMANHO,
-                '' AS TABELA,
-                '' AS CAMPO_ARQ,
-                '' AS CAMPO_ARQ_TAM,
-                '' AS CHAVE
-            FROM ONL_PLAYLISTS
-            WHERE TRIM(PLAYLIST_ID) <> ''
-            
-            UNION
-            
-            SELECT 'IMAGEM_ONL_VIDEOS' AS TIPO,
-                VIDEO_ID || '.jpg' AS ARQUIVO,
-                'config'||'\'||'imagens_onl'||'\'||'videos'||'\' || VIDEO_ID || '.jpg' AS URL,
-                0 AS TAMANHO,
-                '' AS TABELA,
-                '' AS CAMPO_ARQ,
-                '' AS CAMPO_ARQ_TAM,
-                '' AS CHAVE
-            FROM ONL_VIDEOS
-            WHERE TRIM(VIDEO_ID) <> ''
-            
+                        
             ORDER BY ARQUIVO");
 
         DB::connection('sqlite')->statement("CREATE VIEW LISTA_MUSICAS AS
