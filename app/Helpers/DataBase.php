@@ -333,7 +333,7 @@ class DataBase
     {
 
         $database = env('DB_SQLITE_DATABASE');
-        $url_database = app()->basePath('public/db/' . basename($database));
+        $path_database = app()->basePath('public/db/' . basename($database));
 
         if (File::exists($database)) {
             unlink($database);
@@ -1032,10 +1032,10 @@ class DataBase
         $path_parts = pathinfo($database);
         $newname = $path_parts['dirname'] . '/' . $version . '.' . $path_parts['extension'];
         if (copy($database, $newname)) {
-            $url_database = app()->basePath('public/db/' . $newname);
+            $path_database = app()->basePath('public/db/' . basename($newname));
         }
 
-        return ["url" => $url_database, "logs" => $log];
+        return ["path" => $path_database, "logs" => $log];
     }
 
     public static function import_file($file_path)
