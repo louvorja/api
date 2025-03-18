@@ -53,6 +53,13 @@ class FtpController extends Controller
             $data = $ftp->data;
             $data["lang"] = $id_language;
 
+            // RETROCOMPATIBILIDADE
+            $data["ftp_url"] = $data["host"];
+            $data["ftp_dir"] = $data["root"];
+            $data["ftp_porta"] = $data["port"];
+            $data["ftp_usuario"] = $data["username"];
+            $data["ftp_senha"] = $data["password"];
+
             $text = "";
             foreach ($data as $key => $param) {
                 $text .= "$key=$param\r\n";
