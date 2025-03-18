@@ -526,8 +526,8 @@ class DataBase
                 '' COR_LETRA,
                 lyrics.id_music MUSICA,
                 lyrics.time TEMPO,
-                CASE
-                    WHEN lyrics.instrumental_time = '00:00:00' THEN lyrics.time
+                CASE WHEN lyrics.instrumental_time = '00:00:00'
+                    THEN lyrics.time
                     ELSE lyrics.instrumental_time
                 END AS TEMPO_PB,
                 1 FUNDO_LETRA,
@@ -545,8 +545,7 @@ class DataBase
         DB::connection('sqlite')->statement("CREATE TABLE VERSAO AS
             SELECT
                 1 ID,
-                '" . substr($version, 0, 5) . "." .  substr($version, 5, 5) . "' VERSAO_BD
-        ");
+                '" . substr($version, 0, 5) . "." .  substr($version, 5, 5) . "' VERSAO_BD");
 
         DB::connection('sqlite')->statement("CREATE VIEW HINARIO_ADVENTISTA AS
             SELECT
@@ -554,7 +553,7 @@ class DataBase
                 albums_musics.track FAIXA,
                 musics.name NOME,
                 " . self::fn_sqlite_no_accents("musics.name") . " AS NOME_SEMAC,
-                printf('%03d', albums_musics.track) || ' - ' || musics.name NOME_COM,
+                SUBSTR('00' || albums_musics.track, -3, 3) || ' - ' || musics.name NOME_COM,
                 substr(files_url.dir, 12, 100) ALBUM,
                 files_url.name URL,
                 files_url_instrumental.name URL_INSTRUMENTAL
@@ -574,7 +573,7 @@ class DataBase
                 albums_musics.track FAIXA,
                 musics.name NOME,
                 " . self::fn_sqlite_no_accents("musics.name") . " AS NOME_SEMAC,
-                printf('%03d', albums_musics.track) || ' - ' || musics.name NOME_COM,
+                SUBSTR('00' || albums_musics.track, -3, 3) || ' - ' || musics.name NOME_COM,
                 substr(files_url.dir, 12, 100) ALBUM,
                 files_url.name URL,
                 files_url_instrumental.name URL_INSTRUMENTAL
@@ -738,10 +737,10 @@ class DataBase
                 
                 AM.FAIXA,
                 M.NOME ||
-                (CASE WHEN EXISTS (SELECT 1 FROM ALBUM_TIPO WHERE ALBUM_TIPO.ID_ALBUM = A.ID AND ALBUM_TIPO.TIPO = 'HASD') THEN ' (Hino nº ' || printf('%03d', AM.FAIXA) || ') ' ELSE '' END) AS NOME,
+                (CASE WHEN EXISTS (SELECT 1 FROM ALBUM_TIPO WHERE ALBUM_TIPO.ID_ALBUM = A.ID AND ALBUM_TIPO.TIPO = 'HASD') THEN ' (Hino nº ' || SUBSTR('00' || AM.FAIXA, -3, 3) || ') ' ELSE '' END) AS NOME,
                 
                 (CASE WHEN EXISTS (SELECT 1 FROM ALBUM_TIPO WHERE ALBUM_TIPO.ID_ALBUM = A.ID AND ALBUM_TIPO.TIPO = 'HASD')
-                    THEN printf('%03d', AM.FAIXA) || ' - '
+                    THEN SUBSTR('00' || AM.FAIXA, -3, 3) || ' - '
                     ELSE ''
                 END) || M.NOME || ' (' ||
                 COALESCE(
@@ -765,7 +764,7 @@ class DataBase
                 M.IDIOMA,
                 M.LETRA,
 
-                " . self::fn_sqlite_no_accents("M.NOME ||(CASE WHEN EXISTS (SELECT 1 FROM ALBUM_TIPO WHERE ALBUM_TIPO.ID_ALBUM = A.ID AND ALBUM_TIPO.TIPO = 'HASD') THEN ' (Hino nº ' || printf('%03d', AM.FAIXA) || ') ' ELSE '' END)") . " AS NOME_SEMAC,
+                " . self::fn_sqlite_no_accents("M.NOME ||(CASE WHEN EXISTS (SELECT 1 FROM ALBUM_TIPO WHERE ALBUM_TIPO.ID_ALBUM = A.ID AND ALBUM_TIPO.TIPO = 'HASD') THEN ' (Hino nº ' || SUBSTR('00' || AM.FAIXA, -3, 3) || ') ' ELSE '' END)") . " AS NOME_SEMAC,
                 " . self::fn_sqlite_no_accents("M.LETRA") . " AS LETRA_SEMAC,
                 " . self::fn_sqlite_no_accents("
                 A.NOME ||
