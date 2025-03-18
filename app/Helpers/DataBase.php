@@ -5,6 +5,7 @@ namespace App\Helpers;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
+use App\Helpers\Tables;
 use App\Helpers\Configs;
 use App\Helpers\Files;
 use App\Models\File as FileModel;
@@ -16,6 +17,7 @@ use App\Models\Language;
 use App\Models\BibleVersion;
 use App\Models\BibleBook;
 use App\Models\BibleVerse;
+
 
 class DataBase
 {
@@ -337,7 +339,6 @@ class DataBase
             unlink($database);
         }
 
-
         $dir_database = dirname($database);
         if ($dir_database <> "") {
             if (!file_exists($dir_database)) {
@@ -345,6 +346,8 @@ class DataBase
             }
         }
 
+        $tables = Tables::public();
+        $system_tables = Tables::system();
         touch($database);
 
         Artisan::call('migrate', [
@@ -352,32 +355,32 @@ class DataBase
             '--path' => 'database/migrations',
         ]);
 
+        DB::connection('sqlite')->statement("ATTACH DATABASE '{$database}' AS sqlite_db");
+        foreach ($system_tables as $table) {
+            DB::connection('sqlite')->statement("DROP TABLE IF EXISTS {$table}");
+        }
 
-        DB::connection('sqlite')->getPdo()->exec("ATTACH DATABASE '{$database}' AS sqlite_db");
 
-        $mysqlConnection = DB::connection('mysql');
-        $tables = $mysqlConnection->getDoctrineSchemaManager()->listTableNames();
-
-        $exclude = ["migrations", "configs", "users", "download_logs", "ftp_logs", "ftp", "migrations", "logs"]; // Não copiar essas tabelas
         $log = [];
         foreach ($tables as $table) {
-            if (in_array($table, $exclude)) {
-                DB::connection('sqlite')->statement('DROP TABLE IF EXISTS ' . $table);
-                continue;
-            }
-
             try {
                 $log[$table]["table_name"] = $table;
 
                 DB::connection('sqlite')->table($table)->truncate();
-                $data = json_decode(json_encode(DB::connection('mysql')->table($table)->get()->toArray()), true);
-                $log[$table]["count"] = count($data);
 
-                $chunks = array_chunk($data, 50);
-                $log[$table]["parts"] = count($chunks);
-                foreach ($chunks as $chunk) {
-                    DB::connection('sqlite')->table($table)->insert($chunk);
-                    $log[$table]["status"] = "success";
+                $data = DB::connection('mysql')->table($table)->get();
+                $log[$table]["count"] = $data->count();
+
+                DB::connection('sqlite')->beginTransaction();
+                try {
+                    foreach ($data as $row) {
+                        DB::connection('sqlite')->table($table)->insert((array) $row);
+                    }
+                    DB::connection('sqlite')->commit();
+                } catch (\Exception $e) {
+                    DB::connection('sqlite')->rollBack();
+                    $log[$table]["error"] = $e->getMessage();
+                    $log[$table]["status"] = "error";
                 }
             } catch (\Exception $e) {
                 $log[$table]["error"] = $e->getMessage();
@@ -385,18 +388,8 @@ class DataBase
             }
         }
 
-        /*
-        DB::connection('sqlite')->statement("CREATE VIEW hymnal AS"
-            . " SELECT albums_musics.track,musics.* FROM musics"
-            . " INNER JOIN albums_musics ON albums_musics.id_music = musics.id_music"
-            . " INNER JOIN categories_albums ON categories_albums.id_album = albums_musics.id_album"
-            . " INNER JOIN categories ON categories.id_category = categories_albums.id_category"
-            . " WHERE categories.slug = 'hymnal'"
-            . " ORDER BY albums_musics.track");
-        */
 
-        /* CRIAÇÃO DE VIEWS PARA RETROCOMPATIBILIDADE (COM A VERSÂO DELPHI) */
-
+        /* CRIAÇÃO DE VIEWS E TABELAS PARA RETROCOMPATIBILIDADE (COM A VERSÂO DELPHI) */
 
         DB::connection('sqlite')->statement("CREATE VIEW ALBUM AS
             SELECT
@@ -536,12 +529,13 @@ class DataBase
             LEFT JOIN files ON files.id_file = lyrics.id_file_image
             WHERE lyrics.id_language = 'pt'");
 
+
+        $version = Configs::get("version");
         DB::connection('sqlite')->statement("CREATE TABLE VERSAO AS
             SELECT
                 1 ID,
-                substr(value, 1, 5) || '.' || substr(value, 6) VERSAO_BD
-            FROM configs
-            WHERE `key` = 'version'");
+                '" . substr($version, 0, 5) . "." .  substr($version, 5, 5) . "' VERSAO_BD
+        ");
 
         DB::connection('sqlite')->statement("CREATE VIEW HINARIO_ADVENTISTA AS
             SELECT

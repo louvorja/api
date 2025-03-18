@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Models\Config;
+use App\Helpers\Tables;
 use Illuminate\Support\Facades\DB;
 
 class Configs
@@ -59,16 +60,11 @@ class Configs
             //Cria uma transação, pois em caso de erros, deve ser feito o rollback
             DB::beginTransaction();
 
-            $tables = DB::connection()->getDoctrineSchemaManager()->listTableNames();
+            $tables = Tables::public();
 
-            $exclude = ["migrations", "configs", "users", "download_logs", "ftp_logs", "ftp", "migrations", "logs"]; // Não checar essas tabelas
             //Obter a data e hora da alteração mais recente
             $latestUpdatedAt = null;
             foreach ($tables as $table) {
-                if (in_array($table, $exclude)) {
-                    continue;
-                }
-
                 try {
                     $maxUpdatedAtInTable = DB::table($table)
                         ->orderBy('updated_at', 'desc')
