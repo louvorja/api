@@ -363,7 +363,7 @@ class DataBase
         DB::connection('sqlite')->statement('PRAGMA foreign_keys = OFF;');
 
         $log = [];
-        $chunkSize = 500;
+        $chunkSize = 250;
         foreach ($tables as $table) {
             try {
                 $log[$table]["table_name"] = $table;
@@ -389,11 +389,11 @@ class DataBase
                 } catch (\Exception $e) {
                     DB::connection('sqlite')->rollBack();
                     $log[$table]["error"] = $e->getMessage();
-                    $log[$table]["status"] = "error1";
+                    $log[$table]["status"] = "error";
                 }
             } catch (\Exception $e) {
                 $log[$table]["error"] = $e->getMessage();
-                $log[$table]["status"] = "error2";
+                $log[$table]["status"] = "error";
             }
         }
         dd($log);
