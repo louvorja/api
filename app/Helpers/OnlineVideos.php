@@ -162,6 +162,7 @@ class OnlineVideos
                     $video->video_id = $data["snippet"]["resourceId"]["videoId"];
                     $video->title = $data["snippet"]["title"];
                     $video->description = $data["snippet"]["description"];
+                    $video->sequence = $data["snippet"]["position"];
                     $video->default_image = $data["snippet"]["thumbnails"]["default"]["url"] ?? '';
                     $video->medium_image = $data["snippet"]["thumbnails"]["medium"]["url"] ?? '';
                     $video->high_image = $data["snippet"]["thumbnails"]["high"]["url"] ?? '';

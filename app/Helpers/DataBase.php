@@ -590,9 +590,25 @@ class DataBase
         DB::connection('sqlite')->statement("CREATE TABLE _ALBUM_IGNORAR (ID INT)");
         DB::connection('sqlite')->statement("CREATE TABLE _COLETANEAS_PERSONALIZADAS (ID STRING, NOME STRING, URL STRING)");
 
-        DB::connection('sqlite')->statement("CREATE TABLE ONL_CANAIS (CANAL_ID STRING, NOME STRING, CUSTOM_URL STRING, IMAGEM STRING)");
-        DB::connection('sqlite')->statement("CREATE TABLE ONL_PLAYLISTS (PLAYLIST_ID STRING, CANAL_ID STRING, NOME STRING, IMAGEM STRING)");
-        DB::connection('sqlite')->statement("CREATE TABLE ONL_VIDEOS (VIDEO_ID STRING, PLAYLIST_ID STRING, NOME STRING, POSICAO INT, IMAGEM STRING)");
+        DB::connection('sqlite')->statement("CREATE TABLE ONL_CANAIS AS
+            SELECT
+                channel_id CANAL_ID,title NOME,custom_url CUSTOM_URL,default_image IMAGEM,default_image_base64 IMAGEM_64
+            FROM online_videos_channels
+            WHERE id_language='pt'");
+        DB::connection('sqlite')->statement("CREATE TABLE ONL_PLAYLISTS AS
+            SELECT
+                playlist_id PLAYLIST_ID,
+                (SELECT channel_id FROM online_videos_channels WHERE online_videos_channels.id_online_video_channel=online_videos_playlists.id_online_video_channel) CANAL_ID,
+                title NOME,default_image IMAGEM,default_image_base64 IMAGEM_64
+            FROM online_videos_playlists
+            WHERE id_language='pt'");
+        DB::connection('sqlite')->statement("CREATE TABLE ONL_VIDEOS AS
+            SELECT
+                video_id VIDEO_ID,
+                (SELECT playlist_id FROM online_videos_playlists WHERE online_videos_playlists.id_online_video_playlist=online_videos.id_online_video_playlist) PLAYLIST_ID,
+                title NOME,sequence POSICAO,default_image IMAGEM,default_image_base64 IMAGEM_64
+            FROM online_videos
+            WHERE id_language='pt'");
 
         DB::connection('sqlite')->statement("CREATE TABLE ARQUIVOS_SISTEMA AS
             SELECT 'ARQUIVOS_ADICIONAIS' AS TIPO,
