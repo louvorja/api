@@ -47,6 +47,9 @@ class TaskController extends Controller
     public function refresh_online_videos()
     {
         $ret = OnlineVideos::refresh();
+        if ($ret["status"] == "") {
+            $ret = [];
+        }
         return $ret;
     }
 

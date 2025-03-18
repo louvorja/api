@@ -16,7 +16,10 @@ class OnlineVideos
         $playlists = self::refresh_playlists();
         $videos = self::refresh_videos();
 
+        $status = ($channels || $playlists || $videos ? "ok" : "");
+
         return [
+            "status" => $status,
             "channels" => $channels,
             "playlists" => $playlists,
             "videos" => $videos,
