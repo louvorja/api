@@ -701,7 +701,7 @@ class DataBase
             
             SELECT 'IMAGEM_ONL_CANAL' AS TIPO,
                 CANAL_ID || '.jpg' AS ARQUIVO,
-                'config\imagens_onl\canais\' || CANAL_ID || '.jpg' AS URL,
+                'config'||'\'||'imagens_onl'||'\'||'canais'||'\' || CANAL_ID || '.jpg' AS URL,
                 0 AS TAMANHO,
                 '' AS TABELA,
                 '' AS CAMPO_ARQ,
@@ -714,7 +714,7 @@ class DataBase
             
             SELECT 'IMAGEM_ONL_PLAYLIST' AS TIPO,
                 PLAYLIST_ID || '.jpg' AS ARQUIVO,
-                'config\imagens_onl\playlists\' || PLAYLIST_ID || '.jpg' AS URL,
+                'config'||'\'||'imagens_onl'||'\'||'playlists'||'\' || PLAYLIST_ID || '.jpg' AS URL,
                 0 AS TAMANHO,
                 '' AS TABELA,
                 '' AS CAMPO_ARQ,
@@ -727,7 +727,7 @@ class DataBase
             
             SELECT 'IMAGEM_ONL_VIDEOS' AS TIPO,
                 VIDEO_ID || '.jpg' AS ARQUIVO,
-                'config\imagens_onl\videos\' || VIDEO_ID || '.jpg' AS URL,
+                'config'||'\'||'imagens_onl'||'\'||'videos'||'\' || VIDEO_ID || '.jpg' AS URL,
                 0 AS TAMANHO,
                 '' AS TABELA,
                 '' AS CAMPO_ARQ,
