@@ -396,7 +396,7 @@ class DataBase
                 $log[$table]["status"] = "error";
             }
         }
-        //dd($log);
+
         /* CRIAÇÃO DE VIEWS E TABELAS PARA RETROCOMPATIBILIDADE (COM A VERSÂO DELPHI) */
 
         DB::connection('sqlite')->statement("CREATE VIEW ALBUM AS
@@ -414,7 +414,7 @@ class DataBase
             LEFT JOIN categories ON categories.id_category = categories_albums.id_category
             WHERE albums.id_language = 'pt'");
 
-        DB::connection('sqlite')->statement("CREATE VIEW ALBUM_MUSICAS AS
+        DB::connection('sqlite')->statement("CREATE TABLE ALBUM_MUSICAS AS
             SELECT
                 albums_musics.id_album ID_ALBUM,
                 albums_musics.id_music ID_MUSICA,
@@ -440,7 +440,7 @@ class DataBase
             LEFT JOIN categories ON categories.id_category = categories_albums.id_category
             WHERE categories_albums.id_language = 'pt'");
 
-        DB::connection('sqlite')->statement("CREATE VIEW TIPOS_ALBUM AS
+        DB::connection('sqlite')->statement("CREATE TABLE TIPOS_ALBUM AS
             SELECT 'DIV' ID, 'Diversas' TIPO
             UNION
             SELECT 'DOX' ID, 'Doxologia' TIPO
@@ -453,7 +453,7 @@ class DataBase
             UNION
             SELECT 'JA_ANO' ID, 'CDs Oficiais/Ano' TIPO");
 
-        DB::connection('sqlite')->statement("CREATE VIEW ARQUIVOS_ADICIONAIS AS
+        DB::connection('sqlite')->statement("CREATE TABLE ARQUIVOS_ADICIONAIS AS
             SELECT '1' AS ID, '1minuto_escsb.mp3' AS ARQUIVO, 'config\\1minuto_escsb.mp3' AS URL
             UNION ALL
             SELECT '2' AS ID, '5minutos_escsb.mp3' AS ARQUIVO, 'config\\5minutos_escsb.mp3' AS URL
@@ -490,7 +490,7 @@ class DataBase
             UNION ALL
             SELECT '19' AS ID, 'scripts.js' AS ARQUIVO, 'config\\server\\lib\\scripts.js' AS URL");
 
-        DB::connection('sqlite')->statement("CREATE VIEW IMAGEM_POSICAO AS
+        DB::connection('sqlite')->statement("CREATE TABLE IMAGEM_POSICAO AS
             SELECT `name` IMAGEM,image_position POSICAO FROM files WHERE image_position IS NOT NULL");
 
         DB::connection('sqlite')->statement("CREATE VIEW MUSICAS AS
@@ -526,7 +526,10 @@ class DataBase
                 '' COR_LETRA,
                 lyrics.id_music MUSICA,
                 lyrics.time TEMPO,
-                IIF(lyrics.instrumental_time = '00:00:00',lyrics.time,lyrics.instrumental_time) TEMPO_PB,
+                CASE
+                    WHEN lyrics.instrumental_time = '00:00:00' THEN lyrics.time
+                    ELSE lyrics.instrumental_time
+                END AS TEMPO_PB,
                 1 FUNDO_LETRA,
                 0 TAMANHO_LETRA,
                 lyrics.aux_lyric LETRA_AUX,
@@ -539,7 +542,7 @@ class DataBase
 
 
         $version = Configs::get("version");
-        DB::connection('sqlite')->statement("CREATE VIEW VERSAO AS
+        DB::connection('sqlite')->statement("CREATE TABLE VERSAO AS
             SELECT
                 1 ID,
                 '" . substr($version, 0, 5) . "." .  substr($version, 5, 5) . "' VERSAO_BD
@@ -588,11 +591,11 @@ class DataBase
         DB::connection('sqlite')->statement("CREATE TABLE _ALBUM_IGNORAR (ID INT)");
         DB::connection('sqlite')->statement("CREATE TABLE _COLETANEAS_PERSONALIZADAS (ID STRING, NOME STRING, URL STRING)");
 
-        DB::connection('sqlite')->statement("CREATE VIEW ONL_CANAIS (CANAL_ID STRING, NOME STRING, CUSTOM_URL STRING, IMAGEM STRING)");
-        DB::connection('sqlite')->statement("CREATE VIEW ONL_PLAYLISTS (PLAYLIST_ID STRING, CANAL_ID STRING, NOME STRING, IMAGEM STRING)");
-        DB::connection('sqlite')->statement("CREATE VIEW ONL_VIDEOS (VIDEO_ID STRING, PLAYLIST_ID STRING, NOME STRING, POSICAO INT, IMAGEM STRING)");
+        DB::connection('sqlite')->statement("CREATE TABLE ONL_CANAIS (CANAL_ID STRING, NOME STRING, CUSTOM_URL STRING, IMAGEM STRING)");
+        DB::connection('sqlite')->statement("CREATE TABLE ONL_PLAYLISTS (PLAYLIST_ID STRING, CANAL_ID STRING, NOME STRING, IMAGEM STRING)");
+        DB::connection('sqlite')->statement("CREATE TABLE ONL_VIDEOS (VIDEO_ID STRING, PLAYLIST_ID STRING, NOME STRING, POSICAO INT, IMAGEM STRING)");
 
-        DB::connection('sqlite')->statement("CREATE VIEW ARQUIVOS_SISTEMA AS
+        DB::connection('sqlite')->statement("CREATE TABLE ARQUIVOS_SISTEMA AS
             SELECT 'ARQUIVOS_ADICIONAIS' AS TIPO,
                 ARQUIVO,
                 URL,
@@ -848,7 +851,7 @@ class DataBase
             SELECT * FROM LISTA_MUSICAS_PERSO
             ORDER BY NOME");
 
-        DB::connection('sqlite')->statement("CREATE VIEW MUSICAS_SLIDE AS
+        DB::connection('sqlite')->statement("CREATE TABLE MUSICAS_SLIDE AS
             SELECT
                 'CAPA' AS TIPO,
                 ID AS MUSICA_ID,
