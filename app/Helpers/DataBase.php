@@ -1016,8 +1016,14 @@ class DataBase
             SELECT
                     abbreviation SIGLA,
                     name VERSAO,
-                    IIF(abbreviation = 'NTLH', 0, 1) AS QUEBRA,
-                    IIF(abbreviation = 'NTLH', '<pb/>', '') AS SIMBOLO_QUEBRA,
+                    CASE WHEN abbreviation = 'NTLH'
+                        THEN 0
+                        ELSE 1
+                    END AS QUEBRA,
+                    CASE WHEN abbreviation = 'NTLH'
+                        THEN '<pb/>'
+                        ELSE ''
+                    END AS SIMBOLO_QUEBRA,
                     '' EXPLICACAO_VERSOS
             FROM bible_version WHERE id_language='pt'");
 
