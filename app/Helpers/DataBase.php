@@ -363,7 +363,7 @@ class DataBase
         DB::connection('sqlite')->statement('PRAGMA foreign_keys = OFF;');
 
         $log = [];
-        $chunkSize = 1000;
+        $chunkSize = 500;
         foreach ($tables as $table) {
             try {
                 $log[$table]["table_name"] = $table;
