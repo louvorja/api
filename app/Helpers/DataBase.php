@@ -396,7 +396,7 @@ class DataBase
                 $log[$table]["status"] = "error2";
             }
         }
-
+        dd($log);
         /* CRIAÇÃO DE VIEWS E TABELAS PARA RETROCOMPATIBILIDADE (COM A VERSÂO DELPHI) */
 
         DB::connection('sqlite')->statement("CREATE VIEW ALBUM AS
