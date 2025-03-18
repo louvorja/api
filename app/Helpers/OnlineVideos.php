@@ -136,10 +136,20 @@ class OnlineVideos
         $playlists = OnlineVideoPlaylist::get();
         foreach ($playlists as $playlist) {
             $list = $youtube->playlistItems($playlist->playlist_id);
-            if (!isset($data["error"])) {
+            if (!isset($list["error"])) {
                 $ids = array_map(function ($item) {
+                    if (count($item['snippet']['thumbnails']) <= 0) {
+                        return null;
+                    }
                     return $item['snippet']['resourceId']['videoId'];
                 }, $list);
+
+                $ids = array_filter($ids, function ($item) {
+                    return $item !== null;
+                });
+
+                //dd($ids, $list);
+
 
                 OnlineVideo::where('id_online_video_playlist', $playlist->id_online_video_playlist)
                     ->whereNotIn('video_id', $ids)->delete();
@@ -151,6 +161,7 @@ class OnlineVideos
                     ->toArray();
 
                 $videos = array_diff($ids, $ids_exists);
+
                 foreach ($videos as $video) {
                     $data = array_filter($list, function ($item) use ($video) {
                         return $item['snippet']['resourceId']['videoId'] == $video;
@@ -183,6 +194,7 @@ class OnlineVideos
                     }
 
                     $logs[] = ["video_id" => $video->video_id, "title" => $video->title, "status" => $video->status];
+
                     $video->save();
                 }
             }
