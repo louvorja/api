@@ -360,34 +360,42 @@ class DataBase
             DB::connection('sqlite')->statement("DROP TABLE IF EXISTS {$table}");
         }
 
+        DB::connection('sqlite')->statement('PRAGMA foreign_keys = OFF;');
 
         $log = [];
+        $chunkSize = 1000;
         foreach ($tables as $table) {
             try {
                 $log[$table]["table_name"] = $table;
 
-                DB::connection('sqlite')->table($table)->truncate();
+                if ($table == "languages") {
+                    DB::connection('sqlite')->table($table)->truncate();
+                }
 
-                $data = DB::connection('mysql')->table($table)->get();
+                if ($table == "files") {
+                    $data = DB::connection('mysql')->table($table)->get();
+                } else {
+                    $data = DB::connection('mysql')->table($table)->where('id_language', 'pt')->get();
+                }
                 $log[$table]["count"] = $data->count();
-
+                $chunks = array_chunk($data->toArray(), $chunkSize);
                 DB::connection('sqlite')->beginTransaction();
                 try {
-                    foreach ($data as $row) {
-                        DB::connection('sqlite')->table($table)->insert((array) $row);
+                    foreach ($chunks as $chunk) {
+                        $chunk = json_decode(json_encode($chunk), true);
+                        DB::connection('sqlite')->table($table)->insert($chunk);
                     }
                     DB::connection('sqlite')->commit();
                 } catch (\Exception $e) {
                     DB::connection('sqlite')->rollBack();
                     $log[$table]["error"] = $e->getMessage();
-                    $log[$table]["status"] = "error";
+                    $log[$table]["status"] = "error1";
                 }
             } catch (\Exception $e) {
                 $log[$table]["error"] = $e->getMessage();
-                $log[$table]["status"] = "error";
+                $log[$table]["status"] = "error2";
             }
         }
-
 
         /* CRIAÇÃO DE VIEWS E TABELAS PARA RETROCOMPATIBILIDADE (COM A VERSÂO DELPHI) */
 
