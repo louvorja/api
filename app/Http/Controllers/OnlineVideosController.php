@@ -12,6 +12,9 @@ class OnlineVideosController extends Controller
     public function index(Request $request)
     {
         $id_language = strtolower($request->id_language ?? $request->query('lang') ?? "pt");
+        if ($id_language == "") {
+            $id_language = "pt";
+        }
 
         $type = $request->query('tipo') ?? "tudo";
         $id = $request->query('id') ?? "";
