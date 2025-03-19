@@ -30,4 +30,9 @@ class OnlineVideo extends Model
         $maxLength = 100;
         $this->attributes['title'] = substr($value, 0, $maxLength);
     }
+
+    public function playlist()
+    {
+        return $this->belongsTo(OnlineVideoPlaylist::class, 'id_online_video_playlist', 'id_online_video_playlist');
+    }
 }

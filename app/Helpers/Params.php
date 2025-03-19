@@ -52,7 +52,7 @@ class Params
         $params["help"] = "https://louvorja.com.br/ajuda/";
 
         /* A partir daqui, são todos parâmetros do Delphi */
-        $params["coletaneas_online"] = "https://params.louvorja.com.br/baixa_coletaneas_web.php";
+        $params["coletaneas_online"] = "https://api.louvorja.com.br/onlinevideos";
         $params["embed_youtube"] = "https://www.youtube.com/embed/{videoID}";
         $params["ftp"] = "https://api.louvorja.com.br/ftp"; // REMOVER DEPOIS PARA MANTER A FORMA SEGURA (COM TOKEN)
         $params["helpPT"] = $params["help"] . "?lang=pt";

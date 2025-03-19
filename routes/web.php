@@ -28,6 +28,7 @@ $router->group(['middleware' => 'general'], function () use ($router) {
 
         $router->get('/params', 'ParamsController@index');
         $router->get('/ftp', 'FtpController@index');
+        $router->get('/onlinevideos', 'OnlineVideosController@index');
 
         $router->group(['prefix' => 'auth'], function () use ($router) {
             $router->post('/login', 'AuthController@login');
