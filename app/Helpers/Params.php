@@ -46,7 +46,7 @@ class Params
             }
         }
 
-        $token_ftp = JWT::encode(['exp' => time() + 120], env('JWT_SECRET'), 'HS256');
+        $token_ftp = JWT::encode(['exp' => time() + 30], env('JWT_SECRET'), 'HS256');
         $params["conn_ftp"] = "https://api.louvorja.com.br/ftp?token=" . $token_ftp;
         $params["version_log"] = "https://api.louvorja.com.br/version_log";
         $params["help"] = "https://louvorja.com.br/ajuda/";
