@@ -74,7 +74,7 @@ class OnlineVideosController extends Controller
             $videos = $videos->get();
             foreach ($videos as $video) {
                 $sql[] = sprintf(
-                    "INSERT INTO ONL_VIDEOS (VIDEO_ID,PLAYLIST_ID,NOM,POSICAO,IMAGEM,IMAGEM_64) VALUES ('%s','%s','%s','%s','%s')",
+                    "INSERT INTO ONL_VIDEOS (VIDEO_ID,PLAYLIST_ID,NOME,POSICAO,IMAGEM,IMAGEM_64) VALUES ('%s','%s','%s','%s','%s')",
                     $this->escapeString($video->video_id),
                     $this->escapeString($video->playlist->playlist_id),
                     $this->escapeString($video->title),
