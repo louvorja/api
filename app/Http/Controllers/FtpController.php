@@ -13,6 +13,9 @@ class FtpController extends Controller
     public function index(Request $request)
     {
         $id_language = strtolower($request->id_language ?? $request->query('lang') ?? "pt");
+        if ($id_language == "") {
+            $id_language = "pt";
+        }
 
         //REMOVER DEPOIS -- RETROCOMPATIBILIDADE
         if (!$request->get("token")) {
