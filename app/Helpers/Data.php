@@ -2,6 +2,8 @@
 
 namespace App\Helpers;
 
+use Illuminate\Support\Facades\DB;
+
 class Data
 {
 
@@ -24,12 +26,13 @@ class Data
             $we = Data::whereExplode($value);
 
             if ($we['sep'] == "or") {
-                $data->orWhere($field, $we['op'], $we['value']);
+                $data->orWhere(DB::raw($field), $we['op'], $we['value']);
             } else {
-                $data->where($field, $we['op'], $we['value']);
+                $data->where(DB::raw($field), $we['op'], $we['value']);
             }
         }
         //echo PHP_EOL . $data->toSql();
+        //dd($data->toSql());
         return $data->paginate($request->limit);
     }
 
