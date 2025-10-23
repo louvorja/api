@@ -1,7 +1,10 @@
 {
     "name": "louvorja/api",
     "description": "API LouvorJA.",
-    "keywords": ["api", "louvorja"],
+    "keywords": [
+        "api",
+        "louvorja"
+    ],
     "license": "MIT",
     "type": "project",
     "require": {
@@ -13,6 +16,7 @@
         "illuminate/database": "^8.83",
         "james-heinrich/getid3": "^1.9",
         "laravel/lumen-framework": "^8.3.1",
+        "league/flysystem": "1.0",
         "tymon/jwt-auth": "^1.0@dev"
     },
     "require-dev": {

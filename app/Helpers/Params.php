@@ -53,7 +53,7 @@ class Params
             }
         }
 
-        $params["db_version"] = Configs::get("version_number");
+        $params["db_version"] = Configs::get("version_number_ftp");
 
         $token_ftp = JWT::encode(['exp' => time() + 30], env('JWT_SECRET'), 'HS256');
         $params["conn_ftp"] = "https://api.louvorja.com.br/ftp?token=" . $token_ftp;

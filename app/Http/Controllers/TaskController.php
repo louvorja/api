@@ -6,6 +6,7 @@ use App\Helpers\Configs;
 use App\Helpers\Files;
 use App\Helpers\OnlineVideos;
 use App\Helpers\DataBase;
+use App\Helpers\Ftp;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -93,6 +94,23 @@ class TaskController extends Controller
 
         $ret = DataBase::export_json();
         Configs::set("version_export_database_json", $version);
+        return $ret;
+    }
+
+    public function send_database_ftp($check_version = true)
+    {
+        if ($check_version) {
+            $version = Configs::get("version");
+            $last_version = Configs::get("version_send_database_ftp");
+            if ($last_version == $version) {
+                return;
+            }
+        }
+
+        $ret = Ftp::send_database();
+        if ($ret["status"] == true) {
+            Configs::set("version_send_database_ftp", $version);
+        }
         return $ret;
     }
 

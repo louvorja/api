@@ -969,6 +969,8 @@ class DataBase
             }
             $log[$id_language]["path_database"] = $path_database;
 
+            Configs::set($id_language . "_path_database", $path_database);
+
             DB::connection('sqlite')->disconnect();
         }
 

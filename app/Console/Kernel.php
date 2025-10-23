@@ -118,6 +118,21 @@ class Kernel extends ConsoleKernel
             }
         })->hourly();
 
+        $schedule->call(function () {
+            $controller = new TaskController();
+            Configs::set('schedule:13.send_database_ftp.start', date('Y-m-d H:i:s'), 'datetime');
+            $ret = $controller->send_database_ftp();
+            Configs::set('schedule:14.send_database_ftp.end', date('Y-m-d H:i:s'), 'datetime', $ret);
+
+            echo "Tarefa: send_database_ftp" . PHP_EOL;
+            if ($ret) {
+                echo "Executado!" . PHP_EOL;
+                $telegramService = new TelegramService();
+                $telegramService->sendMessage("⏰ Rotina executada: Envio de Banco de Dados via FTP!");
+                $telegramService->sendMessage("<pre>" . json_encode($ret, JSON_PRETTY_PRINT) . "</pre>");
+            }
+        })->hourly();
+
         //})->everyMinute();
     }
 }
