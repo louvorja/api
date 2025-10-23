@@ -471,8 +471,6 @@ class DataBase
                 UNION ALL
                 SELECT '4' AS ID, 'din-condensed-bold.ttf' AS ARQUIVO, 'config\\fontes\\din-condensed-bold.ttf' AS URL
                 UNION ALL
-                SELECT '5' AS ID, 'database.db' AS ARQUIVO, 'config\\database.db' AS URL
-                UNION ALL
                 SELECT '6' AS ID, 'bass.dll' AS ARQUIVO, 'bass.dll' AS URL
                 UNION ALL
                 SELECT '7' AS ID, 'borlndmm.dll' AS ARQUIVO, 'borlndmm.dll' AS URL
@@ -550,11 +548,11 @@ class DataBase
                 WHERE lyrics.id_language = '" . $id_language . "'");
 
 
-            $version = Configs::get("version");
+            $version = Configs::get("version_number");
             DB::connection('sqlite')->statement("CREATE TABLE VERSAO AS
                 SELECT
                     1 ID,
-                    '" . substr($version, 0, 5) . "." .  substr($version, 5, 5) . "' VERSAO_BD");
+                    $version VERSAO_BD");
 
             DB::connection('sqlite')->statement("CREATE VIEW HINARIO_ADVENTISTA AS
                 SELECT
@@ -963,7 +961,7 @@ class DataBase
                 FROM bible_version WHERE id_language='" . $id_language . "'");
 
             /* Renomeia para identificar a versão */
-            $version = Configs::get("version");
+            $version = Configs::get("version_number");
             $path_parts = pathinfo($database);
             $newname = $path_parts['dirname'] . '/db_' . $id_language . '_' . $version . '.' . $path_parts['extension'];
             if (copy($database, $newname)) {

@@ -23,7 +23,7 @@ class Params
         foreach ($langs as $lang) {
             $id_language = $lang->id_language;
 
-            $version = Configs::get($id_language . "_delphi_version"); // mudar depois para ser 3 digitos ex.: 26.0.130
+            $version = Configs::get($id_language . "_delphi_version"); // mudar depois para ser 2 digitos ex.: 26.0
             $params["versao" . strtoupper($id_language)] = $version; // remover depois -- adaptar no Delphi primeiro (removido na versao 26)
             $params["instalador" . strtoupper($id_language)] = "setup\Output\\" . $file_name[$id_language] . $version . ".exe"; // remover depois -- adaptar no Delphi primeiro  (removido na versao 26)
 
