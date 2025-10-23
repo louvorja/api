@@ -23,9 +23,9 @@ class Params
         foreach ($langs as $lang) {
             $id_language = $lang->id_language;
 
-            $version = Configs::get($id_language . "_delphi_version");
-            $params["versao" . strtoupper($id_language)] = $version; // remover depois -- adaptar no Delphi primeiro
-            $params["instalador" . strtoupper($id_language)] = "setup\Output\\" . $file_name[$id_language] . $version . ".exe"; // remover depois -- adaptar no Delphi primeiro
+            $version = Configs::get($id_language . "_delphi_version"); // mudar depois para ser 3 digitos ex.: 26.0.130
+            $params["versao" . strtoupper($id_language)] = $version; // remover depois -- adaptar no Delphi primeiro (removido na versao 26)
+            $params["instalador" . strtoupper($id_language)] = "setup\Output\\" . $file_name[$id_language] . $version . ".exe"; // remover depois -- adaptar no Delphi primeiro  (removido na versao 26)
 
             $params[$id_language . "_version"] = $version;
 
@@ -33,18 +33,27 @@ class Params
             $version_software = $version_array[0] . "." . $version_array[1];
             $params[$id_language . "_version_software"] = $version_software;
 
+            $params[$id_language . "_setup_name"] = $file_name[$id_language] . $version_software . ".exe";
+
             $params["setup_name" . strtoupper($id_language)] = $file_name[$id_language] . $version . ".exe"; // remover depois -- adaptar no Delphi primeiro
-            $params[$id_language . "_download"] = "https://github.com/louvorja/desktop/releases/download/v" . $version_software . "/" . $params["setup_name" . strtoupper($id_language)];
+            if ($version_array[0] >= "26") {
+                $params[$id_language . "_download"] = "https://github.com/louvorja/desktop/releases/download/v" . $version_software . "/" . $params[$id_language . "_setup_name"];
+            } else {
+                $params[$id_language . "_download"] = "https://github.com/louvorja/desktop/releases/download/v" . $version_software . "/" . $params["setup_name" . strtoupper($id_language)]; // remover depois -- adaptar no Delphi primeiro (removido na versao 26)
+            }
+
             $params["download" . strtoupper($id_language)] = $params[$id_language . "_download"]; // remover depois -- adaptar no Delphi primeiro
 
 
             if ($lang->id_language == "pt") {
-                $params["versao"] = $version; // remover depois -- adaptar no Delphi primeiro
-                $params["instalador"] = $params["instalador" . strtoupper($id_language)]; // remover depois -- adaptar no Delphi primeiro
+                $params["versao"] = $version; // remover depois -- adaptar no Delphi primeiro (removido na versao 26)
+                $params["instalador"] = $params["instalador" . strtoupper($id_language)]; // remover depois -- adaptar no Delphi primeiro (removido na versao 26)
                 $params["download"] = $params["download" . strtoupper($id_language)]; // remover depois -- adaptar no Delphi primeiro
                 $params["setup_name"] = $params["setup_name" . strtoupper($id_language)]; // remover depois -- adaptar no Delphi primeiro
             }
         }
+
+        $params["db_version"] = Configs::get("version_number");
 
         $token_ftp = JWT::encode(['exp' => time() + 30], env('JWT_SECRET'), 'HS256');
         $params["conn_ftp"] = "https://api.louvorja.com.br/ftp?token=" . $token_ftp;
@@ -54,7 +63,7 @@ class Params
         /* A partir daqui, são todos parâmetros do Delphi */
         $params["coletaneas_online"] = "https://api.louvorja.com.br/onlinevideos";
         $params["embed_youtube"] = "https://www.youtube.com/embed/{videoID}";
-        $params["ftp"] = "https://api.louvorja.com.br/ftp"; // REMOVER DEPOIS PARA MANTER A FORMA SEGURA (COM TOKEN)
+        //$params["ftp"] = "https://api.louvorja.com.br/ftp"; // REMOVER DEPOIS PARA MANTER A FORMA SEGURA (COM TOKEN)
         $params["helpPT"] = $params["help"] . "?lang=pt";
         $params["helpES"] = $params["help"] . "?lang=es";
         $params["logs_versao"] = $params["version_log"];
