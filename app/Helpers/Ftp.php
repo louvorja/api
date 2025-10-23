@@ -49,7 +49,7 @@ class Ftp
 
 
                     $ftp->put('database.db', fopen($file, 'r+'));
-                    $ret["file"] = $file;
+                    $ret[$id_language]["file"] = $file;
                 } catch (\Throwable $e) {
                     $ret[$id_language]["ftp"][$ftp_item->id_ftp]["error"] = $e->getMessage();
                     $ret["status"] = false;
