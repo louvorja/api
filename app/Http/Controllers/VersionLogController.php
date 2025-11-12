@@ -33,7 +33,7 @@ class VersionLogController extends Controller
         $html .= "</head>";
         $html .= "<body>";
         $html .= "<h1>$version</h1>";
-        $html .= $api["body"];
+        $html .= nl2br(htmlspecialchars($api["body"], ENT_QUOTES, 'UTF-8'));
         $html .= "</body></html>";
 
         return $html;
