@@ -11,7 +11,7 @@ class PlayerController extends Controller
     public function index(Request $request)
     {
         $id = $request->v;
-        $url = "https://www.youtube.com/embed/DP0cpOdufpc?si=$id";
+        $url = "https://www.youtube.com/embed/$id";
 
         return "
             <html>
