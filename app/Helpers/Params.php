@@ -24,7 +24,7 @@ class Params
             $id_language = $lang->id_language;
 
             $version = Configs::get($id_language . "_delphi_version"); // mudar depois para ser 2 digitos ex.: 26.0
-            $params["versao" . strtoupper($id_language)] = $version; // remover depois -- adaptar no Delphi primeiro (removido na versao 26)
+            $params["versao" . strtoupper($id_language)] = $version . ".0.0"; // remover depois -- adaptar no Delphi primeiro (removido na versao 26)
             $params["instalador" . strtoupper($id_language)] = "setup\Output\\" . $file_name[$id_language] . $version . ".exe"; // remover depois -- adaptar no Delphi primeiro  (removido na versao 26)
 
             $params[$id_language . "_version"] = $version;
