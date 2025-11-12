@@ -46,7 +46,7 @@ class Params
 
 
             if ($lang->id_language == "pt") {
-                $params["versao"] = $version; // remover depois -- adaptar no Delphi primeiro (removido na versao 26)
+                $params["versao"] = $version . ".0.0"; // remover depois -- adaptar no Delphi primeiro (removido na versao 26)
                 $params["instalador"] = $params["instalador" . strtoupper($id_language)]; // remover depois -- adaptar no Delphi primeiro (removido na versao 26)
                 $params["download"] = $params["download" . strtoupper($id_language)]; // remover depois -- adaptar no Delphi primeiro
                 $params["setup_name"] = $params["setup_name" . strtoupper($id_language)]; // remover depois -- adaptar no Delphi primeiro
