@@ -18,6 +18,7 @@ $router->group(['middleware' => 'general'], function () use ($router) {
     $router->get('/', function () {
         return [];
     });
+    $router->get('/player', 'PlayerController@index');
 
     $router->get('/json_db/{file}', 'DatabaseJsonController@index');
 
@@ -153,6 +154,4 @@ $router->group(['middleware' => 'general'], function () use ($router) {
     $router->group(['prefix' => '{lang}', 'middleware' =>  'lang'], function () use ($router) {
         $router->get('/download', 'DownloadController@index');
     });
-
-    //$router->get('/player', 'PlayerController@index');
 });
