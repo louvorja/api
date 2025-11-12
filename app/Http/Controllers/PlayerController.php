@@ -21,6 +21,7 @@ class PlayerController extends Controller
                         html,body{
                             margin:0;
                             padding:0;
+                            background:#000;
                         }
                         iframe{
                             position:absolute;
