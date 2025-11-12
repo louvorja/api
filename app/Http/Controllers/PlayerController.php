@@ -18,6 +18,10 @@ class PlayerController extends Controller
                 <head>
                     <title>Player</title>
                     <style>
+                        html,body{
+                            margin:0;
+                            padding:0;
+                        }
                         iframe{
                             position:absolute;
                             width:100%;
