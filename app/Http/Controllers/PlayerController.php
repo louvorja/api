@@ -29,6 +29,7 @@ class PlayerController extends Controller
                             height:100%;
                             top:0;
                             left:0;
+                            border:0;
                         }
                     </style>
                 </head>
