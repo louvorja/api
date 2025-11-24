@@ -72,7 +72,7 @@ class FtpController extends Controller
             return response()->json([
                 'error' => 'Token inválido',
                 'details' => $e
-            ], 401);
+            ], 405);
         }
     }
 
