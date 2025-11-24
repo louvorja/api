@@ -19,10 +19,10 @@ class ApiMiddleware
 
         if (!$debug) {
             if (!$request->header('Api-Token')) {
-                return response()->json(['error' => "Token de API não informado!"], 401);
+                return response()->json(['error' => "Token de API não informado!"], 403);
             }
             if ($request->header('Api-Token') != env('API_TOKEN')) {
-                return response()->json(['error' => "Token de API inválido!"], 401);
+                return response()->json(['error' => "Token de API inválido!"], 404);
             }
         }
 
