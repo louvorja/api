@@ -17,33 +17,6 @@ class FtpController extends Controller
             $id_language = "pt";
         }
 
-        //REMOVER DEPOIS -- RETROCOMPATIBILIDADE
-        if (!$request->get("token")) {
-
-            $ftp = Ftp::where('id_language', $id_language)->inRandomOrder()->first();
-
-            $data = $ftp->data;
-            $data["lang"] = $id_language;
-
-            // RETROCOMPATIBILIDADE
-            $data["ftp_url"] = $data["host"];
-            $data["ftp_dir"] = $data["root"];
-            $data["ftp_porta"] = $data["port"];
-            $data["ftp_usuario"] = $data["username"];
-            $data["ftp_senha"] = $data["password"];
-            // -------------------
-
-            self::save_log($request, $ftp->id_ftp);
-
-            $text = "";
-            foreach ($data as $key => $param) {
-                $text .= "$key=$param\r\n";
-            }
-            return response(base64_encode($text), 200)->header('Content-Type', 'text/plain');
-        }
-        //----------REMOVER ATÉ AQUI--------------------------
-
-
         $key = env('JWT_SECRET');
         $jwt = $request->get("token");
 
@@ -55,13 +28,6 @@ class FtpController extends Controller
 
             $data = $ftp->data;
             $data["lang"] = $id_language;
-
-            // RETROCOMPATIBILIDADE
-            /*            $data["ftp_url"] = $data["host"];
-            $data["ftp_dir"] = $data["root"];
-            $data["ftp_porta"] = $data["port"];
-            $data["ftp_usuario"] = $data["username"];
-            $data["ftp_senha"] = $data["password"];*/
 
             $text = "";
             foreach ($data as $key => $param) {
