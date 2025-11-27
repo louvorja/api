@@ -27,13 +27,12 @@ class FtpController extends Controller
         } catch (\Exception $e) {
             $error = [
                 'error' => 'Token inválido',
-                'details' => $e,
+                'details' => $e->getMessage(),
                 'token' => $jwt,
             ];
             self::save_log($request,  $ftp->id_ftp, $error);
             return response()->json($error, 402);
         }
-
 
         self::save_log($request, $ftp->id_ftp);
 
@@ -70,8 +69,8 @@ class FtpController extends Controller
             $data["bin_version"] = $p["bin_version"] ?? "";
             $data["datetime"] = $p["datetime"] ?? null;
             $data["ip"] = $p["ip"] ?? "";
-            $data["directory"] = $p["directory"] ?? "";
-            $data["pc_name"] = $p["pc_name"] ?? "";
+            $data["directory"] = mb_convert_encoding($p["directory"] ?? "", 'UTF-8', 'auto');
+            $data["pc_name"] = mb_convert_encoding($p["pc_name"] ?? "", 'UTF-8', 'auto');
         } elseif ($request->p) {
             //RETROCOMPATIBILIDADE
             parse_str(base64_decode($request->p), $p);
@@ -80,10 +79,11 @@ class FtpController extends Controller
             $data["bin_version"] = $p["versao_exe"] ?? "";
             $data["datetime"] = $p["datahora"] ?? null;
             $data["ip"] = $p["ip"] ?? "";
-            $data["directory"] = $p["dir"] ?? "";
-            $data["pc_name"] = $p["nome"] ?? "";
+            $data["directory"] = mb_convert_encoding($p["dir"] ?? "", 'UTF-8', 'auto');
+            $data["pc_name"] = mb_convert_encoding($p["pc_name"] ?? "", 'UTF-8', 'auto');
         }
         $data["error"] = $error;
+
 
         FtpLog::create($data);
     }
