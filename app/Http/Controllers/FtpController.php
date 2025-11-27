@@ -31,7 +31,7 @@ class FtpController extends Controller
                 'token' => $jwt,
             ];
             self::save_log($request,  $ftp->id_ftp, $error);
-            return response()->json($error, 402);
+            return response()->json($error, 401);
         }
 
         self::save_log($request, $ftp->id_ftp);
