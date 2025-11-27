@@ -28,7 +28,8 @@ class CreateFtpLogsTable extends Migration
             $table->string('remote_addr', 20)->nullable();
             $table->string('browser', 255)->nullable();
             $table->json('request')->nullable();
-            $table->string('id_language', 5);
+            $table->json('error')->nullable();
+            $table->string('id_language', 5)->nullable();
             $table->timestamps();
 
             $table->foreign('id_ftp')->references('id_ftp')->on('ftp');

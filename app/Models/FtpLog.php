@@ -22,11 +22,13 @@ class FtpLog extends Model
         'remote_addr',
         'browser',
         'request',
+        'error',
         'id_language'
     ];
 
     protected $casts = [
         'request' => 'array',
+        'error' => 'array',
     ];
 
     protected static function boot()

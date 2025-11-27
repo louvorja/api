@@ -20,37 +20,47 @@ class FtpController extends Controller
         $key = env('JWT_SECRET');
         $jwt = $request->get("token");
 
+        $ftp = Ftp::where('id_language', $id_language)->inRandomOrder()->first();
+
         try {
             JWT::decode($jwt, new Key($key, 'HS256'));
-
-            $ftp = Ftp::where('id_language', $id_language)->inRandomOrder()->first();
-            self::save_log($request, $ftp->id_ftp);
-
-            $data = $ftp->data;
-            $data["lang"] = $id_language;
-
-            $text = "";
-            foreach ($data as $key => $param) {
-                $text .= "$key=$param\r\n";
-            }
-            return response(base64_encode($text), 200)->header('Content-Type', 'text/plain');
         } catch (\Exception $e) {
-            return response()->json([
+            $error = [
                 'error' => 'Token inválido',
-                'details' => $e
-            ], 405);
+                'details' => $e,
+                'token' => $jwt,
+            ];
+            self::save_log($request,  $ftp->id_ftp, $error);
+            return response()->json($error, 405);
         }
+
+
+        self::save_log($request, $ftp->id_ftp);
+
+        $data = $ftp->data;
+        $data["lang"] = $id_language;
+
+        $text = "";
+        foreach ($data as $key => $param) {
+            $text .= "$key=$param\r\n";
+        }
+        return response(base64_encode($text), 200)->header('Content-Type', 'text/plain');
     }
 
-    public function save_log(Request $request, $id_ftp)
+    public function save_log(Request $request, $id_ftp, $error = null)
     {
-        $ftp = Ftp::find($id_ftp);
+        $data = [];
 
-        $data = [
-            'id_ftp' => $ftp->id_ftp,
-            'id_language' => $ftp->id_language,
-            'request' => $request->toArray(),
-        ];
+        if ($id_ftp) {
+            $ftp = Ftp::find($id_ftp);
+
+            $data = [
+                'id_ftp' => $ftp->id_ftp ?? null,
+                'id_language' => $ftp->id_language ?? null,
+            ];
+        }
+        $data['request'] = $request->toArray();
+
 
         $request->request->remove('limit');
         if ($request->data) {
@@ -73,6 +83,7 @@ class FtpController extends Controller
             $data["directory"] = $p["dir"] ?? "";
             $data["pc_name"] = $p["nome"] ?? "";
         }
+        $data["error"] = $error;
 
         FtpLog::create($data);
     }
