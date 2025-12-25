@@ -102,7 +102,7 @@ class Kernel extends ConsoleKernel
                 $telegramService->sendMessage("<pre>" . json_encode($ret, JSON_PRETTY_PRINT) . "</pre>");
             }
             //})->hourly();
-        })->everyMinute();
+        })->everyThreeMinutes();
 
         $schedule->call(function () {
             $controller = new TaskController();
