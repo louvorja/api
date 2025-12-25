@@ -962,7 +962,7 @@ class DataBase
             /* Renomeia para identificar a versão */
             $version = Configs::get("version_number");
             $path_parts = pathinfo($database);
-            $newname = app()->basePath('public/db_' . $id_language . '_' . $version . '.' . $path_parts['extension']);
+            $newname = app()->basePath('public/db/db_' . $id_language . '_' . $version . '.' . $path_parts['extension']);
             $path_database = null;
             if (rename($database, $newname)) {
                 $path_database = $newname;
