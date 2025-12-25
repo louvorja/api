@@ -337,6 +337,7 @@ class DataBase
         $langs =  Language::get();
 
         $log = [];
+        $error = null;
 
         foreach ($langs as $lang) {
             $id_language = $lang->id_language;
@@ -970,7 +971,7 @@ class DataBase
             $log[$id_language]["path_database"] = $path_database;
             if (!file_exists($path_database)) {
                 $log[$id_language]["error"] = "Erro ao copiar banco de dados.";
-                $log["error"] = "Erro ao copiar banco de dados.";
+                $error = "Erro ao copiar banco de dados.";
             }
 
             Configs::set($id_language . "_path_database", $path_database);
@@ -978,7 +979,7 @@ class DataBase
             DB::connection('sqlite')->disconnect();
         }
 
-        return ["logs" => $log];
+        return ["logs" => $log, "error" => $error];
     }
 
     public static function import_file($file_path)
