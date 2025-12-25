@@ -964,7 +964,7 @@ class DataBase
             $path_parts = pathinfo($database);
             $newname = app()->basePath('public/db_' . $id_language . '_' . $version . '.' . $path_parts['extension']);
             $path_database = "";
-            if (copy($database, $newname)) {
+            if (rename($database, $newname)) {
                 $path_database = $newname;
             }
             $log[$id_language]["path_database"] = $path_database;
