@@ -968,6 +968,10 @@ class DataBase
                 $path_database = app()->basePath('public/db/' . basename($newname));
             }
             $log[$id_language]["path_database"] = $path_database;
+            if (!file_exists($path_database)) {
+                $log[$id_language]["error"] = "Erro ao copiar banco de dados.";
+                $log["error"] = "Erro ao copiar banco de dados.";
+            }
 
             Configs::set($id_language . "_path_database", $path_database);
 

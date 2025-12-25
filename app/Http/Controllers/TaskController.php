@@ -93,7 +93,11 @@ class TaskController extends Controller
         }
 
         $ret = DataBase::export_json();
-        Configs::set("version_export_database_json", $version);
+        if ($ret["error"]) {
+            Configs::set("version_export_database_json", -1);
+        } else {
+            Configs::set("version_export_database_json", $version);
+        }
         return $ret;
     }
 
