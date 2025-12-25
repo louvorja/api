@@ -332,7 +332,7 @@ class DataBase
     public static function export()
     {
 
-        $database = env('DB_SQLITE_DATABASE');
+        $database = app()->basePath('public/dbz/' . env('DB_SQLITE_DATABASE'));
 
         $langs =  Language::get();
 
