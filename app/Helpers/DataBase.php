@@ -963,12 +963,12 @@ class DataBase
             $version = Configs::get("version_number");
             $path_parts = pathinfo($database);
             $newname = app()->basePath('public/db_' . $id_language . '_' . $version . '.' . $path_parts['extension']);
-            $path_database = "";
+            $path_database = null;
             if (rename($database, $newname)) {
                 $path_database = $newname;
             }
             $log[$id_language]["path_database"] = $path_database;
-            if (!file_exists($path_database)) {
+            if (!$path_database || !file_exists($path_database)) {
                 $error = "Erro ao copiar banco de dados. De: \"" . $database . "\", Para: \"" . $newname . "\"";
                 $log[$id_language]["error"] = $error;
             }
