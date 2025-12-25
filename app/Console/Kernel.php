@@ -131,7 +131,7 @@ class Kernel extends ConsoleKernel
                 $telegramService->sendMessage("⏰ Rotina executada: Envio de Banco de Dados via FTP!");
                 $telegramService->sendMessage("<pre>" . json_encode($ret, JSON_PRETTY_PRINT) . "</pre>");
             }
-        })->everyThreeMinutes();
+        })->hourly();
 
         //})->everyMinute();
     }
