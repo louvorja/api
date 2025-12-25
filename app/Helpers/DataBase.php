@@ -342,8 +342,6 @@ class DataBase
         foreach ($langs as $lang) {
             $id_language = $lang->id_language;
 
-            $path_database = app()->basePath('public/db/' . basename($database));
-
             if (File::exists($database)) {
                 unlink($database);
             }
@@ -964,9 +962,10 @@ class DataBase
             /* Renomeia para identificar a versão */
             $version = Configs::get("version_number");
             $path_parts = pathinfo($database);
-            $newname = $path_parts['dirname'] . '/db_' . $id_language . '_' . $version . '.' . $path_parts['extension'];
+            $newname = app()->basePath('public/db_' . $id_language . '_' . $version . '.' . $path_parts['extension']);
+            $path_database = "";
             if (copy($database, $newname)) {
-                $path_database = app()->basePath('public/db/' . basename($newname));
+                $path_database = $newname;
             }
             $log[$id_language]["path_database"] = $path_database;
             if (!file_exists($path_database)) {
