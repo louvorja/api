@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Auth\Authenticatable;
 use App\Models\BaseModel;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 
 class User extends BaseModel implements AuthenticatableContract, JWTSubject
