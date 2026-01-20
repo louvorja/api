@@ -69,8 +69,12 @@ class FileController extends Controller
 
         $replaces = [
             [],
-            ['images/', 'imagens/']
+            ['images/', 'imagens/'],
+            ['musics/pt/', 'musicas/'],
         ];
+
+
+        $path = urldecode($path);
 
         $exist = false;
         $original_path = $path;
