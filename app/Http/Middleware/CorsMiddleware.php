@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CorsMiddleware
 {
@@ -28,8 +29,11 @@ class CorsMiddleware
         }
 
         $response = $next($request);
+
+        // Adiciona headers de forma compatível com todos os tipos de resposta
         foreach ($headers as $key => $value) {
-            $response->header($key, $value);
+            // Usa o método correto para cada tipo de resposta
+            $response->headers->set($key, $value);
         }
 
         return $response;

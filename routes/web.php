@@ -155,3 +155,6 @@ $router->group(['middleware' => 'general'], function () use ($router) {
         $router->get('/download', 'DownloadController@index');
     });
 });
+
+
+$router->get('/file/{path:.*}', 'FileController@open');
