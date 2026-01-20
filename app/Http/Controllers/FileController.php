@@ -90,7 +90,7 @@ class FileController extends Controller
 
         if (!$exist) {
             return response()->json([
-                'error' => 'Arquivo não encontrado',
+                'error' => 'Arquivo não encontrado no servidor',
                 'path' => $path
             ], 404);
         }
