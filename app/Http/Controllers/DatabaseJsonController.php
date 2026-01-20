@@ -16,7 +16,7 @@ class DatabaseJsonController extends Controller
         $filePath = base_path('public/db/json/' . $file);
 
         if (!file_exists($filePath)) {
-            return response()->json(['error' => 'Arquivo não encontrado!'], 404);
+            return response()->json(['error' => 'Arquivo não encontrado!', 'path' => $filePath], 404);
         }
 
         $content = file_get_contents($filePath);
