@@ -71,6 +71,8 @@ class FileController extends Controller
             [],
             ['images/', 'imagens/'],
             ['musics/pt/', 'musicas/'],
+            ['musics/es/', 'musicas/'],
+            ['covers/', 'capas/'],
         ];
 
 
@@ -143,6 +145,7 @@ class FileController extends Controller
             'jpg' => 'image/jpeg',
             'jpeg' => 'image/jpeg',
             'png' => 'image/png',
+            'bmp' => 'image/bmp',
             'gif' => 'image/gif',
             'webp' => 'image/webp',
             'pdf' => 'application/pdf',
