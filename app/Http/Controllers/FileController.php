@@ -45,6 +45,45 @@ class FileController extends Controller
 
     public function open($path)
     {
+        $replaces = [
+            [],
+            ['images/', 'imagens/'],
+            ['musics/pt/', 'musicas/'],
+            ['musics/es/', 'musicas/'],
+            ['covers/', 'capas/'],
+        ];
+
+        $path = urldecode($path);
+
+        //Checa se o arquivo existe no diretório
+        $exist = false;
+        $original_path = $path;
+        foreach ($replaces as $replace) {
+            $search = $replace[0] ?? "";
+            $to = $replace[1] ?? "";
+
+            if ($search <> "") {
+                $path = str_replace($search, $to, $original_path);
+            }
+
+            $path = app()->basePath('public') . "/" . $path;
+            if (file_exists($path)) {
+                $exist = true;
+                break;
+            }
+        }
+
+        if ($exist) {
+            dd("existe", $path);
+        }
+
+
+        dd("nao existe", $path);
+
+
+        //Arquivo não existe no diretório, tenta pegar de um servidor FTP
+        $path = $original_path;
+
         $ftp = Ftp::inRandomOrder()->first();
 
         if (!$ftp) {
@@ -66,17 +105,6 @@ class FileController extends Controller
             'ssl'      => false,
             'timeout'  => 30,
         ]);
-
-        $replaces = [
-            [],
-            ['images/', 'imagens/'],
-            ['musics/pt/', 'musicas/'],
-            ['musics/es/', 'musicas/'],
-            ['covers/', 'capas/'],
-        ];
-
-
-        $path = urldecode($path);
 
         $exist = false;
         $original_path = $path;
