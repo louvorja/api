@@ -66,7 +66,7 @@ class FileController extends Controller
                 $path = str_replace($search, $to, $original_path);
             }
 
-            $path = app()->basePath('public') . "/" . $path;
+            $path = app()->basePath('public') . "/files/" . $path;
             if (file_exists($path)) {
                 $exist = true;
                 break;
@@ -74,11 +74,34 @@ class FileController extends Controller
         }
 
         if ($exist) {
-            dd("existe", $path);
+            $mimeType = $this->getMimeType($path);
+            $fileSize = filesize($path);
+            $fileName = basename($path);
+
+            // Criar stream do arquivo
+            $stream = fopen($path, 'rb');
+
+            // Retornar a resposta com os headers corretos
+            return response()->stream(
+                function () use ($stream) {
+                    fpassthru($stream);
+                    if (is_resource($stream)) {
+                        fclose($stream);
+                    }
+                },
+                200,
+                [
+                    'Content-Type' => $mimeType,
+                    'Content-Length' => $fileSize,
+                    'Content-Disposition' => 'inline; filename="' . $fileName . '"',
+                    'Cache-Control' => 'public, max-age=3600',
+                    'Accept-Ranges' => 'bytes',
+                ]
+            );
         }
 
 
-        dd("nao existe", $path);
+
 
 
         //Arquivo não existe no diretório, tenta pegar de um servidor FTP
