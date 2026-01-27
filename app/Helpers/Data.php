@@ -40,9 +40,14 @@ class Data
     {
         $fields = [];
         foreach ($get as $field) {
-            if (is_object($field)) {
+            if ($field instanceof \Illuminate\Database\Query\Expression) {
+                $field = $field->getValue(DB::connection()->getQueryGrammar());
+            }
+            // Se for um objeto que tem método getValue()
+            elseif (is_object($field) && method_exists($field, 'getValue')) {
                 $field = $field->getValue();
             }
+
             $sep = explode(' ', $field);
             if (count($sep) > 1) {
                 $field = end($sep);

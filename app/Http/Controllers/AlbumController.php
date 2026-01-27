@@ -59,6 +59,7 @@ class AlbumController extends Controller
             $data = $data->with('categories');
         }
         $data = $data->distinct();
+
         return response()->json(Data::data($data, $request, $fields));
     }
 
