@@ -40,7 +40,7 @@ class Kernel extends ConsoleKernel
                 $telegramService->sendMessage("⏰ Rotina executada: Atualização de configurações!");
                 $telegramService->sendMessage("<pre>" . json_encode($ret, JSON_PRETTY_PRINT) . "</pre>");
             }
-        })->everyMinute();
+        })->dailyAt('00:00');
 
         $schedule->call(function () {
             $controller = new TaskController();
@@ -55,7 +55,7 @@ class Kernel extends ConsoleKernel
                 $telegramService->sendMessage("⏰ Rotina executada: Atualização de tamanho de arquivos no Banco de Dados!");
                 $telegramService->sendMessage("<pre>" . json_encode($ret, JSON_PRETTY_PRINT) . "</pre>");
             }
-        })->everyMinute();
+        })->hourly();
 
         $schedule->call(function () {
             $controller = new TaskController();
@@ -70,7 +70,7 @@ class Kernel extends ConsoleKernel
                 $telegramService->sendMessage("⏰ Rotina executada: Atualização de duração de arquivos no Banco de Dados!");
                 $telegramService->sendMessage("<pre>" . json_encode($ret, JSON_PRETTY_PRINT) . "</pre>");
             }
-        })->everyMinute();
+        })->hourly();
 
         $schedule->call(function () {
             $controller = new TaskController();
@@ -85,7 +85,7 @@ class Kernel extends ConsoleKernel
                 $telegramService->sendMessage("⏰ Rotina executada: Atualização de vídeos online!");
                 $telegramService->sendMessage("<pre>" . json_encode($ret, JSON_PRETTY_PRINT) . "</pre>");
             }
-        })->everyMinute();
+        })->hourly();
         //})->daily();
 
         $schedule->call(function () {
@@ -101,7 +101,7 @@ class Kernel extends ConsoleKernel
                 $telegramService->sendMessage("⏰ Rotina executada: Exportação de Banco de Dados!");
                 $telegramService->sendMessage("<pre>" . json_encode($ret, JSON_PRETTY_PRINT) . "</pre>");
             }
-        })->everyMinute();
+        })->hourly();
 
         $schedule->call(function () {
             $controller = new TaskController();
@@ -116,7 +116,7 @@ class Kernel extends ConsoleKernel
                 $telegramService->sendMessage("⏰ Rotina executada: Exportação de Banco de Dados em JSON!");
                 $telegramService->sendMessage("<pre>" . json_encode($ret, JSON_PRETTY_PRINT) . "</pre>");
             }
-        })->everyMinute();
+        })->hourly();
 
         $schedule->call(function () {
             $controller = new TaskController();
@@ -131,7 +131,7 @@ class Kernel extends ConsoleKernel
                 $telegramService->sendMessage("⏰ Rotina executada: Envio de Banco de Dados via FTP!");
                 $telegramService->sendMessage("<pre>" . json_encode($ret, JSON_PRETTY_PRINT) . "</pre>");
             }
-        })->everyMinute();
+        })->hourly();
 
         //})->everyMinute();
     }
