@@ -40,7 +40,7 @@ class Kernel extends ConsoleKernel
                 $telegramService->sendMessage("⏰ Rotina executada: Atualização de configurações!");
                 $telegramService->sendMessage("<pre>" . json_encode($ret, JSON_PRETTY_PRINT) . "</pre>");
             }
-        })->dailyAt('00:00');
+        })->everyMinute();
 
         $schedule->call(function () {
             $controller = new TaskController();
