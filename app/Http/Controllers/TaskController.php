@@ -88,11 +88,15 @@ class TaskController extends Controller
 
     public function export_database_json($check_version = true)
     {
+        if (request("force") && request("force") == "true") {
+            $check_version = false;
+        }
+
         if ($check_version) {
             $version = Configs::get("version");
             $last_version = Configs::get("version_export_database_json");
             if ($last_version == $version) {
-                return;
+                return [];
             }
         }
 
