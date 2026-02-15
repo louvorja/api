@@ -101,7 +101,9 @@ class TaskController extends Controller
         }
 
         $ret = DataBase::export_json();
-        Configs::set("version_export_database_json", $version);
+        if ($check_version) {
+            Configs::set("version_export_database_json", $version);
+        }
         return $ret;
     }
 
