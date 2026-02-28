@@ -85,7 +85,7 @@ class Kernel extends ConsoleKernel
                 $telegramService->sendMessage("⏰ Rotina executada: Atualização de vídeos online!");
                 $telegramService->sendMessage("<pre>" . json_encode($ret, JSON_PRETTY_PRINT) . "</pre>");
             }
-        })->hourly();
+        })->monthly();
         //})->daily();
 
         $schedule->call(function () {
