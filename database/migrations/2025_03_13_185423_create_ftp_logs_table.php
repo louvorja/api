@@ -22,7 +22,7 @@ class CreateFtpLogsTable extends Migration
             $table->string('directory')->nullable();
             $table->string('pc_name', 100)->nullable();
             $table->string('local_ip', 20)->nullable();
-            $table->string('ip', 20)->nullable();
+            $table->string('ip', 50)->nullable();
             $table->string('http_client_ip', 20)->nullable();
             $table->string('http_x_forwarded_for', 20)->nullable();
             $table->string('remote_addr', 20)->nullable();
