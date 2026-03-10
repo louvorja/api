@@ -117,11 +117,11 @@ class DataBase
                 ->leftJoin('files as files_music', 'musics.id_file_music', 'files_music.id_file')
                 ->where("id_language", $l)
                 ->with(['albums' => function ($query) {
-                    $query->select(['albums.id_album', 'albums.name', DB::raw('min(categories.order) as `order`', 'categories.type')])
+                    $query->select(['albums.id_album', 'albums.name', DB::raw('min(categories.order) as `order`'), 'categories.type'])
                         ->leftJoin('categories_albums', 'categories_albums.id_album', 'albums.id_album')
                         ->leftJoin('categories', 'categories.id_category', 'categories_albums.id_category')
                         ->whereIn('categories.type', ['hymnal', 'collection'])
-                        ->groupBy(['albums.id_album', 'albums.name', 'albums_musics.id_music', 'albums_musics.id_album', 'albums_musics.track'])
+                        ->groupBy(['albums.id_album', 'albums.name', 'albums_musics.id_music', 'albums_musics.id_album', 'albums_musics.track', 'categories.type'])
                         ->orderBy('order');
                 }])
                 ->get();
