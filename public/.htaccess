@@ -25,7 +25,13 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+
+    # Bloqueia acesso direto a qualquer arquivo PHP, exceto os necessários
+    RewriteCond %{THE_REQUEST} \.php [NC]
+    RewriteCond %{REQUEST_URI} !/(index)\.php$ [NC]
+    RewriteRule ^ - [F,L]
 </IfModule>
+
 
 # Páginas de erro personalizadas
 ErrorDocument 403 /403.shtml
