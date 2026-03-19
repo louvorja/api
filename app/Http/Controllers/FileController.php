@@ -66,7 +66,7 @@ class FileController extends Controller
                 $path = str_replace($search, $to, $original_path);
             }
 
-            $path = app()->basePath('public') . "/files/" . $path;
+            $path = env("FILES_DIR") . "/" . $path;
             if (file_exists($path)) {
                 $exist = true;
                 break;
