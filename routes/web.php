@@ -158,3 +158,9 @@ $router->group(['middleware' => 'general'], function () use ($router) {
 
 
 $router->get('/file/{path:.*}', 'FileController@open');
+/*
+$router->get('/schedule-run', function () {
+    \Illuminate\Support\Facades\Artisan::call('schedule:run');
+    return ['message' => 'Schedule run executed'];
+});
+*/
