@@ -158,7 +158,3 @@ $router->group(['middleware' => 'general'], function () use ($router) {
 
 
 $router->get('/file/{path:.*}', 'FileController@open');
-$router->get('/unlock', function () {
-    \Illuminate\Support\Facades\File::chmod(env("FILES_DIR"), 0755);
-    return response()->json(['status' => 'success']);
-});
