@@ -6,6 +6,9 @@ use App\Models\File as FileModel;
 use Illuminate\Support\Facades\File;
 use zipArchive;
 use getID3;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
+use Exception;
 
 class Files
 {
@@ -126,5 +129,27 @@ class Files
         $zipArchive->close();
 
         return ['files' => $filenames, 'output' => $output];
+    }
+
+    public static function permissions($path, $filePerm = 0644, $dirPerm = 0755)
+    {
+        if (!file_exists($path)) {
+            throw new Exception("Caminho não encontrado: {$path}");
+        }
+
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($path, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST
+        );
+
+        foreach ($iterator as $item) {
+            if ($item->isDir()) {
+                chmod($item->getRealPath(), $dirPerm);
+            } else {
+                chmod($item->getRealPath(), $filePerm);
+            }
+        }
+
+        chmod($path, $dirPerm);
     }
 }
