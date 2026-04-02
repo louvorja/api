@@ -117,7 +117,7 @@ class Kernel extends ConsoleKernel
                 $telegramService->sendMessage("<pre>" . json_encode($ret, JSON_PRETTY_PRINT) . "</pre>");
             }
         })->hourly();
-
+        /* TODO: Adequar no Delphi para ler pt_database/es_database, antes de descomentar aqui
         $schedule->call(function () {
             $controller = new TaskController();
             Configs::set('schedule:13.send_database_ftp.start', date('Y-m-d H:i:s'), 'datetime');
@@ -132,7 +132,7 @@ class Kernel extends ConsoleKernel
                 $telegramService->sendMessage("<pre>" . json_encode($ret, JSON_PRETTY_PRINT) . "</pre>");
             }
         })->hourly();
-
+*/
         //})->everyMinute();
     }
 }
