@@ -16,4 +16,9 @@ class BibleVerse extends BaseModel
         'text',
         'id_language',
     ];
+
+    public function book()
+    {
+        return $this->belongsTo(BibleBook::class, 'id_bible_book', 'id_bible_book');
+    }
 }

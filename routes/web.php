@@ -19,6 +19,7 @@ $router->group(['middleware' => 'general'], function () use ($router) {
         return [];
     });
     $router->get('/file/{path:.*}', 'FileController@open');
+    $router->get('/metadata', 'MetaController@index');
 
     $router->get('/player', 'PlayerController@index');
 

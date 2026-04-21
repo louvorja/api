@@ -13,4 +13,9 @@ class BibleVersion extends BaseModel
         'abbreviation',
         'id_language',
     ];
+
+    public function verses()
+    {
+        return $this->hasMany(BibleVerse::class, 'id_bible_version', 'id_bible_version');
+    }
 }
