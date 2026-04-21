@@ -36,6 +36,9 @@ class MetaController extends Controller
                 'bible_verse.chapter',
                 'bible_verse.verse'
             )
+            ->orderBy('bible_book.book_number')
+            ->orderBy('bible_verse.chapter')
+            ->orderBy('bible_verse.verse')
             ->having('total_versions', '<>', $total_versions)
             ->get()
             ->map(function ($item) {
