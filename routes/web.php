@@ -18,6 +18,8 @@ $router->group(['middleware' => 'general'], function () use ($router) {
     $router->get('/', function () {
         return [];
     });
+    $router->get('/file/{path:.*}', 'FileController@open');
+
     $router->get('/player', 'PlayerController@index');
 
     $router->get('/json_db/{file}', 'DatabaseJsonController@index');
@@ -157,7 +159,6 @@ $router->group(['middleware' => 'general'], function () use ($router) {
 });
 
 
-$router->get('/file/{path:.*}', 'FileController@open');
 /*
 $router->get('/schedule-run', function () {
     \Illuminate\Support\Facades\Artisan::call('schedule:run');
