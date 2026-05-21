@@ -482,19 +482,7 @@ class DataBase
                 UNION ALL
                 SELECT '12' AS ID, 'libeay32.dll' AS ARQUIVO, 'libeay32.dll' AS URL
                 UNION ALL
-                SELECT '13' AS ID, 'louvorja_slja.ico' AS ARQUIVO, 'config\\ico\\louvorja_slja.ico' AS URL
-                UNION ALL
-                SELECT '14' AS ID, 'pagina_nao_encontrada.htm' AS ARQUIVO, 'config\\server\\pagina_nao_encontrada.htm' AS URL
-                UNION ALL
-                SELECT '15' AS ID, 'page.htm' AS ARQUIVO, 'config\\server\\page.htm' AS URL
-                UNION ALL
-                SELECT '16' AS ID, 'index.htm' AS ARQUIVO, 'config\\server\\index.htm' AS URL
-                UNION ALL
-                SELECT '17' AS ID, 'file.ja' AS ARQUIVO, 'config\\server\\file\\file.ja' AS URL
-                UNION ALL
-                SELECT '18' AS ID, 'estilo.css' AS ARQUIVO, 'config\\server\\lib\\estilo.css' AS URL
-                UNION ALL
-                SELECT '19' AS ID, 'scripts.js' AS ARQUIVO, 'config\\server\\lib\\scripts.js' AS URL");
+                SELECT '13' AS ID, 'louvorja_slja.ico' AS ARQUIVO, 'config\\ico\\louvorja_slja.ico' AS URL");
 
             DB::connection('sqlite')->statement("CREATE TABLE IMAGEM_POSICAO AS
                 SELECT `name` IMAGEM,image_position POSICAO FROM files WHERE image_position IS NOT NULL");
