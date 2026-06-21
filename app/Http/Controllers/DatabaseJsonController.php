@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use OpenApi\Attributes as OA;
+
 class DatabaseJsonController extends Controller
 {
     public function __construct()
@@ -10,6 +12,26 @@ class DatabaseJsonController extends Controller
         set_time_limit(60 * 60);
     }
 
+    #[OA\Get(
+        path: '/json_db/{file}',
+        summary: 'Obter arquivo JSON exportado',
+        description: 'Retorna o conteudo de um arquivo JSON especifico da pasta public/db/json/',
+        tags: ['Database'],
+        security: [['ApiToken' => []]],
+        parameters: [
+            new OA\Parameter(
+                name: 'file',
+                description: 'Nome do arquivo (sem extensao .json)',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string', example: 'config')
+            )
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Conteudo do JSON'),
+            new OA\Response(response: 404, description: 'Arquivo nao encontrado'),
+        ]
+    )]
     public function index($file)
     {
         $file = $file . ".json";

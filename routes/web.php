@@ -18,6 +18,11 @@ $router->group(['middleware' => 'general'], function () use ($router) {
     $router->get('/', function () {
         return [];
     });
+
+    // OpenAPI documentation
+    $router->get('/openapi.json', 'OpenApiController@spec');
+    $router->get('/documentation', 'OpenApiController@ui');
+
     $router->get('/file/{path:.*}', 'FileController@open');
     $router->get('/metadata', 'MetaController@index');
 
