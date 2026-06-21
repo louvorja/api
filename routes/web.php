@@ -30,6 +30,9 @@ $router->group(['middleware' => 'general'], function () use ($router) {
 
     $router->get('/json_db', 'DatabaseJsonController@manifest');
     $router->get('/json_db/{file}', 'DatabaseJsonController@index');
+    $router->get('/db/manifest', 'DatabaseJsonController@manifest');
+    $router->get('/db/{table}', 'DatabaseJsonController@table');
+    $router->get('/db/{table}/categories', 'DatabaseJsonController@categories');
 
     $router->get('/download', 'DownloadController@index');
     $router->get('/version', 'VersionController@index');
