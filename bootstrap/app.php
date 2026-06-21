@@ -64,6 +64,9 @@ $app->configure('auth');
 $app->configure('api');
 $app->configure('files');
 
+/* Validate required environment variables after config loads */
+App\Helpers\EnvValidator::check();
+
 /*
 |--------------------------------------------------------------------------
 | Register Middleware
