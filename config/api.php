@@ -13,6 +13,25 @@ return [
     */
 
     'token' => env('API_TOKEN', ''),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Multiple API Keys (optional)
+    |--------------------------------------------------------------------------
+    |
+    | When set, validates Api-Token header against this list instead of the
+    | single token above. Each key has a label (for logging) and active flag.
+    | Falls back to single token when this array is empty (backward compat).
+    |
+    | Example:
+    |   'tokens' => [
+    |       'louvorja-desktop' => env('API_TOKEN_DESKTOP', ''),
+    |       'louvorja-web'     => env('API_TOKEN_WEB', ''),
+    |   ],
+    |
+    */
+
+    'tokens' => [],
     'cache' => env('APP_CACHE', true),
     'debug' => env('APP_DEBUG', false),
     'timezone' => env('APP_TIMEZONE', 'UTC'),
