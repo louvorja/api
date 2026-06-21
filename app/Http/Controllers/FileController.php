@@ -18,12 +18,13 @@ class FileController extends Controller
         $data = $model->select();
 
         if (isset($request["id_album"])) {
+            $albumId = (int) $request["id_album"];
             $data = $data
-                ->whereRaw('id_file in (select id_file_image from albums where albums.id_album=' . $request["id_album"] . ')')
-                ->orWhereRaw('id_file in (select id_file_image from musics inner join albums_musics on albums_musics.id_music=musics.id_music where albums_musics.id_album=' . $request["id_album"] . ')')
-                ->orWhereRaw('id_file in (select id_file_music from musics inner join albums_musics on albums_musics.id_music=musics.id_music where albums_musics.id_album=' . $request["id_album"] . ')')
-                ->orWhereRaw('id_file in (select id_file_instrumental_music from musics inner join albums_musics on albums_musics.id_music=musics.id_music where albums_musics.id_album=' . $request["id_album"] . ')')
-                ->orWhereRaw('id_file in (select id_file_image from lyrics inner join albums_musics on albums_musics.id_music=lyrics.id_music where albums_musics.id_album=' . $request["id_album"] . ')');
+                ->whereRaw('id_file in (select id_file_image from albums where albums.id_album = ?)', [$albumId])
+                ->orWhereRaw('id_file in (select id_file_music from musics inner join albums_musics on albums_musics.id_music=musics.id_music where albums_musics.id_album = ?)', [$albumId])
+                ->orWhereRaw('id_file in (select id_file_instrumental_music from musics inner join albums_musics on albums_musics.id_music=musics.id_music where albums_musics.id_album = ?)', [$albumId])
+                ->orWhereRaw('id_file in (select id_file_image from lyrics inner join albums_musics on albums_musics.id_music=lyrics.id_music where albums_musics.id_album = ?)', [$albumId])
+                ->orWhereRaw('id_file in (select id_file_image from musics inner join albums_musics on albums_musics.id_music=musics.id_music where albums_musics.id_album = ?)', [$albumId]);
         }
 
         return response()->json(Data::data($data, $request, [$model->getKeyName(), ...$model->getFillable()], 'files'));
