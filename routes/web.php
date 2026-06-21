@@ -23,6 +23,7 @@ $router->group(['middleware' => 'general'], function () use ($router) {
 
     $router->get('/player', 'PlayerController@index');
 
+    $router->get('/json_db', 'DatabaseJsonController@manifest');
     $router->get('/json_db/{file}', 'DatabaseJsonController@index');
 
     $router->get('/download', 'DownloadController@index');
