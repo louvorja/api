@@ -8,6 +8,7 @@ use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -27,8 +28,6 @@ class Handler extends ExceptionHandler
     /**
      * Report or log an exception.
      *
-     * This is a great spot to send exceptions to Sentry, Bugsnag, etc.
-     *
      * @param  \Throwable  $exception
      * @return void
      *
@@ -42,6 +41,10 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
+     * All errors return JSON with a consistent { error, code } structure.
+     * In debug mode, the message includes the exception details.
+     * In production, generic messages are used for server errors.
+     *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Throwable  $exception
      * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
@@ -50,38 +53,72 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        $rendered = parent::render($request, $exception);
+        $status = $this->getStatusCode($exception);
+        $message = $this->getErrorMessage($exception, $status);
 
+        // Validation errors: include field-level messages
         if ($exception instanceof ValidationException) {
-            $errors = $exception->errors();
-            $errorMessages = [];
-
-            foreach ($errors as $field => $messages) {
-                foreach ($messages as $message) {
-                    $errorMessages[] = $message;
-                }
-            }
-
             return response()->json([
-                'error' => implode(PHP_EOL, $errorMessages),
+                'error' => implode(PHP_EOL, array_merge(...array_values($exception->errors()))),
                 'messages' => $exception->errors(),
+                'code' => 422,
             ], 422);
-        } elseif ($exception instanceof NotFoundHttpException) {
-            $message = $exception->getMessage() ? $exception->getMessage() : Response::$statusTexts[$rendered->getStatusCode()];
-            $exception = new NotFoundHttpException($message, $exception);
-        } elseif ($exception instanceof HttpException) {
-            $message = $exception->getMessage() ? $exception->getMessage() : Response::$statusTexts[$rendered->getStatusCode()];
-            $exception = new HttpException($rendered->getStatusCode(), $message);
-        } else {
-            $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
-            $message = config('api.debug') ? $exception->getMessage() : Response::$statusTexts[$statusCode];
-            $exception = new HttpException($statusCode, $message);
         }
 
-        // Resonse
+        // All other errors: consistent { error, code } JSON
         return response()->json([
-            'error' => $exception->getMessage(),
-            'code' => $rendered->getStatusCode(),
-        ], $rendered->getStatusCode());
+            'error' => $message,
+            'code' => $status,
+        ], $status);
+    }
+
+    /**
+     * Determine the HTTP status code for the exception.
+     */
+    private function getStatusCode(Throwable $exception): int
+    {
+        if ($exception instanceof ValidationException) {
+            return 422;
+        }
+
+        if ($exception instanceof HttpException) {
+            return $exception->getStatusCode();
+        }
+
+        return 500;
+    }
+
+    /**
+     * Get the error message for the exception.
+     * Debug mode shows real messages; production shows generic ones for 5xx.
+     */
+    private function getErrorMessage(Throwable $exception, int $status): string
+    {
+        $debug = config('api.debug', false);
+
+        if ($status >= 500 && !$debug) {
+            return 'Erro interno do servidor.';
+        }
+
+        return $exception->getMessage() ?: $this->defaultMessage($status);
+    }
+
+    /**
+     * Default messages for common HTTP status codes.
+     */
+    private function defaultMessage(int $status): string
+    {
+        $messages = [
+            401 => 'Token inválido ou expirado.',
+            403 => 'Acesso negado.',
+            404 => 'Recurso não encontrado.',
+            405 => 'Método não permitido.',
+            422 => 'Dados inválidos.',
+            429 => 'Muitas requisições. Tente novamente mais tarde.',
+            500 => 'Erro interno do servidor.',
+            503 => 'Serviço indisponível.',
+        ];
+
+        return $messages[$status] ?? 'Erro desconhecido.';
     }
 }
