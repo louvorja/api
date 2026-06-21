@@ -92,6 +92,7 @@ $app->routeMiddleware([
     'confirmed_pwd' => App\Http\Middleware\ConfirmedPasswordMiddleware::class,
     'access' => App\Http\Middleware\AccessMiddleware::class,
     'general' => \App\Http\Middleware\GeneralMiddleware::class,
+    'rate_limit' => App\Http\Middleware\RateLimitMiddleware::class,
 ]);
 
 /*
