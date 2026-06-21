@@ -75,6 +75,7 @@ $app->configure('auth');
 
 $app->middleware([
     App\Http\Middleware\CorsMiddleware::class,
+    App\Http\Middleware\SecurityHeadersMiddleware::class,
 ]);
 
 $app->routeMiddleware([
