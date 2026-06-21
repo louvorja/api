@@ -47,7 +47,7 @@ class CorsMiddleware
      */
     private function resolveOrigin($request)
     {
-        $allowed = env('CORS_ALLOWED_ORIGINS', '*');
+        $allowed = config('api.cors.allowed_origins');
 
         if ($allowed === '*') {
             return '*';

@@ -11,8 +11,8 @@ class TelegramService
 
     public function __construct()
     {
-        $this->botToken = env('TELEGRAM_BOT_TOKEN');
-        $this->chatId = env('TELEGRAM_CHAT_ID');
+        $this->botToken = config('api.telegram.bot_token');
+        $this->chatId = config('api.telegram.chat_id');
     }
 
     public function sendMessage($message)
@@ -25,7 +25,7 @@ class TelegramService
         ];
 
         Http::withOptions([
-            'verify' => env('SSL_VERIFY', false),
+            'verify' => config('files.ssl_verify'),
         ])->post($url, $data);
     }
 }

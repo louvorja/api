@@ -61,6 +61,8 @@ $app->singleton(
 
 $app->configure('app');
 $app->configure('auth');
+$app->configure('api');
+$app->configure('files');
 
 /*
 |--------------------------------------------------------------------------

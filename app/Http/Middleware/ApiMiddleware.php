@@ -15,13 +15,13 @@ class ApiMiddleware
      */
     public function handle($request, Closure $next)
     {
-        $debug = env('APP_DEBUG', false);
+        $debug = config('api.debug');
 
         if (!$debug) {
             if (!$request->header('Api-Token')) {
                 return response()->json(['error' => "Token de API não informado!"], 401);
             }
-            if ($request->header('Api-Token') != env('API_TOKEN')) {
+            if ($request->header('Api-Token') != config('api.token')) {
                 return response()->json(['error' => "Token de API inválido!"], 401);
             }
         }

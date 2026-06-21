@@ -74,7 +74,7 @@ class Handler extends ExceptionHandler
             $exception = new HttpException($rendered->getStatusCode(), $message);
         } else {
             $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
-            $message = env('APP_DEBUG', false) ? $exception->getMessage() : Response::$statusTexts[$statusCode];
+            $message = config('api.debug') ? $exception->getMessage() : Response::$statusTexts[$statusCode];
             $exception = new HttpException($statusCode, $message);
         }
 

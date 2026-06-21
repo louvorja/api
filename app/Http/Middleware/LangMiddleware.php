@@ -19,7 +19,7 @@ class LangMiddleware
     {
         list($lang) = explode("/", $request->path());
 
-        $cache = env('APP_CACHE', true);
+        $cache = config('api.cache');
 
         if ($lang != "") {
             if (!$cache || Cache::store('file')->get("lang_{$lang}") != true) {

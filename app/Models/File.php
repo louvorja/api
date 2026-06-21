@@ -25,6 +25,6 @@ class File extends BaseModel
 
     public function getUrlAttribute()
     {
-        return env("FILES_URL") . $this->dir . "/" . $this->file_name;
+        return config("files.url") . $this->dir . "/" . $this->file_name;
     }
 }

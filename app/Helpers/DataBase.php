@@ -332,7 +332,7 @@ class DataBase
     public static function export()
     {
 
-        $database = env('DB_SQLITE_DATABASE');
+        $database = config('api.sqlite_database');
 
         $langs =  Language::get();
 

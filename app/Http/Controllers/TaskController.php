@@ -117,9 +117,9 @@ class TaskController extends Controller
             }
         }
 
-        Files::permissions(env("FILES_DIR"), 0644, 0755);
+        Files::permissions(config("files.dir"), 0644, 0755);
         $ret = Ftp::send_database();
-        Files::permissions(env("FILES_DIR"), 0444, 0555);
+        Files::permissions(config("files.dir"), 0444, 0555);
         if ($ret["status"] == true) {
             Configs::set("version_send_database_ftp", $version);
         }

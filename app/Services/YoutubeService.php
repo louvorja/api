@@ -11,7 +11,7 @@ class YoutubeService
 
     public function __construct()
     {
-        $this->key = env('YOUTUBE_KEY');
+        $this->key = config('api.youtube.key');
         $this->isLocalhost = (request()->getHost() === 'localhost' || request()->getHost() === '127.0.0.1');
     }
 

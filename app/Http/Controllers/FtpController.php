@@ -17,7 +17,7 @@ class FtpController extends Controller
             $id_language = "pt";
         }
 
-        $key = env('JWT_SECRET');
+        $key = config('api.jwt_secret');
         $jwt = $request->get("token");
 
         $ftp = Ftp::where('id_language', $id_language)->inRandomOrder()->first();

@@ -63,7 +63,7 @@ class LyricController extends Controller
             'lyrics.lyric',
             'lyrics.aux_lyric',
             'lyrics.id_file_image',
-            DB::raw('concat("' . env("FILES_URL") . '",files.dir,"/",files.file_name) as url_image'),
+            DB::raw('concat("' . config("files.url") . '",files.dir,"/",files.file_name) as url_image'),
             DB::raw('files.version as image_version'),
             'lyrics.time',
             'lyrics.instrumental_time',
