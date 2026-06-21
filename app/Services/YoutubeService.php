@@ -7,12 +7,10 @@ use GuzzleHttp\Client;
 class YoutubeService
 {
     protected $key;
-    protected $isLocalhost;
 
     public function __construct()
     {
         $this->key = config('api.youtube.key');
-        $this->isLocalhost = (request()->getHost() === 'localhost' || request()->getHost() === '127.0.0.1');
     }
 
     public function channel($id)
@@ -26,7 +24,7 @@ class YoutubeService
                     'id' => $id,
                     'key' => $this->key,
                 ],
-                'verify' => !$this->isLocalhost
+                'verify' => config('files.ssl_verify'),
             ]);
 
             $data = json_decode($response->getBody(), true);
@@ -53,7 +51,7 @@ class YoutubeService
                     'id' => $id,
                     'key' => $this->key,
                 ],
-                'verify' => !$this->isLocalhost
+                'verify' => config('files.ssl_verify'),
             ]);
 
             $data = json_decode($response->getBody(), true);
@@ -85,7 +83,7 @@ class YoutubeService
                         'maxResults' => 50,
                         'pageToken' => $pageToken,
                     ],
-                    'verify' => !$this->isLocalhost
+                    'verify' => config('files.ssl_verify'),
                 ]);
 
                 $data = json_decode($response->getBody(), true);
