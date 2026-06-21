@@ -63,4 +63,26 @@ class DatabaseJsonController extends Controller
 
         return response()->json(json_decode($content, true));
     }
+
+    /**
+     * Recria todos os arquivos JSON estaticos gerados do banco.
+     * Chama DataBase::export_json() para gerar pt_categories.json, pt_musics.json, etc.
+     */
+    public function export()
+    {
+        try {
+            $logs = \App\Helpers\DataBase::export_json();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Arquivos JSON recriados com sucesso',
+                'logs' => $logs,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Erro ao recriar arquivos JSON',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
