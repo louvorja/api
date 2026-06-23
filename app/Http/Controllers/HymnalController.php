@@ -1,13 +1,60 @@
-<?php\n\nnamespace App\Http\Controllers;\n\nuse App\Helpers\Data;\nuse App\Models\Music;\nuse Illuminate\Http\Request;\nuse Illuminate\Support\Facades\DB;\nuse OpenApi\Attributes as OA;\n\nclass HymnalController extends Controller\n{\n    public function __construct() {}\n\n    #[OA\Get(
-        path: '/hymnals',
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Helpers\Data;
+use App\Models\Music;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use OpenApi\Attributes as OA;
+
+class HymnalController extends Controller
+{
+    public function __construct() {}
+
+    #[OA\Get(
+        path: '/{lang}/hymnal',
         summary: 'Listar hinários',
-        description: 'Retorna lista de hinários disponíveis',
+        description: 'Retorna lista de hinários disponíveis para o idioma informado',
         tags: ['Public'],
         security: [],
         parameters: [
-            new OA\Parameter(name: 'lang', description: 'Idioma', in: 'query', required: false, schema: new OA\Schema(type: 'string', default: 'pt'))
+            new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt'))
         ],
         responses: [
             new OA\Response(response: 200, description: 'Lista de hinários', content: new OA\JsonContent(type: 'array', items: new OA\Items(type: 'object')))
         ]
-    )]\n    public function index(Request $request)\n    {\n        $model = new Music;\n        $fields = [\n            'musics.id_music',\n            'musics.name',\n            'albums_musics.track',\n            'musics.id_file_image',\n            DB::raw('concat("' . config("files.url") . '",files_image.dir,"/",files_image.file_name) as url_image'),\n            'files_image.version as image_version',\n            'musics.id_file_music',\n            DB::raw('concat("' . config("files.url") . '",files_music.dir,"/",files_music.file_name) as url_music'),\n            'files_music.version as music_version',\n            'musics.id_file_instrumental_music',\n            DB::raw('concat("' . config("files.url") . '",files_instrumental_music.dir,"/",files_instrumental_music.file_name) as url_instrumental_music'),\n            'files_instrumental_music.version as instrumental_music_version',\n            'musics.id_language',\n            'musics.created_at',\n            'musics.updated_at',\n        ];\n        $data = $model->select($fields)\n            ->where('musics.id_language', $request->id_language)\n            ->join('albums_musics', 'albums_musics.id_music', 'musics.id_music')\n            ->join('categories_albums', 'categories_albums.id_album', 'albums_musics.id_album')\n            ->join('categories', 'categories.id_category', 'categories_albums.id_category')\n            ->leftJoin('files as files_image', 'musics.id_file_image', 'files_image.id_file')\n            ->leftJoin('files as files_music', 'musics.id_file_music', 'files_music.id_file')\n            ->leftJoin('files as files_instrumental_music', 'musics.id_file_instrumental_music', 'files_instrumental_music.id_file')\n            ->where('categories.slug', 'hymnal')\n            ->where('categories.id_language', $request->id_language);\n        return response()->json(Data::data($data, $request, $fields));\n    }\n}
+    )]
+    public function index(Request $request)
+    {
+        $model = new Music;
+        $fields = [
+            'musics.id_music',
+            'musics.name',
+            'albums_musics.track',
+            'musics.id_file_image',
+            DB::raw('concat("' . config("files.url") . '",files_image.dir,"/",files_image.file_name) as url_image'),
+            'files_image.version as image_version',
+            'musics.id_file_music',
+            DB::raw('concat("' . config("files.url") . '",files_music.dir,"/",files_music.file_name) as url_music'),
+            'files_music.version as music_version',
+            'musics.id_file_instrumental_music',
+            DB::raw('concat("' . config("files.url") . '",files_instrumental_music.dir,"/",files_instrumental_music.file_name) as url_instrumental_music'),
+            'files_instrumental_music.version as instrumental_music_version',
+            'musics.id_language',
+            'musics.created_at',
+            'musics.updated_at',
+        ];
+        $data = $model->select($fields)
+            ->where('musics.id_language', $request->id_language)
+            ->join('albums_musics', 'albums_musics.id_music', 'musics.id_music')
+            ->join('categories_albums', 'categories_albums.id_album', 'albums_musics.id_album')
+            ->join('categories', 'categories.id_category', 'categories_albums.id_category')
+            ->leftJoin('files as files_image', 'musics.id_file_image', 'files_image.id_file')
+            ->leftJoin('files as files_music', 'musics.id_file_music', 'files_music.id_file')
+            ->leftJoin('files as files_instrumental_music', 'musics.id_file_instrumental_music', 'files_instrumental_music.id_file')
+            ->where('categories.slug', 'hymnal')
+            ->where('categories.id_language', $request->id_language);
+        return response()->json(Data::data($data, $request, $fields));
+    }
+}

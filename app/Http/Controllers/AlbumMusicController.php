@@ -26,7 +26,21 @@ class AlbumMusicController extends Controller
     }
 
     #[OA\Get(
-        path: '/albums/{album_id}/musics',
+        path: '/{lang}/albums_musics',
+        summary: 'Listar associações álbum-música (público)',
+        description: 'Retorna lista paginada para o idioma informado',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt')),
+            new OA\Parameter(name: 'page', description: 'Página', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 1))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Lista', content: new OA\JsonContent(type: 'array', items: new OA\Items(type: 'object')))
+        ]
+    )]
+    #[OA\Get(
+        path: '/admin/albums_musics',
         summary: 'Listar associações álbum-música',
         description: 'Retorna lista paginada',
         tags: ['Admin - Álbuns-Músicas'],
@@ -62,7 +76,7 @@ class AlbumMusicController extends Controller
     }
 
     #[OA\Get(
-        path: '/albums/{album_id}/musics/{id}',
+        path: '/admin/albums_musics/{id}',
         summary: 'Buscar associação álbum-música por ID',
         tags: ['Admin - Álbuns-Músicas'],
         security: [['bearerAuth' => []]],
@@ -87,7 +101,7 @@ class AlbumMusicController extends Controller
     }
 
     #[OA\Post(
-        path: '/albums/{album_id}/musics',
+        path: '/admin/albums_musics',
         summary: 'Criar associação álbum-música',
         tags: ['Admin - Álbuns-Músicas'],
         security: [['bearerAuth' => []]],
@@ -111,7 +125,7 @@ class AlbumMusicController extends Controller
     }
 
     #[OA\Put(
-        path: '/albums/{album_id}/musics/{id}',
+        path: '/admin/albums_musics/{id}',
         summary: 'Atualizar associação álbum-música',
         tags: ['Admin - Álbuns-Músicas'],
         security: [['bearerAuth' => []]],
@@ -142,7 +156,7 @@ class AlbumMusicController extends Controller
     }
 
     #[OA\Delete(
-        path: '/albums/{album_id}/musics/{id}',
+        path: '/admin/albums_musics/{id}',
         summary: 'Excluir associação álbum-música',
         tags: ['Admin - Álbuns-Músicas'],
         security: [['bearerAuth' => []]],

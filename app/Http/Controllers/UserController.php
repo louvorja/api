@@ -27,7 +27,7 @@ class UserController extends Controller
 
 
     #[OA\Get(
-        path: '/users',
+        path: '/admin/users',
         summary: 'Listar usuários',
         description: 'Retorna lista paginada de usuários, com suporte a filtros por idioma e busca textual',
         tags: ['Admin - Usuários'],
@@ -52,7 +52,7 @@ class UserController extends Controller
     }
 
     #[OA\Get(
-        path: '/users/{id}',
+        path: '/admin/users/{id}',
         summary: 'Buscar usuário por ID',
         description: 'Retorna os dados detalhados de um(a) usuário específico(a)',
         tags: ['Admin - Usuários'],
@@ -81,7 +81,7 @@ class UserController extends Controller
     }
 
     #[OA\Post(
-        path: '/users',
+        path: '/admin/users',
         summary: 'Criar usuário',
         description: 'Cria um novo(a) usuário. Requer autenticação admin.',
         tags: ['Admin - Usuários'],
@@ -117,7 +117,7 @@ class UserController extends Controller
     }
 
     #[OA\Put(
-        path: '/users/{id}',
+        path: '/admin/users/{id}',
         summary: 'Atualizar usuário',
         description: 'Atualiza os dados de um(a) usuário existente',
         tags: ['Admin - Usuários'],
@@ -172,7 +172,7 @@ class UserController extends Controller
     }
 
     #[OA\Delete(
-        path: '/users/{id}',
+        path: '/admin/users/{id}',
         summary: 'Excluir usuário',
         description: 'Remove um(a) usuário pelo ID',
         tags: ['Admin - Usuários'],

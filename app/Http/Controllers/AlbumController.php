@@ -26,7 +26,23 @@ class AlbumController extends Controller
     }
 
     #[OA\Get(
-        path: '/albums',
+        path: '/{lang}/albums',
+        summary: 'Listar álbuns (público)',
+        description: 'Retorna lista paginada de álbuns para o idioma informado',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt')),
+            new OA\Parameter(name: 'q', description: 'Busca textual', in: 'query', required: false, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'page', description: 'Página', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 1)),
+            new OA\Parameter(name: 'per_page', description: 'Itens por página', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 15))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Lista de álbuns', content: new OA\JsonContent(type: 'array', items: new OA\Items(type: 'object')))
+        ]
+    )]
+    #[OA\Get(
+        path: '/admin/albums',
         summary: 'Listar álbuns',
         description: 'Retorna lista paginada de álbuns, com suporte a filtros por idioma e busca textual',
         tags: ['Admin - Álbuns'],
@@ -82,7 +98,37 @@ class AlbumController extends Controller
     }
 
     #[OA\Get(
-        path: '/albums/{id}',
+        path: '/{lang}/albums/{id}',
+        summary: 'Buscar álbum por ID (público)',
+        description: 'Retorna os dados detalhados de um álbum para o idioma informado',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt')),
+            new OA\Parameter(name: 'id', description: 'ID do álbum', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Dados do álbum', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 404, description: 'Álbum não encontrado')
+        ]
+    )]
+    #[OA\Get(
+        path: '/{lang}/album/{id}',
+        summary: 'Buscar álbum por ID (alias singular)',
+        description: 'Alias para /{lang}/albums/{id}',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt')),
+            new OA\Parameter(name: 'id', description: 'ID do álbum', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Dados do álbum', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 404, description: 'Álbum não encontrado')
+        ]
+    )]
+    #[OA\Get(
+        path: '/admin/albums/{id}',
         summary: 'Buscar álbum por ID',
         description: 'Retorna os dados detalhados de um(a) álbum específico(a)',
         tags: ['Admin - Álbuns'],
@@ -149,7 +195,7 @@ class AlbumController extends Controller
     }
 
     #[OA\Post(
-        path: '/albums',
+        path: '/admin/albums',
         summary: 'Criar álbum',
         description: 'Cria um novo(a) álbum. Requer autenticação admin.',
         tags: ['Admin - Álbuns'],
@@ -177,7 +223,7 @@ class AlbumController extends Controller
     }
 
     #[OA\Put(
-        path: '/albums/{id}',
+        path: '/admin/albums/{id}',
         summary: 'Atualizar álbum',
         description: 'Atualiza os dados de um(a) álbum existente',
         tags: ['Admin - Álbuns'],
@@ -216,7 +262,7 @@ class AlbumController extends Controller
     }
 
     #[OA\Delete(
-        path: '/albums/{id}',
+        path: '/admin/albums/{id}',
         summary: 'Excluir álbum',
         description: 'Remove um(a) álbum pelo ID',
         tags: ['Admin - Álbuns'],

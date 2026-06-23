@@ -2,8 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use OpenApi\Attributes as OA;
+
 class OpenApiController extends Controller
 {
+    #[OA\Get(
+        path: '/openapi.json',
+        summary: 'Especificação OpenAPI',
+        description: 'Retorna a especificação OpenAPI (Swagger) em formato JSON',
+        tags: ['Documentação'],
+        security: [],
+        responses: [
+            new OA\Response(response: 200, description: 'Spec OpenAPI JSON'),
+            new OA\Response(response: 404, description: 'Arquivo não encontrado')
+        ]
+    )]
     public function spec()
     {
         $path = base_path('storage/openapi.json');
@@ -16,6 +29,16 @@ class OpenApiController extends Controller
         return response()->json(json_decode($content), 200, [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 
+    #[OA\Get(
+        path: '/documentation',
+        summary: 'Interface Swagger UI',
+        description: 'Retorna a página HTML com Swagger UI para visualização interativa da documentação da API',
+        tags: ['Documentação'],
+        security: [],
+        responses: [
+            new OA\Response(response: 200, description: 'Página HTML do Swagger UI')
+        ]
+    )]
     public function ui()
     {
         $html = <<<'HTML'

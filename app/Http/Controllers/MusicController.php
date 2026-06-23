@@ -27,7 +27,23 @@ class MusicController extends Controller
     }
 
     #[OA\Get(
-        path: '/musics',
+        path: '/{lang}/musics',
+        summary: 'Listar músicas (público)',
+        description: 'Retorna lista paginada de músicas para o idioma informado',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt')),
+            new OA\Parameter(name: 'q', description: 'Busca textual', in: 'query', required: false, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'page', description: 'Página', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 1)),
+            new OA\Parameter(name: 'per_page', description: 'Itens por página', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 15))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Lista de músicas', content: new OA\JsonContent(type: 'array', items: new OA\Items(type: 'object')))
+        ]
+    )]
+    #[OA\Get(
+        path: '/admin/musics',
         summary: 'Listar músicas',
         description: 'Retorna lista paginada de músicas, com suporte a filtros por idioma e busca textual',
         tags: ['Admin - Músicas'],
@@ -84,7 +100,37 @@ class MusicController extends Controller
     }
 
     #[OA\Get(
-        path: '/musics/{id}',
+        path: '/{lang}/musics/{id}',
+        summary: 'Buscar música por ID (público)',
+        description: 'Retorna os dados detalhados de uma música para o idioma informado',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt')),
+            new OA\Parameter(name: 'id', description: 'ID da música', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Dados da música', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 404, description: 'Música não encontrada')
+        ]
+    )]
+    #[OA\Get(
+        path: '/{lang}/music/{id}',
+        summary: 'Buscar música por ID (alias singular)',
+        description: 'Alias para /{lang}/musics/{id}',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt')),
+            new OA\Parameter(name: 'id', description: 'ID da música', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Dados da música', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 404, description: 'Música não encontrada')
+        ]
+    )]
+    #[OA\Get(
+        path: '/admin/musics/{id}',
         summary: 'Buscar música por ID',
         description: 'Retorna os dados detalhados de um(a) música específico(a)',
         tags: ['Admin - Músicas'],
@@ -150,7 +196,7 @@ class MusicController extends Controller
     }
 
     #[OA\Post(
-        path: '/musics',
+        path: '/admin/musics',
         summary: 'Criar música',
         description: 'Cria um novo(a) música. Requer autenticação admin.',
         tags: ['Admin - Músicas'],
@@ -178,7 +224,7 @@ class MusicController extends Controller
     }
 
     #[OA\Put(
-        path: '/musics/{id}',
+        path: '/admin/musics/{id}',
         summary: 'Atualizar música',
         description: 'Atualiza os dados de um(a) música existente',
         tags: ['Admin - Músicas'],
@@ -217,7 +263,7 @@ class MusicController extends Controller
     }
 
     #[OA\Delete(
-        path: '/musics/{id}',
+        path: '/admin/musics/{id}',
         summary: 'Excluir música',
         description: 'Remove um(a) música pelo ID',
         tags: ['Admin - Músicas'],

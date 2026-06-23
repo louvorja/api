@@ -25,7 +25,23 @@ class LyricController extends Controller
     }
 
     #[OA\Get(
-        path: '/lyrics',
+        path: '/{lang}/lyrics',
+        summary: 'Listar letras (público)',
+        description: 'Retorna lista paginada de letras para o idioma informado',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt')),
+            new OA\Parameter(name: 'q', description: 'Busca textual', in: 'query', required: false, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'page', description: 'Página', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 1)),
+            new OA\Parameter(name: 'per_page', description: 'Itens por página', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 15))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Lista de letras', content: new OA\JsonContent(type: 'array', items: new OA\Items(type: 'object')))
+        ]
+    )]
+    #[OA\Get(
+        path: '/admin/lyrics',
         summary: 'Listar letras',
         description: 'Retorna lista paginada de letras, com suporte a filtros por idioma e busca textual',
         tags: ['Admin - Letras'],
@@ -74,7 +90,7 @@ class LyricController extends Controller
     }
 
     #[OA\Get(
-        path: '/lyrics/{id}',
+        path: '/admin/lyrics/{id}',
         summary: 'Buscar letra por ID',
         description: 'Retorna os dados detalhados de um(a) letra específico(a)',
         tags: ['Admin - Letras'],
@@ -120,7 +136,7 @@ class LyricController extends Controller
     }
 
     #[OA\Post(
-        path: '/lyrics',
+        path: '/admin/lyrics',
         summary: 'Criar letra',
         description: 'Cria um novo(a) letra. Requer autenticação admin.',
         tags: ['Admin - Letras'],
@@ -148,7 +164,7 @@ class LyricController extends Controller
     }
 
     #[OA\Put(
-        path: '/lyrics/{id}',
+        path: '/admin/lyrics/{id}',
         summary: 'Atualizar letra',
         description: 'Atualiza os dados de um(a) letra existente',
         tags: ['Admin - Letras'],
@@ -187,7 +203,7 @@ class LyricController extends Controller
     }
 
     #[OA\Delete(
-        path: '/lyrics/{id}',
+        path: '/admin/lyrics/{id}',
         summary: 'Excluir letra',
         description: 'Remove um(a) letra pelo ID',
         tags: ['Admin - Letras'],

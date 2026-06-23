@@ -25,8 +25,24 @@ class CategoryAlbumController extends Controller
         return Validations::validationMessages();
     }
 
+    /**
+     * Display a listing of the resource.
+     */
     #[OA\Get(
-        path: '/categories/{category_id}/albums',
+        path: '/{lang}/categories_albums',
+        summary: 'Listagem de associações categoria-álbum (público)',
+        description: 'Retorna a listagem de associações categoria-álbum para o idioma informado',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: '...', content: new OA\JsonContent(type: 'array', items: new OA\Items(type: 'object')))
+        ]
+    )]
+    #[OA\Get(
+        path: '/admin/categories_albums',
         summary: 'Listar associações categoria-álbum',
         description: 'Retorna lista paginada',
         tags: ['Admin - Categorias-Álbuns'],
@@ -63,7 +79,7 @@ class CategoryAlbumController extends Controller
     }
 
     #[OA\Get(
-        path: '/categories/{category_id}/albums/{id}',
+        path: '/admin/categories_albums/{id}',
         summary: 'Buscar associação categoria-álbum por ID',
         tags: ['Admin - Categorias-Álbuns'],
         security: [['bearerAuth' => []]],
@@ -88,7 +104,7 @@ class CategoryAlbumController extends Controller
     }
   
     #[OA\Post(
-        path: '/categories/{category_id}/albums',
+        path: '/admin/categories_albums',
         summary: 'Criar associação categoria-álbum',
         tags: ['Admin - Categorias-Álbuns'],
         security: [['bearerAuth' => []]],
@@ -119,7 +135,7 @@ class CategoryAlbumController extends Controller
     }
 
     #[OA\Put(
-        path: '/categories/{category_id}/albums/{id}',
+        path: '/admin/categories_albums/{id}',
         summary: 'Atualizar associação categoria-álbum',
         tags: ['Admin - Categorias-Álbuns'],
         security: [['bearerAuth' => []]],
@@ -150,7 +166,7 @@ class CategoryAlbumController extends Controller
     }
 
     #[OA\Delete(
-        path: '/categories/{category_id}/albums/{id}',
+        path: '/admin/categories_albums/{id}',
         summary: 'Excluir associação categoria-álbum',
         tags: ['Admin - Categorias-Álbuns'],
         security: [['bearerAuth' => []]],

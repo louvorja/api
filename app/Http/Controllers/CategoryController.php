@@ -24,8 +24,24 @@ class CategoryController extends Controller
         return Validations::validationMessages();
     }
 
+    /**
+     * Display a listing of the resource.
+     */
     #[OA\Get(
-        path: '/categories',
+        path: '/{lang}/categories',
+        summary: 'Listagem de categorias (público)',
+        description: 'Retorna a listagem de categorias para o idioma informado',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: '...', content: new OA\JsonContent(type: 'array', items: new OA\Items(type: 'object')))
+        ]
+    )]
+    #[OA\Get(
+        path: '/admin/categories',
         summary: 'Listar categorias',
         description: 'Retorna lista paginada de categorias, com suporte a filtros por idioma e busca textual',
         tags: ['Admin - Categorias'],
@@ -52,7 +68,7 @@ class CategoryController extends Controller
     }
 
     #[OA\Get(
-        path: '/categories/{id}',
+        path: '/admin/categories/{id}',
         summary: 'Buscar categoria por ID',
         description: 'Retorna os dados detalhados de um(a) categoria específico(a)',
         tags: ['Admin - Categorias'],
@@ -81,7 +97,7 @@ class CategoryController extends Controller
     }
 
     #[OA\Post(
-        path: '/categories',
+        path: '/admin/categories',
         summary: 'Criar categoria',
         description: 'Cria um novo(a) categoria. Requer autenticação admin.',
         tags: ['Admin - Categorias'],
@@ -113,7 +129,7 @@ class CategoryController extends Controller
     }
 
     #[OA\Put(
-        path: '/categories/{id}',
+        path: '/admin/categories/{id}',
         summary: 'Atualizar categoria',
         description: 'Atualiza os dados de um(a) categoria existente',
         tags: ['Admin - Categorias'],
@@ -152,7 +168,7 @@ class CategoryController extends Controller
     }
 
     #[OA\Delete(
-        path: '/categories/{id}',
+        path: '/admin/categories/{id}',
         summary: 'Excluir categoria',
         description: 'Remove um(a) categoria pelo ID',
         tags: ['Admin - Categorias'],

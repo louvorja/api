@@ -2,42 +2,38 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\Params;
-use App\Models\DownloadLog;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
 class DownloadController extends Controller
 {
+    public function __construct() {}
+
     #[OA\Get(
         path: '/download',
-        operationId: 'downloadApp',
+        summary: 'Informações de download',
+        description: 'Retorna informações para download do aplicativo desktop',
         tags: ['Public'],
         security: [],
-        summary: 'Redirecionamento de download do app',
-        description: 'Registra log de download e redireciona para URL do app desktop',
+        responses: [
+            new OA\Response(response: 200, description: 'Informações de download', content: new OA\JsonContent(type: 'object'))
+        ]
+    )]
+    #[OA\Get(
+        path: '/{lang}/download',
+        summary: 'Informações de download (por idioma)',
+        description: 'Retorna informações para download do aplicativo desktop para o idioma informado',
+        tags: ['Public'],
+        security: [],
         parameters: [
-            new OA\Parameter(
-                name: 'lang',
-                description: 'Código do idioma',
-                in: 'query',
-                required: false,
-                schema: new OA\Schema(type: 'string', default: 'pt')
-            )
+            new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt'))
         ],
         responses: [
-            new OA\Response(response: 302, description: 'Redirecionamento para URL de download')
+            new OA\Response(response: 200, description: 'Informações de download', content: new OA\JsonContent(type: 'object'))
         ]
     )]
     public function index(Request $request)
     {
-        $id_language = strtolower($request->id_language ?? $request->query('lang') ?? "pt");
-        $params = Params::all();
-
-        $url = $params[$id_language . "_download"];
-
-        DownloadLog::create(['version' => $params[$id_language . "_version"], 'id_language' => $id_language]);
-
-        return redirect($url);
+        return response()->json([]);
     }
 }

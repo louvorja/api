@@ -14,7 +14,22 @@ class FileController extends Controller
     public function __construct() {}
 
     #[OA\Get(
-        path: '/files',
+        path: '/{lang}/files',
+        summary: 'Listar arquivos (público)',
+        description: 'Retorna lista paginada de arquivos para o idioma informado',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt')),
+            new OA\Parameter(name: 'q', description: 'Busca textual', in: 'query', required: false, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'type', description: 'Tipo do arquivo', in: 'query', required: false, schema: new OA\Schema(type: 'string'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Lista de arquivos', content: new OA\JsonContent(type: 'array', items: new OA\Items(type: 'object')))
+        ]
+    )]
+    #[OA\Get(
+        path: '/admin/files',
         summary: 'Listar arquivos',
         description: 'Retorna lista paginada de arquivos, com filtros por idioma e tipo',
         tags: ['Public'],
@@ -47,7 +62,7 @@ class FileController extends Controller
     }
 
     #[OA\Get(
-        path: '/files/{id}',
+        path: '/admin/files/{id}',
         summary: 'Buscar arquivo por ID',
         description: 'Retorna os metadados de um arquivo específico',
         tags: ['Public'],
@@ -75,7 +90,7 @@ class FileController extends Controller
     }
 
     #[OA\Get(
-        path: '/files/open/{path}',
+        path: '/file/{path}',
         summary: 'Abrir arquivo',
         description: 'Retorna o conteúdo ou redireciona para o arquivo no caminho informado',
         tags: ['Public'],
