@@ -66,6 +66,9 @@ $app->configure('files');
 $app->configure('jwt');
 $app->configure('version');
 
+/* Validate required environment variables after config loads */
+App\Helpers\EnvValidator::check();
+
 /*
 |--------------------------------------------------------------------------
 | Register Middleware
