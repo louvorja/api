@@ -125,6 +125,7 @@ $router->group(['middleware' => 'general'], function () use ($router) {
             $router->get('/refresh_online_videos', 'TaskController@refresh_online_videos');
             $router->get('/import_slides', 'TaskController@import_slides');
             $router->get('/export_database_json', 'TaskController@export_database_json');
+            $router->get('/send_database_ftp', 'TaskController@send_database_ftp');
         });
 
         $router->group(['prefix' => '{lang}', 'middleware' =>  'lang'], function () use ($router) {
