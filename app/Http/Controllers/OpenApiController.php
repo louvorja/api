@@ -28,8 +28,6 @@ class OpenApiController extends Controller
         $spec = json_decode(file_get_contents($path), true);
 
         // Detectar a URL base dinamicamente do request atual.
-        // Isso garante que o "Try it out" do Swagger UI sempre bata no servidor certo,
-        // independente do ambiente (producao, dev, staging, homologacao).
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
             || ($_SERVER['SERVER_PORT'] ?? '') == 443
             || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
@@ -39,8 +37,12 @@ class OpenApiController extends Controller
         $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
         $baseUrl = $protocol . '://' . $host;
 
+        // Sempre incluir producao como server alternativo.
+        // O Swagger UI mostra um dropdown para alternar entre os servers.
+        // CORS ja configurado em producao (Access-Control-Allow-Origin: *).
         $spec['servers'] = [
-            ['url' => $baseUrl, 'description' => 'Servidor atual (auto-detectado)'],
+            ['url' => $baseUrl, 'description' => 'Dev - ' . $host],
+            ['url' => 'https://api.louvorja.com.br', 'description' => 'Producao - api.louvorja.com.br'],
         ];
 
         return response()->json($spec, 200, [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -58,7 +60,16 @@ class OpenApiController extends Controller
     )]
     public function ui()
     {
-        $html = <<<'HTML'
+        // Detectar URL base para construir a URL absoluta da spec.
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || ($_SERVER['SERVER_PORT'] ?? '') == 443
+            || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
+            ? 'https'
+            : 'http';
+        $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
+        $specUrl = $protocol . '://' . $host . '/openapi.json';
+
+        $html = <<<HTML
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -73,7 +84,7 @@ class OpenApiController extends Controller
     <script>
         window.onload = function() {
             window.ui = SwaggerUIBundle({
-                url: '/openapi.json',
+                url: '{$specUrl}',
                 dom_id: '#swagger-ui',
                 deepLinking: true,
                 presets: [SwaggerUIBundle.presets.apis],
