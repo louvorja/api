@@ -18,7 +18,19 @@ class OnlineVideosController extends Controller
 
         $type = $request->query('tipo') ?? "tudo";
         $id = $request->query('id') ?? "";
+        $format = $request->query('format') ?? "sql"; // sql ou json
 
+        // SQL format (default for backward compatibility)
+        if ($format === "sql") {
+            return $this->returnSqlFormat($id_language, $type, $id);
+        }
+
+        // JSON format (modern, easier to parse)
+        return $this->returnJsonFormat($id_language, $type, $id);
+    }
+
+    private function returnSqlFormat($id_language, $type, $id)
+    {
         $sql = [];
 
         // SQL CANAIS
@@ -88,8 +100,69 @@ class OnlineVideosController extends Controller
         return implode("|", $sql) . PHP_EOL;
     }
 
+    private function returnJsonFormat($id_language, $type, $id)
+    {
+        $data = [];
+
+        // CANAIS
+        if ($type == "canais" || $type == "tudo") {
+            $data['channels'] = OnlineVideoChannel::where('id_language', $id_language)->where('status', 'validated')
+                ->get()
+                ->map(function ($channel) {
+                    return [
+                        'channel_id' => $channel->channel_id,
+                        'title' => $channel->title,
+                        'custom_url' => $channel->custom_url,
+                        'default_image' => $channel->default_image,
+                        'default_image_base64' => $channel->default_image_base64,
+                    ];
+                })->toArray();
+        }
+
+        // PLAYLISTS
+        if ($type == "playlists" || $type == "tudo") {
+            $playlists = OnlineVideoPlaylist::where('id_language', $id_language)->where('status', 'validated');
+            if ($id <> "") {
+                $playlists->with('channel')->whereHas('channel', function ($query) use ($id) {
+                    $query->where('channel_id', $id);
+                });
+            }
+            $data['playlists'] = $playlists->get()->map(function ($playlist) {
+                return [
+                    'playlist_id' => $playlist->playlist_id,
+                    'channel_id' => $playlist->channel->channel_id,
+                    'title' => $playlist->title,
+                    'default_image' => $playlist->default_image,
+                    'default_image_base64' => $playlist->default_image_base64,
+                ];
+            })->toArray();
+        }
+
+        // VIDEOS
+        if ($type == "videos" || $type == "tudo") {
+            $videos = OnlineVideo::where('id_language', $id_language)->where('status', 'validated');
+            if ($id <> "") {
+                $videos->with('playlist')->whereHas('playlist', function ($query) use ($id) {
+                    $query->where('playlist_id', $id);
+                });
+            }
+            $data['videos'] = $videos->get()->map(function ($video) {
+                return [
+                    'video_id' => $video->video_id,
+                    'playlist_id' => $video->playlist->playlist_id,
+                    'title' => $video->title,
+                    'sequence' => $video->sequence,
+                    'default_image' => $video->default_image,
+                    'default_image_base64' => $video->default_image_base64,
+                ];
+            })->toArray();
+        }
+
+        return response()->json($data);
+    }
+
     private function escapeString($string)
     {
-        return str_replace("'", "\'", $string);
+        return str_replace("'", "\\'", $string);
     }
 }
