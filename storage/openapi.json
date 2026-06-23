@@ -1568,19 +1568,27 @@
                 "tags": [
                     "Public"
                 ],
-                "summary": "Informações de download",
-                "description": "Retorna informações para download do aplicativo desktop",
+                "summary": "Download do app desktop",
+                "description": "Redireciona (302) para a URL de download do instalador do app desktop LouvorJA. A URL é obtida dinamicamente dos parâmetros do sistema conforme o idioma.",
                 "operationId": "cfdf8fb0400afc2cc594de357da6ebb9",
-                "responses": {
-                    "200": {
-                        "description": "Informações de download",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "query",
+                        "description": "Código do idioma (default: pt)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
                         }
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Redirecionamento para a URL de download"
+                    },
+                    "404": {
+                        "description": "URL de download não configurada para o idioma"
                     }
                 },
                 "security": []
@@ -1591,8 +1599,8 @@
                 "tags": [
                     "Public"
                 ],
-                "summary": "Informações de download (por idioma)",
-                "description": "Retorna informações para download do aplicativo desktop para o idioma informado",
+                "summary": "Download do app desktop (por idioma)",
+                "description": "Redireciona (302) para a URL de download do instalador do app desktop LouvorJA para o idioma informado.",
                 "operationId": "937e4605ab69d410993b1c49792a22dd",
                 "parameters": [
                     {
@@ -1607,15 +1615,11 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "Informações de download",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
+                    "302": {
+                        "description": "Redirecionamento para a URL de download"
+                    },
+                    "404": {
+                        "description": "URL de download não configurada para o idioma"
                     }
                 },
                 "security": []
