@@ -25,8 +25,25 @@ class OpenApiController extends Controller
             return response()->json(['error' => 'openapi.json not found. Run: php generate_openapi.php'], 404);
         }
 
-        $content = file_get_contents($path);
-        return response()->json(json_decode($content), 200, [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $spec = json_decode(file_get_contents($path), true);
+
+        // Detectar a URL base dinamicamente do request atual.
+        // Isso garante que o "Try it out" do Swagger UI sempre bata no servidor certo,
+        // independente do ambiente (producao, dev, staging, homologacao).
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || ($_SERVER['SERVER_PORT'] ?? '') == 443
+            || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
+            ? 'https'
+            : 'http';
+
+        $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
+        $baseUrl = $protocol . '://' . $host;
+
+        $spec['servers'] = [
+            ['url' => $baseUrl, 'description' => 'Servidor atual (auto-detectado)'],
+        ];
+
+        return response()->json($spec, 200, [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 
     #[OA\Get(
@@ -60,7 +77,13 @@ class OpenApiController extends Controller
                 dom_id: '#swagger-ui',
                 deepLinking: true,
                 presets: [SwaggerUIBundle.presets.apis],
-                layout: 'BaseLayout'
+                layout: 'BaseLayout',
+                tryItOutEnabled: true,
+                supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
+                docExpansion: 'list',
+                filter: true,
+                showExtensions: true,
+                showCommonExtensions: true
             });
         };
     </script>
