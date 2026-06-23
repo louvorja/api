@@ -64,6 +64,7 @@ $app->configure('auth');
 $app->configure('api');
 $app->configure('files');
 $app->configure('jwt');
+$app->configure('version');
 
 /*
 |--------------------------------------------------------------------------
