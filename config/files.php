@@ -26,6 +26,6 @@ return [
     |
     */
 
-    'ssl_verify' => env('SSL_VERIFY', false),
+    'ssl_verify' => env('SSL_VERIFY', true),
 
 ];
