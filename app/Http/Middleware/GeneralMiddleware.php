@@ -35,7 +35,13 @@ class GeneralMiddleware
         // Libera acesso direto por IP (desenvolvimento)
         $isDirectIp = (bool) preg_match('/^\d+\.\d+\.\d+\.\d+/', $host);
 
-        if ($subdomain !== 'api' && $subdomain !== 'localhost' && !$isDirectIp) {
+        // Libera túneis de desenvolvimento (trycloudflare.com, etc.)
+        $isDevTunnel = str_contains($host, 'trycloudflare.com')
+            || str_contains($host, 'loca.lt')
+            || str_contains($host, 'ngrok.io')
+            || $host === 'localhost';
+
+        if (!$isDevTunnel && $subdomain !== 'api' && !$isDirectIp) {
             $locale = 'pt'; // Idioma padrão
 
             // Verifica se a URL contém um segmento de idioma (ex: /es)
