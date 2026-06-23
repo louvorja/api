@@ -14,8 +14,12 @@ use OpenApi\Attributes as OA;
     )
 )]
 #[OA\Server(
-    url: '/api',
-    description: 'API Base URL'
+    url: 'https://api.louvorja.com.br',
+    description: 'Produção'
+)]
+#[OA\Server(
+    url: 'http://localhost:8000',
+    description: 'Desenvolvimento'
 )]
 #[OA\SecurityScheme(
     securityScheme: 'bearerAuth',
