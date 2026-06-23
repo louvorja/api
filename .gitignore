@@ -29,3 +29,6 @@ Homestead.yaml
 *.log
 
 error_log
+# OpenAPI generated
+/storage/openapi.json
+generate_openapi.php

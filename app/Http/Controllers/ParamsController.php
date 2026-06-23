@@ -18,8 +18,7 @@ class ParamsController extends Controller
             new OA\Parameter(name: 'type', description: 'Formato de resposta', in: 'query', required: false, schema: new OA\Schema(type: 'string', enum: ['json', 'env'], default: 'json'))
         ],
         responses: [
-            new OA\Response(response: 200, description: 'Parâmetros em formato JSON', content: new OA\JsonContent(type: 'object')),
-            new OA\Response(response: 200, description: 'Parâmetros em formato .env', content: new OA\MediaType(mediaType: 'text/plain'))
+            new OA\Response(response: 200, description: 'Parâmetros da aplicação (formato depende do parâmetro type)', content: new OA\JsonContent(type: 'object'))
         ]
     )]
     public function index(Request $request)

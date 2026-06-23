@@ -15,18 +15,19 @@ class PlayerController extends Controller
         tags: ['Public'],
         security: [],
         summary: 'Player de vídeo YouTube',
-        description: 'Retorna HTML com iframe embed do YouTube para o vídeo informado'
-    )]
-    #[OA\QueryParameter(
-        name: 'v',
-        description: 'ID do vídeo no YouTube',
-        required: true,
-        type: 'string'
-    )]
-    #[OA\Response(
-        response: 200,
-        description: 'Sucesso',
-        content: new OA\Content\TextContent(type: 'text/html')
+        description: 'Retorna HTML com iframe embed do YouTube para o vídeo informado',
+        parameters: [
+            new OA\Parameter(
+                name: 'v',
+                description: 'ID do vídeo no YouTube',
+                in: 'query',
+                required: true,
+                schema: new OA\Schema(type: 'string')
+            )
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'HTML do player')
+        ]
     )]
     public function index(Request $request)
     {
@@ -57,7 +58,7 @@ class PlayerController extends Controller
         <iframe src='$url' title='Player' frameborder='0' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share' referrerpolicy='strict-origin-when-cross-origin' allowfullscreen>
         </iframe>
         </body>
-        </html>
+        <html>
         ";
     }
 }

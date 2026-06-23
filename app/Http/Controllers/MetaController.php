@@ -26,8 +26,8 @@ class MetaController extends Controller
                 new OA\Property(property: 'bible',
                     properties: [
                         new OA\Property(property: 'total_versions', type: 'integer'),
-                        new OA\Property(property: 'versions', type: 'array', items: new OA\Object),
-                        new OA\Property(property: 'missing_verses', type: 'array', items: new OA\Object)
+                        new OA\Property(property: 'versions', type: 'array', items: new OA\Items(type: 'object')),
+                        new OA\Property(property: 'missing_verses', type: 'array', items: new OA\Items(type: 'object'))
                     ]
                 )
             ]

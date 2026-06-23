@@ -29,16 +29,7 @@ class DatabaseJsonController extends Controller
                 description: 'Lista de arquivos JSON',
                 content: new OA\JsonContent(
                     type: 'object',
-                    properties: [
-                        new OA\Property(property: 'files', description: 'Lista de arquivos', type: 'array', items: new OA\Items(
-                            type: 'object',
-                            properties: [
-                                new OA\Property(property: 'name', description: 'Nome do arquivo', type: 'string'),
-                                new OA\Property(property: 'size', description: 'Tamanho em bytes', type: 'integer')
-                            ]
-                        )]),
-                        new OA\Property(property: 'total', description: 'Total de arquivos', type: 'integer')
-                    ]
+                    example: '{"files":[{"name":"config","size":1024}],"total":1}'
                 )
             )
         ]
@@ -79,7 +70,7 @@ class DatabaseJsonController extends Controller
         summary: 'Obter arquivo JSON exportado',
         description: 'Retorna o conteudo de um arquivo JSON especifico da pasta public/db/json/',
         tags: ['Database'],
-        security: [['ApiToken' => []]],
+        security: [],
         parameters: [
             new OA\Parameter(
                 name: 'file',

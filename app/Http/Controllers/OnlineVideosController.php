@@ -23,8 +23,7 @@ class OnlineVideosController extends Controller
             new OA\Parameter(name: 'format', description: 'Formato de resposta', in: 'query', required: false, schema: new OA\Schema(type: 'string', enum: ['sql', 'json'], default: 'sql'))
         ],
         responses: [
-            new OA\Response(response: 200, description: 'SQL: INSERT statements separados por pipe (|)', content: new OA\MediaType(mediaType: 'text/plain')),
-            new OA\Response(response: 200, description: 'JSON: Canais, playlists e vídeos', content: new OA\JsonContent(
+            new OA\Response(response: 200, description: 'Canais, playlists e vídeos (formato depende do parâmetro format)', content: new OA\JsonContent(
                 properties: [
                     new OA\Property(property: 'channels', type: 'array', items: new OA\Items(type: 'object', properties: [
                         new OA\Property(property: 'channel_id', type: 'string'),

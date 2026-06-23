@@ -32,7 +32,10 @@ class GeneralMiddleware
         }
 
         // Verifica a requisição da url
-        if ($subdomain !== 'api' && $subdomain !== 'localhost') {
+        // Libera acesso direto por IP (desenvolvimento)
+        $isDirectIp = (bool) preg_match('/^\d+\.\d+\.\d+\.\d+/', $host);
+
+        if ($subdomain !== 'api' && $subdomain !== 'localhost' && !$isDirectIp) {
             $locale = 'pt'; // Idioma padrão
 
             // Verifica se a URL contém um segmento de idioma (ex: /es)

@@ -15,18 +15,19 @@ class DownloadController extends Controller
         tags: ['Public'],
         security: [],
         summary: 'Redirecionamento de download do app',
-        description: 'Registra log de download e redireciona para URL do app desktop'
-    )]
-    #[OA\QueryParameter(
-        name: 'lang',
-        description: 'Código do idioma',
-        required: false,
-        type: 'string',
-        schema: new OA\Schema(type: 'string', default: 'pt')
-    )]
-    #[OA\Response(
-        response: 302,
-        description: 'Redirecionamento para URL de download'
+        description: 'Registra log de download e redireciona para URL do app desktop',
+        parameters: [
+            new OA\Parameter(
+                name: 'lang',
+                description: 'Código do idioma',
+                in: 'query',
+                required: false,
+                schema: new OA\Schema(type: 'string', default: 'pt')
+            )
+        ],
+        responses: [
+            new OA\Response(response: 302, description: 'Redirecionamento para URL de download')
+        ]
     )]
     public function index(Request $request)
     {
