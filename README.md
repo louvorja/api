@@ -1,150 +1,280 @@
 # LouvorJA API
 
-API RESTful para gerenciar o banco de dados do LouvorJA (músicas, álbuns, categorias, arquivos).
+API RESTful para gerenciamento de liturgias, cânticos, oradores, videos online e notificações do LouvorJA.
 
-## Endpoints Disponíveis
+## Documentação Interativa
 
-### Públicos (sem autenticação)
+A documentação interativa está disponível em: `/api/documentation` (quando o PR #11 for mergeado)
 
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| GET | `/` | Health check |
-| GET | `/file/{path}` | Arquivos estáticos |
-| GET | `/metadata` | Metadados da API |
-| GET | `/player` | Player |
-| GET | `/json_db` | Lista todos os JSONs disponíveis (manifest) |
-| GET | `/json_db/{file}` | Baixa JSON específico do banco de dados |
-| GET | `/download` | Download de arquivos |
-| GET | `/version_log` | Log de versões |
-| GET | `/{lang}/download` | Download com idioma |
+## Base URL
 
-### Autenticados (requer token JWT)
-
-#### Autenticação
-
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| POST | `/auth/login` | Login (retorna token) |
-| POST | `/auth/refresh-token` | Renova token |
-| GET | `/auth/me` | Dados do usuário atual |
-| POST | `/auth/logout` | Logout |
-| POST | `/auth/change-password` | Alterar senha |
-
-#### Parâmetros e Configurações
-
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| GET | `/params` | Parâmetros do sistema |
-| GET | `/ftp` | Configurações FTP |
-| GET | `/onlinevideos` | Vídeos online |
-
-#### Tasks
-
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| GET | `/tasks/` | Lista todas as tasks disponíveis |
-| GET | `/tasks/refresh_configs` | Atualiza configurações |
-| GET | `/tasks/export_database` | Exporta banco de dados |
-| GET | `/tasks/refresh_files_size` | Atualiza tamanho dos arquivos |
-| GET | `/tasks/refresh_files_duration` | Atualiza duração dos arquivos |
-| GET | `/tasks/refresh_online_videos` | Atualiza vídeos online |
-| GET | `/tasks/import_slides` | Importa slides |
-| GET | `/tasks/export_database_json` | Exporta banco como JSON |
-
-#### Endpoints com Idioma
-
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| GET | `/{lang}/languages` | Lista idiomas |
-| GET | `/{lang}/config` | Configurações |
-| GET | `/{lang}/musics` | Lista músicas |
-| GET | `/{lang}/musics/{id}` | Detalhes da música |
-| GET | `/{lang}/music/{id}` | Detalhes da música (alias) |
-| GET | `/{lang}/categories` | Lista categorias |
-| GET | `/{lang}/categories_albums` | Lista categorias de álbuns |
-| GET | `/{lang}/albums` | Lista álbuns |
-| GET | `/{lang}/albums/{id}` | Detalhes do álbum |
-| GET | `/{lang}/albums_musics` | Lista músicas dos álbuns |
-| GET | `/{lang}/lyrics` | Lista letras |
-| GET | `/{lang}/hymnal` | Hinário |
-| GET | `/{lang}/files` | Lista arquivos |
-| GET | `/{lang}/ftp` | Configurações FTP |
-
-### Admin (autenticado + senha confirmada)
-
-#### Usuários
-
-| Método | Endpoint | Descrição | Permissão |
-|--------|----------|-----------|-----------|
-| GET | `/admin/users` | Lista usuários | `users` |
-| POST | `/admin/users` | Cria usuário | `users` |
-| GET | `/admin/users/{id}` | Detalhes do usuário | `users` |
-| PUT | `/admin/users/{id}` | Atualiza usuário | `users` |
-| DELETE | `/admin/users/{id}` | Remove usuário | `users` |
-
-#### Categorias
-
-| Método | Endpoint | Descrição | Permissão |
-|--------|----------|-----------|-----------|
-| GET | `/admin/categories` | Lista categorias (público) | - |
-| GET | `/admin/categories/{id}` | Detalhes da categoria (público) | - |
-| POST | `/admin/categories` | Cria categoria | `categories` |
-| PUT | `/admin/categories/{id}` | Atualiza categoria | `categories` |
-| DELETE | `/admin/categories/{id}` | Remove categoria | `categories` |
-
-#### Álbuns
-
-| Método | Endpoint | Descrição | Permissão |
-|--------|----------|-----------|-----------|
-| GET | `/admin/albums` | Lista álbuns (público) | - |
-| GET | `/admin/albums/{id}` | Detalhes do álbum (público) | - |
-| POST | `/admin/albums` | Cria álbum | `albums` |
-| PUT | `/admin/albums/{id}` | Atualiza álbum | `albums` |
-| DELETE | `/admin/albums/{id}` | Remove álbum | `albums` |
-
-#### Músicas
-
-| Método | Endpoint | Descrição | Permissão |
-|--------|----------|-----------|-----------|
-| GET | `/admin/musics` | Lista músicas (público) | - |
-| GET | `/admin/musics/{id}` | Detalhes da música (público) | - |
-| POST | `/admin/musics` | Cria música | `musics` |
-| PUT | `/admin/musics/{id}` | Atualiza música | `musics` |
-| DELETE | `/admin/musics/{id}` | Remove música | `musics` |
-
-#### Letras
-
-| Método | Endpoint | Descrição | Permissão |
-|--------|----------|-----------|-----------|
-| GET | `/admin/lyrics` | Lista letras (público) | - |
-| GET | `/admin/lyrics/{id}` | Detalhes da letra (público) | - |
-| POST | `/admin/lyrics` | Cria letra | `lyrics` |
-| PUT | `/admin/lyrics/{id}` | Atualiza letra | `lyrics` |
-| DELETE | `/admin/lyrics/{id}` | Remove letra | `lyrics` |
+```
+https://api.louvorja.com.br/api
+```
 
 ## Autenticação
 
-1. Faça login com `POST /auth/login` enviando `username` e `password`
-2. Receba um token JWT na resposta
-3. Inclua o token no header `Authorization: Bearer <token>` nas requisições autenticadas
+Atualmente a API não requer autenticação para endpoints públicos.
 
-## Swagger/OpenAPI
+## Endpoints Disponíveis
 
-Documentação interativa disponível em `/api/documentation` (após merge do PR #11).
+### 📖 Liturgia
 
-## Desenvolvimento
-
-```bash
-# Instalar dependências
-composer install
-
-# Configurar ambiente
-cp .env.example .env
-
-# Rodar servidor
-php -S localhost:8000 -t public
+#### Listar Liturgias
 ```
+GET /liturgia/{data}
+```
+
+**Parâmetros:**
+- `data` (path): Data no formato YYYY-MM-DD (opcional, usa data atual se não informado)
+
+**Response:**
+```json
+{
+  "id": 123,
+  "data": "2024-01-01",
+  "versiculo": "Versículo do dia",
+  "reflexao": "Reflexão do dia",
+  "oracao": "Oração do dia",
+  "hino": 456,
+  "cantico_manha": "Cântico da manhã",
+  "cantico_tarde": "Cântico da tarde",
+  "created_at": "2024-01-01T00:00:00Z",
+  "updated_at": "2024-01-01T00:00:00Z"
+}
+```
+
+#### Copiar Liturgia do Dia
+```
+GET /liturgia/copia/{data}
+```
+
+**Parâmetros:**
+- `data` (path): Data no formato YYYY-MM-DD (opcional, usa data atual se não informado)
+
+**Response:** Objeto JSON da liturgia copiada
+
+#### Atualizar Liturgia
+```
+PUT /liturgia
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+  "data": "2024-01-01",
+  "versiculo": "Texto do versículo",
+  "reflexao": "Texto da reflexão",
+  "oracao": "Texto da oração",
+  "hino": 456
+}
+```
+
+---
+
+### 🎵 Cânticos
+
+#### Listar Cânticos
+```
+GET /cantico?busca={termo}&codigo={codigo}
+```
+
+**Parâmetros Query:**
+- `busca` (opcional): Termo para busca em título, conteúdo ou número
+- `codigo` (opcional): Número específico do cântico
+
+**Response:**
+```json
+[
+  {
+    "id": 456,
+    "titulo": "Título do Cântico",
+    "conteudo": "Conteúdo completo do cântico",
+    "numero": 456,
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  }
+]
+```
+
+---
+
+### 🎤 Oradores
+
+#### Listar Oradores
+```
+GET /orador
+```
+
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "nome": "Nome do Orador",
+    "bio": "Biografia do orador",
+    "foto": "URL da foto",
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  }
+]
+```
+
+#### Buscar Orador por Nome
+```
+GET /orador/nome/{nome}
+```
+
+**Parâmetros:**
+- `nome` (path): Nome ou parte do nome do orador
+
+#### Atualizar Orador
+```
+PUT /orador
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+  "id": 1,
+  "nome": "Nome do Orador",
+  "bio": "Biografia do orador",
+  "foto": "URL da foto"
+}
+```
+
+#### Criar Orador
+```
+POST /orador
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+  "nome": "Nome do Orador",
+  "bio": "Biografia do orador",
+  "foto": "URL da foto"
+}
+```
+
+---
+
+### 📺 Vídeos Online
+
+#### Listar Vídeos Online (Formato SQL - Padrão)
+```
+GET /onlinevideos?lang={id_language}&tipo={tipo}&id={id}
+```
+
+**Parâmetros Query:**
+- `lang` (opcional): Idioma (`pt`, `en`, `es`). Padrão: `pt`
+- `tipo` (opcional): Tipo de retorno (`canais`, `playlists`, `videos`, `tudo`). Padrão: `tudo`
+- `id` (opcional): ID do canal ou playlist para filtro
+
+**Response (SQL):** String com comandos SQL separados por `|` para compatibilidade com desktop
+
+#### Listar Vídeos Online (Formato JSON - Moderno)
+```
+GET /onlinevideos?format=json&lang={id_language}&tipo={tipo}&id={id}
+```
+
+**Parâmetros Query:**
+- `format` (opcional): `sql` (padrão) ou `json`
+- `lang` (opcional): Idioma (`pt`, `en`, `es`). Padrão: `pt`
+- `tipo` (opcional): Tipo de retorno (`canais`, `playlists`, `videos`, `tudo`). Padrão: `tudo`
+- `id` (opcional): ID do canal ou playlist para filtro
+
+**Response (JSON):**
+```json
+{
+  "channels": [
+    {
+      "channel_id": "UC...",
+      "title": "Nome do Canal",
+      "custom_url": "custom/url",
+      "default_image": "https://...",
+      "default_image_base64": "data:image/png;base64,..."
+    }
+  ],
+  "playlists": [
+    {
+      "playlist_id": "PL...",
+      "channel_id": "UC...",
+      "title": "Nome da Playlist",
+      "default_image": "https://...",
+      "default_image_base64": "data:image/png;base64,..."
+    }
+  ],
+  "videos": [
+    {
+      "video_id": "...",
+      "playlist_id": "PL...",
+      "title": "Título do Vídeo",
+      "sequence": 1,
+      "default_image": "https://...",
+      "default_image_base64": "data:image/png;base64,..."
+    }
+  ]
+}
+```
+
+---
+
+### 🔧 Sistema
+
+#### Interface de Rede
+```
+POST /network-interface
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+  "interface": "eth0"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Interface de rede atualizada"
+}
+```
+
+## Formato de Resposta
+
+Sucesso:
+```json
+{
+  "data": { ... }
+}
+```
+
+Erro:
+```json
+{
+  "error": "Mensagem de erro",
+  "status": 400
+}
+```
+
+## Código de Status HTTP
+
+- `200`: Sucesso
+- `400`: Bad Request
+- `404`: Não encontrado
+- `500`: Erro interno do servidor
+
+## Repositório
+
+- GitHub: https://github.com/louvorja/api
+- Issues: https://github.com/louvorja/api/issues
 
 ## Licença
 
-MIT
+Este projeto está sob licença proprietária.
