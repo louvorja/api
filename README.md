@@ -40,7 +40,7 @@ Obtenha o token via `POST /auth/login`.
 |--------|------|-----------|
 | GET | `/metadata` | Metadados do sistema |
 | GET | `/player` | Dados do player |
-| GET | `/download` | Downloads disponíveis |
+| GET | `/download` | Redirect (302) p/ download do instalador desktop |
 | GET | `/version` | Versão da API |
 | GET | `/version_log` | Log de versões |
 | GET | `/file/{path}` | Abrir arquivo estático |
@@ -72,7 +72,7 @@ Todos os endpoints abaixo suportam prefixo de idioma (ex: `/pt/musics`, `/en/alb
 | GET | `/{lang}/lyrics` | Listar letras |
 | GET | `/{lang}/hymnal` | Listar hinários |
 | GET | `/{lang}/files` | Listar arquivos |
-| GET | `/{lang}/download` | Downloads por idioma |
+| GET | `/{lang}/download` | Redirect (302) p/ download por idioma |
 | GET | `/{lang}/ftp` | Status FTP por idioma |
 
 ### Autenticação
@@ -132,6 +132,7 @@ Todos os endpoints admin exigem **Bearer JWT** + **senha confirmada** (`confirme
 | GET | `/tasks/import_slides` | Importar slides de apresentações |
 | GET | `/tasks/export_database` | Exportar banco (SQL) |
 | GET | `/tasks/export_database_json` | Exportar banco (JSON) |
+| GET | `/tasks/send_database_ftp` | Enviar banco via FTP |
 
 ### Vídeos Online
 
@@ -195,6 +196,26 @@ GET /onlinevideos?lang={lang}&tipo={tipo}&id={id}
 - **Auth:** JWT (php-open-source-saver/jwt-auth)
 - **Docs:** Swagger PHP (zircote/swagger-php) — OpenAPI 3.0
 - **Database:** MySQL + SQLite (desktop export)
+
+## Desenvolvimento Local
+
+```bash
+# Instalar dependências
+composer install
+
+# Gerar spec OpenAPI
+php generate_openapi.php
+
+# Iniciar servidor de desenvolvimento
+php -S 0.0.0.0:8000 -t public public/index.php
+
+# Acessar Swagger UI
+# http://localhost:8000/documentation
+```
+
+O Swagger UI detecta automaticamente a URL do servidor e também oferece produção (`api.louvorja.com.br`) como alternativa no dropdown de servers. Use o dropdown para alternar entre dev e prod ao testar endpoints.
+
+> **Nota sobre `/download`:** O endpoint retorna HTTP 302 (redirect) para `github.com`. O "Try it out" do Swagger pode mostrar "Failed to fetch" porque o GitHub não envia headers CORS. Teste direto no navegador ou via `curl`.
 
 ## Repositório
 
