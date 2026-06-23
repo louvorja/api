@@ -17,6 +17,32 @@ class DatabaseJsonController extends Controller
      * Lista todos os arquivos JSON disponiveis para download.
      * Retorna nome (sem extensao) e tamanho em bytes de cada arquivo.
      */
+    #[OA\Get(
+        path: '/json_db',
+        summary: 'Listar arquivos JSON disponíveis',
+        description: 'Retorna nome e tamanho de cada arquivo JSON na pasta public/db/json/',
+        tags: ['Database'],
+        security: [],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Lista de arquivos JSON',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'files', description: 'Lista de arquivos', type: 'array', items: new OA\Items(
+                            type: 'object',
+                            properties: [
+                                new OA\Property(property: 'name', description: 'Nome do arquivo', type: 'string'),
+                                new OA\Property(property: 'size', description: 'Tamanho em bytes', type: 'integer')
+                            ]
+                        )]),
+                        new OA\Property(property: 'total', description: 'Total de arquivos', type: 'integer')
+                    ]
+                )
+            )
+        ]
+    )]
     public function manifest()
     {
         $dir = base_path('public/db/json/');

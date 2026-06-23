@@ -4,10 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Params;
 use Illuminate\Http\Request;
-
+use OpenApi\Attributes as OA;
 
 class VersionLogController extends Controller
 {
+    #[OA\Get(
+        path: '/version_log',
+        summary: 'Changelog de versão do desktop',
+        description: 'Busca release notes do GitHub para a versão informada e retorna como HTML formatado',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'version', description: 'Versão do app (ex: 2.5.0)', in: 'query', required: false, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'versao', description: 'Versão do app (legado, mesmo que version)', in: 'query', required: false, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'lang', description: 'Idioma', in: 'query', required: false, schema: new OA\Schema(type: 'string', default: 'pt'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'HTML com release notes da versão', content: new OA\MediaType(mediaType: 'text/html'))
+        ]
+    )]
     public function index(Request $request)
     {
         $id_language = strtolower($request->id_language ?? $request->query('lang') ?? "pt");

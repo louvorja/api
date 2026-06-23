@@ -7,11 +7,27 @@ use App\Models\File;
 use App\Models\Ftp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use OpenApi\Attributes as OA;
 
 class FileController extends Controller
 {
     public function __construct() {}
 
+    #[OA\Get(
+        path: '/files',
+        summary: 'Listar arquivos',
+        description: 'Retorna lista paginada de arquivos, com filtros por idioma e tipo',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Idioma', in: 'query', required: false, schema: new OA\Schema(type: 'string', default: 'pt')),
+            new OA\Parameter(name: 'q', description: 'Busca textual', in: 'query', required: false, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'type', description: 'Tipo do arquivo', in: 'query', required: false, schema: new OA\Schema(type: 'string'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Lista de arquivos', content: new OA\JsonContent(type: 'array', items: new OA\Items(type: 'object')))
+        ]
+    )]
     public function index(Request $request)
     {
         $model = new File;
@@ -30,6 +46,20 @@ class FileController extends Controller
         return response()->json(Data::data($data, $request, [$model->getKeyName(), ...$model->getFillable()], 'files'));
     }
 
+    #[OA\Get(
+        path: '/files/{id}',
+        summary: 'Buscar arquivo por ID',
+        description: 'Retorna os metadados de um arquivo específico',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'id', description: 'ID do arquivo', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Dados do arquivo', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 404, description: 'Arquivo não encontrado')
+        ]
+    )]
     public function show($id, Request $request)
     {
         $file = File::select()->find($id);
@@ -44,6 +74,20 @@ class FileController extends Controller
         return response()->json($data);
     }
 
+    #[OA\Get(
+        path: '/files/open/{path}',
+        summary: 'Abrir arquivo',
+        description: 'Retorna o conteúdo ou redireciona para o arquivo no caminho informado',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'path', description: 'Caminho do arquivo', in: 'path', required: true, schema: new OA\Schema(type: 'string'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Conteúdo do arquivo ou redirecionamento'),
+            new OA\Response(response: 404, description: 'Arquivo não encontrado')
+        ]
+    )]
     public function open($path)
     {
         $replaces = [

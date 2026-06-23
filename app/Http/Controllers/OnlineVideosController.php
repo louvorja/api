@@ -6,9 +6,52 @@ use Illuminate\Http\Request;
 use App\Models\OnlineVideo;
 use App\Models\OnlineVideoPlaylist;
 use App\Models\OnlineVideoChannel;
+use OpenApi\Attributes as OA;
 
 class OnlineVideosController extends Controller
 {
+    #[OA\Get(
+        path: '/onlinevideos',
+        summary: 'Listar vídeos online',
+        description: 'Retorna canais, playlists e vídeos online em formato SQL ou JSON. O formato SQL usa pipe (|) como separador e é compatível com o app desktop legado.',
+        tags: ['API'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Idioma', in: 'query', required: false, schema: new OA\Schema(type: 'string', default: 'pt')),
+            new OA\Parameter(name: 'tipo', description: 'Tipo de conteúdo', in: 'query', required: false, schema: new OA\Schema(type: 'string', enum: ['tudo', 'canais', 'playlists', 'videos'], default: 'tudo')),
+            new OA\Parameter(name: 'id', description: 'ID do canal ou playlist para filtrar', in: 'query', required: false, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'format', description: 'Formato de resposta', in: 'query', required: false, schema: new OA\Schema(type: 'string', enum: ['sql', 'json'], default: 'sql'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'SQL: INSERT statements separados por pipe (|)', content: new OA\MediaType(mediaType: 'text/plain')),
+            new OA\Response(response: 200, description: 'JSON: Canais, playlists e vídeos', content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'channels', type: 'array', items: new OA\Items(type: 'object', properties: [
+                        new OA\Property(property: 'channel_id', type: 'string'),
+                        new OA\Property(property: 'title', type: 'string'),
+                        new OA\Property(property: 'custom_url', type: 'string'),
+                        new OA\Property(property: 'default_image', type: 'string'),
+                        new OA\Property(property: 'default_image_base64', type: 'string')
+                    ])),
+                    new OA\Property(property: 'playlists', type: 'array', items: new OA\Items(type: 'object', properties: [
+                        new OA\Property(property: 'playlist_id', type: 'string'),
+                        new OA\Property(property: 'channel_id', type: 'string'),
+                        new OA\Property(property: 'title', type: 'string'),
+                        new OA\Property(property: 'default_image', type: 'string'),
+                        new OA\Property(property: 'default_image_base64', type: 'string')
+                    ])),
+                    new OA\Property(property: 'videos', type: 'array', items: new OA\Items(type: 'object', properties: [
+                        new OA\Property(property: 'video_id', type: 'string'),
+                        new OA\Property(property: 'playlist_id', type: 'string'),
+                        new OA\Property(property: 'title', type: 'string'),
+                        new OA\Property(property: 'sequence', type: 'string'),
+                        new OA\Property(property: 'default_image', type: 'string'),
+                        new OA\Property(property: 'default_image_base64', type: 'string')
+                    ]))
+                ]
+            ))
+        ]
+    )]
     public function index(Request $request)
     {
         $id_language = strtolower($request->id_language ?? $request->query('lang') ?? "pt");

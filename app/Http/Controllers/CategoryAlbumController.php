@@ -7,6 +7,7 @@ use App\Helpers\Validations;
 use App\Models\CategoryAlbum;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use OpenApi\Attributes as OA;
 
 class CategoryAlbumController extends Controller
 {
@@ -24,6 +25,21 @@ class CategoryAlbumController extends Controller
         return Validations::validationMessages();
     }
 
+    #[OA\Get(
+        path: '/categories/{category_id}/albums',
+        summary: 'Listar associações categoria-álbum',
+        description: 'Retorna lista paginada',
+        tags: ['Admin - Categorias-Álbuns'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Idioma', in: 'query', required: false, schema: new OA\Schema(type: 'string', default: 'pt')),
+            new OA\Parameter(name: 'page', description: 'Página', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 1))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Lista', content: new OA\JsonContent(type: 'array', items: new OA\Items(type: 'object'))),
+            new OA\Response(response: 401, description: 'Não autenticado')
+        ]
+    )]
     public function index(Request $request)
     {
         $model = new CategoryAlbum;
@@ -46,6 +62,17 @@ class CategoryAlbumController extends Controller
         return response()->json(Data::data($data, $request, $fields));
     }
 
+    #[OA\Get(
+        path: '/categories/{category_id}/albums/{id}',
+        summary: 'Buscar associação categoria-álbum por ID',
+        tags: ['Admin - Categorias-Álbuns'],
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Dados', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 401, description: 'Não autenticado'),
+            new OA\Response(response: 404, description: 'Não encontrado')
+        ]
+    )]
     public function show($id, Request $request)
     {
         $category_album = CategoryAlbum::with(['category', 'album'])->find($id);
@@ -60,6 +87,18 @@ class CategoryAlbumController extends Controller
         return response()->json($data);
     }
   
+    #[OA\Post(
+        path: '/categories/{category_id}/albums',
+        summary: 'Criar associação categoria-álbum',
+        tags: ['Admin - Categorias-Álbuns'],
+        security: [['bearerAuth' => []]],
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: 'object')),
+        responses: [
+            new OA\Response(response: 201, description: 'Criado com sucesso', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 401, description: 'Não autenticado'),
+            new OA\Response(response: 422, description: 'Validação falhou')
+        ]
+    )]
     public function store(Request $request)
     {
         $this->validate($request, $this->validationRules($request), $this->validationMessages());
@@ -79,6 +118,18 @@ class CategoryAlbumController extends Controller
         return response()->json($data, 201);
     }
 
+    #[OA\Put(
+        path: '/categories/{category_id}/albums/{id}',
+        summary: 'Atualizar associação categoria-álbum',
+        tags: ['Admin - Categorias-Álbuns'],
+        security: [['bearerAuth' => []]],
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: 'object')),
+        responses: [
+            new OA\Response(response: 200, description: 'Atualizado', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 401, description: 'Não autenticado'),
+            new OA\Response(response: 422, description: 'Validação falhou')
+        ]
+    )]
     public function update(Request $request, $id)
     {
         $this->validate($request, $this->validationRules($request, $id), $this->validationMessages());
@@ -98,6 +149,17 @@ class CategoryAlbumController extends Controller
         return response()->json($data);
     }
 
+    #[OA\Delete(
+        path: '/categories/{category_id}/albums/{id}',
+        summary: 'Excluir associação categoria-álbum',
+        tags: ['Admin - Categorias-Álbuns'],
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Excluído'),
+            new OA\Response(response: 401, description: 'Não autenticado'),
+            new OA\Response(response: 404, description: 'Não encontrado')
+        ]
+    )]
     public function destroy($id)
     {
         $category_album = CategoryAlbum::find($id);

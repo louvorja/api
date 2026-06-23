@@ -7,9 +7,32 @@ use App\Models\Ftp;
 use App\Models\FtpLog;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use OpenApi\Attributes as OA;
 
 class FtpController extends Controller
 {
+    #[OA\Get(
+        path: '/ftp',
+        summary: 'Dados de conexão FTP',
+        description: 'Retorna credenciais FTP codificadas em base64, protegidas por token Firebase JWT via query param',
+        tags: ['API'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Idioma', in: 'query', required: false, schema: new OA\Schema(type: 'string', default: 'pt')),
+            new OA\Parameter(name: 'token', description: 'Firebase JWT token', in: 'query', required: true, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'data', description: 'Dados adicionais codificados em base64', in: 'query', required: false, schema: new OA\Schema(type: 'string'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Dados FTP codificados em base64', content: new OA\MediaType(mediaType: 'text/plain')),
+            new OA\Response(response: 401, description: 'Token inválido', content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'error', type: 'string', example: 'Token inválido'),
+                    new OA\Property(property: 'details', type: 'string'),
+                    new OA\Property(property: 'token', type: 'string')
+                ]
+            ))
+        ]
+    )]
     public function index(Request $request)
     {
         $id_language = strtolower($request->id_language ?? $request->query('lang') ?? "pt");

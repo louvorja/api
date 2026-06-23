@@ -7,9 +7,37 @@ use Illuminate\Support\Facades\Hash;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenBlacklistedException;
+use OpenApi\Attributes as OA;
 
 class AuthController extends Controller
 {
+    #[OA\Post(
+        path: '/auth/login',
+        summary: 'Login do usuário',
+        description: 'Autentica o usuário com username e password e retorna token JWT',
+        tags: ['Auth'],
+        security: [],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['username', 'password'],
+                properties: [
+                    new OA\Property(property: 'username', type: 'string', example: 'admin'),
+                    new OA\Property(property: 'password', type: 'string', example: 'secret')
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Login realizado com sucesso', content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'token', type: 'string'),
+                    new OA\Property(property: 'user', type: 'object')
+                ]
+            )),
+            new OA\Response(response: 401, description: 'Credenciais inválidas'),
+            new OA\Response(response: 500, description: 'Erro interno no servidor')
+        ]
+    )]
     public function login(Request $request)
     {
         $this->validate($request, [
@@ -36,11 +64,39 @@ class AuthController extends Controller
         return response()->json(['token' => $token, 'user' => $user]);
     }
 
+    #[OA\Get(
+        path: '/auth/me',
+        summary: 'Usuário autenticado',
+        description: 'Retorna os dados do usuário autenticado pelo token JWT',
+        tags: ['Auth'],
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Dados do usuário', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 401, description: 'Não autenticado')
+        ]
+    )]
     public function me()
     {
         return response()->json(JWTAuth::parseToken()->authenticate());
     }
 
+    #[OA\Post(
+        path: '/auth/refresh-token',
+        summary: 'Renovar token JWT',
+        description: 'Renova o token JWT atual, invalidando o token anterior (refresh rotation)',
+        tags: ['Auth'],
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Token renovado', content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'token', type: 'string'),
+                    new OA\Property(property: 'user', type: 'object')
+                ]
+            )),
+            new OA\Response(response: 401, description: 'Token inválido ou já invalidado'),
+            new OA\Response(response: 500, description: 'Erro ao renovar token')
+        ]
+    )]
     public function refreshToken(Request $request)
     {
         try {
@@ -73,6 +129,17 @@ class AuthController extends Controller
         }
     }
 
+    #[OA\Post(
+        path: '/auth/logout',
+        summary: 'Logout do usuário',
+        description: 'Invalida o token JWT atual, realizando logout do usuário',
+        tags: ['Auth'],
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Logout realizado com sucesso', content: new OA\JsonContent(type: 'array', items: new OA\Items(type: 'string'))),
+            new OA\Response(response: 500, description: 'Erro ao realizar logout')
+        ]
+    )]
     public function logout(Request $request)
     {
         try {
@@ -90,6 +157,31 @@ class AuthController extends Controller
         }
     }
 
+    #[OA\Post(
+        path: '/auth/change-password',
+        summary: 'Alterar senha',
+        description: 'Altera a senha do usuário autenticado. Invalida todos os tokens existentes após a alteração.',
+        tags: ['Auth'],
+        security: [['bearerAuth' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['current_password', 'new_password'],
+                properties: [
+                    new OA\Property(property: 'current_password', type: 'string', description: 'Senha atual'),
+                    new OA\Property(property: 'new_password', type: 'string', description: 'Nova senha (mín. 8 caracteres, 1 letra, 1 número, 1 especial)'),
+                    new OA\Property(property: 'new_password_confirmation', type: 'string', description: 'Confirmação da nova senha')
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Senha alterada com sucesso', content: new OA\JsonContent(
+                properties: [new OA\Property(property: 'message', type: 'string')]
+            )),
+            new OA\Response(response: 400, description: 'Senha atual incorreta ou nova senha inválida'),
+            new OA\Response(response: 401, description: 'Não autenticado')
+        ]
+    )]
     public function changePassword(Request $request)
     {
         $this->validate($request, [
