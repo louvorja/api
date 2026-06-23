@@ -12,28 +12,32 @@ class DownloadController extends Controller
     #[OA\Get(
         path: '/download',
         summary: 'Download do app desktop',
-        description: 'Redireciona (302) para a URL de download do instalador do app desktop LouvorJA. A URL é obtida dinamicamente dos parâmetros do sistema conforme o idioma.',
+        description: 'Redireciona (302) para a URL de download do instalador do app desktop LouvorJA. A URL é obtida dinamicamente dos parâmetros do sistema conforme o idioma. ⚠️ O "Try it out" do Swagger pode falhar porque o redirect vai para github.com (CORS do browser bloqueia). Teste direto no navegador ou via curl.',
         tags: ['Public'],
         security: [],
         parameters: [
             new OA\Parameter(name: 'lang', description: 'Código do idioma (default: pt)', in: 'query', required: false, schema: new OA\Schema(type: 'string', default: 'pt'))
         ],
         responses: [
-            new OA\Response(response: 302, description: 'Redirecionamento para a URL de download'),
+            new OA\Response(response: 302, description: 'Redirecionamento para a URL de download', headers: [
+                new OA\Header(header: 'Location', description: 'URL de download', schema: new OA\Schema(type: 'string', format: 'url'))
+            ]),
             new OA\Response(response: 404, description: 'URL de download não configurada para o idioma')
         ]
     )]
     #[OA\Get(
         path: '/{lang}/download',
         summary: 'Download do app desktop (por idioma)',
-        description: 'Redireciona (302) para a URL de download do instalador do app desktop LouvorJA para o idioma informado.',
+        description: 'Redireciona (302) para a URL de download do instalador do app desktop LouvorJA para o idioma informado. ⚠️ O "Try it out" do Swagger pode falhar porque o redirect vai para github.com (CORS do browser bloqueia). Teste direto no navegador ou via curl.',
         tags: ['Public'],
         security: [],
         parameters: [
             new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt'))
         ],
         responses: [
-            new OA\Response(response: 302, description: 'Redirecionamento para a URL de download'),
+            new OA\Response(response: 302, description: 'Redirecionamento para a URL de download', headers: [
+                new OA\Header(header: 'Location', description: 'URL de download', schema: new OA\Schema(type: 'string', format: 'url'))
+            ]),
             new OA\Response(response: 404, description: 'URL de download não configurada para o idioma')
         ]
     )]

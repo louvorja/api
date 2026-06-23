@@ -1569,7 +1569,7 @@
                     "Public"
                 ],
                 "summary": "Download do app desktop",
-                "description": "Redireciona (302) para a URL de download do instalador do app desktop LouvorJA. A URL é obtida dinamicamente dos parâmetros do sistema conforme o idioma.",
+                "description": "Redireciona (302) para a URL de download do instalador do app desktop LouvorJA. A URL é obtida dinamicamente dos parâmetros do sistema conforme o idioma. ⚠️ O \"Try it out\" do Swagger pode falhar porque o redirect vai para github.com (CORS do browser bloqueia). Teste direto no navegador ou via curl.",
                 "operationId": "cfdf8fb0400afc2cc594de357da6ebb9",
                 "parameters": [
                     {
@@ -1585,7 +1585,16 @@
                 ],
                 "responses": {
                     "302": {
-                        "description": "Redirecionamento para a URL de download"
+                        "description": "Redirecionamento para a URL de download",
+                        "headers": {
+                            "Location": {
+                                "description": "URL de download",
+                                "schema": {
+                                    "type": "string",
+                                    "format": "url"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "URL de download não configurada para o idioma"
@@ -1600,7 +1609,7 @@
                     "Public"
                 ],
                 "summary": "Download do app desktop (por idioma)",
-                "description": "Redireciona (302) para a URL de download do instalador do app desktop LouvorJA para o idioma informado.",
+                "description": "Redireciona (302) para a URL de download do instalador do app desktop LouvorJA para o idioma informado. ⚠️ O \"Try it out\" do Swagger pode falhar porque o redirect vai para github.com (CORS do browser bloqueia). Teste direto no navegador ou via curl.",
                 "operationId": "937e4605ab69d410993b1c49792a22dd",
                 "parameters": [
                     {
@@ -1616,7 +1625,16 @@
                 ],
                 "responses": {
                     "302": {
-                        "description": "Redirecionamento para a URL de download"
+                        "description": "Redirecionamento para a URL de download",
+                        "headers": {
+                            "Location": {
+                                "description": "URL de download",
+                                "schema": {
+                                    "type": "string",
+                                    "format": "url"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "URL de download não configurada para o idioma"
