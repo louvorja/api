@@ -1,0 +1,3644 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "LouvorJA API",
+        "description": "API do LouvorJA - Gerenciador de Hinários e Músicas para a Igreja Adventista do Sétimo Dia. Fornece endpoints públicos para consulta de músicas, letras, arquivos e álbuns, além de endpoints administrativos protegidos por autenticação JWT.",
+        "contact": {
+            "name": "LouvorJA",
+            "email": "contato@louvorja.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "https://api.louvorja.com.br",
+            "description": "Produção"
+        },
+        {
+            "url": "http://localhost:8000",
+            "description": "Desenvolvimento"
+        }
+    ],
+    "paths": {
+        "/{lang}/albums": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Listar álbuns (público)",
+                "description": "Retorna lista paginada de álbuns para o idioma informado",
+                "operationId": "4c40849d962c5ca87686cf2d59db7418",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "path",
+                        "description": "Código do idioma",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Busca textual",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Itens por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de álbuns",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/admin/albums": {
+            "get": {
+                "tags": [
+                    "Admin - Álbuns"
+                ],
+                "summary": "Listar álbuns",
+                "description": "Retorna lista paginada de álbuns, com suporte a filtros por idioma e busca textual",
+                "operationId": "4c96441c818261199ac28dea8f7c2c4c",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "query",
+                        "description": "Idioma",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Busca textual",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Itens por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de álbuns",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin - Álbuns"
+                ],
+                "summary": "Criar álbum",
+                "description": "Cria um novo(a) álbum. Requer autenticação admin.",
+                "operationId": "63ccfd3316d5bb58336e507cef6651c4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Álbum criado(a) com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "422": {
+                        "description": "Dados de validação inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/{lang}/albums/{id}": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Buscar álbum por ID (público)",
+                "description": "Retorna os dados detalhados de um álbum para o idioma informado",
+                "operationId": "5455f57dcbbbf4cb96914dc54bfe85f5",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "path",
+                        "description": "Código do idioma",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do álbum",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados do álbum",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Álbum não encontrado"
+                    }
+                },
+                "security": []
+            }
+        },
+        "/{lang}/album/{id}": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Buscar álbum por ID (alias singular)",
+                "description": "Alias para /{lang}/albums/{id}",
+                "operationId": "9a81d11285a42e09f28da11924d93207",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "path",
+                        "description": "Código do idioma",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do álbum",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados do álbum",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Álbum não encontrado"
+                    }
+                },
+                "security": []
+            }
+        },
+        "/admin/albums/{id}": {
+            "get": {
+                "tags": [
+                    "Admin - Álbuns"
+                ],
+                "summary": "Buscar álbum por ID",
+                "description": "Retorna os dados detalhados de um(a) álbum específico(a)",
+                "operationId": "d16bcc8d3951aae63a3a7958e9cabe45",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do(a) álbum",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados do(a) álbum",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Álbum não encontrado(a)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin - Álbuns"
+                ],
+                "summary": "Atualizar álbum",
+                "description": "Atualiza os dados de um(a) álbum existente",
+                "operationId": "57d118bcac78bc9c4795f3adebd62370",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do(a) álbum",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Álbum atualizado(a) com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Álbum não encontrado(a)"
+                    },
+                    "422": {
+                        "description": "Dados de validação inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin - Álbuns"
+                ],
+                "summary": "Excluir álbum",
+                "description": "Remove um(a) álbum pelo ID",
+                "operationId": "c5b4deba0b858630557d8cd28af03ac8",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do(a) álbum",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Álbum excluído(a) com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Álbum não encontrado(a)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/{lang}/albums_musics": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Listar associações álbum-música (público)",
+                "description": "Retorna lista paginada para o idioma informado",
+                "operationId": "972ead773a645e62144ca66091a4f262",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "path",
+                        "description": "Código do idioma",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/admin/albums_musics": {
+            "get": {
+                "tags": [
+                    "Admin - Álbuns-Músicas"
+                ],
+                "summary": "Listar associações álbum-música",
+                "description": "Retorna lista paginada",
+                "operationId": "2abcc75cfbc29dd93dc422628ccc6b0f",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "query",
+                        "description": "Idioma",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin - Álbuns-Músicas"
+                ],
+                "summary": "Criar associação álbum-música",
+                "operationId": "0298272cd5af5dbb0afea92d95be622d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Criado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "422": {
+                        "description": "Validação falhou"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/albums_musics/{id}": {
+            "get": {
+                "tags": [
+                    "Admin - Álbuns-Músicas"
+                ],
+                "summary": "Buscar associação álbum-música por ID",
+                "operationId": "dc2c7878a4e38bd7f0b57b3ef11fd9d8",
+                "responses": {
+                    "200": {
+                        "description": "Dados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Não encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin - Álbuns-Músicas"
+                ],
+                "summary": "Atualizar associação álbum-música",
+                "operationId": "11ff95d36cf3555d8f4e33c922b5a6ab",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Atualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "422": {
+                        "description": "Validação falhou"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin - Álbuns-Músicas"
+                ],
+                "summary": "Excluir associação álbum-música",
+                "operationId": "cf0f9383a4b5e8aad8b2448dc031bb43",
+                "responses": {
+                    "200": {
+                        "description": "Excluído"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Não encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login do usuário",
+                "description": "Autentica o usuário com username e password e retorna token JWT",
+                "operationId": "8cb7742ae98d0990acb2907c4e00bf24",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "username",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "username": {
+                                        "type": "string",
+                                        "example": "admin"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "secret"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login realizado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string"
+                                        },
+                                        "user": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Credenciais inválidas"
+                    },
+                    "500": {
+                        "description": "Erro interno no servidor"
+                    }
+                },
+                "security": []
+            }
+        },
+        "/auth/me": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Usuário autenticado",
+                "description": "Retorna os dados do usuário autenticado pelo token JWT",
+                "operationId": "a9c495788506b114956e3f509e5d90a2",
+                "responses": {
+                    "200": {
+                        "description": "Dados do usuário",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/refresh-token": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Renovar token JWT",
+                "description": "Renova o token JWT atual, invalidando o token anterior (refresh rotation)",
+                "operationId": "f63bd8623627d4788e5207877d1c582d",
+                "responses": {
+                    "200": {
+                        "description": "Token renovado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string"
+                                        },
+                                        "user": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token inválido ou já invalidado"
+                    },
+                    "500": {
+                        "description": "Erro ao renovar token"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout do usuário",
+                "description": "Invalida o token JWT atual, realizando logout do usuário",
+                "operationId": "0d29c740dc06d77602af8095bf4654cc",
+                "responses": {
+                    "200": {
+                        "description": "Logout realizado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro ao realizar logout"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/change-password": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Alterar senha",
+                "description": "Altera a senha do usuário autenticado. Invalida todos os tokens existentes após a alteração.",
+                "operationId": "255dd8dc9b5174b7256349a2318e8c1e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "current_password",
+                                    "new_password"
+                                ],
+                                "properties": {
+                                    "current_password": {
+                                        "description": "Senha atual",
+                                        "type": "string"
+                                    },
+                                    "new_password": {
+                                        "description": "Nova senha (mín. 8 caracteres, 1 letra, 1 número, 1 especial)",
+                                        "type": "string"
+                                    },
+                                    "new_password_confirmation": {
+                                        "description": "Confirmação da nova senha",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Senha alterada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Senha atual incorreta ou nova senha inválida"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/{lang}/categories_albums": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Listagem de associações categoria-álbum (público)",
+                "description": "Retorna a listagem de associações categoria-álbum para o idioma informado",
+                "operationId": "15e3267942368bd17dffcc97e9197109",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "path",
+                        "description": "Código do idioma",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "...",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/admin/categories_albums": {
+            "get": {
+                "tags": [
+                    "Admin - Categorias-Álbuns"
+                ],
+                "summary": "Listar associações categoria-álbum",
+                "description": "Retorna lista paginada",
+                "operationId": "45ba23896f0c35701fd4ebab7a27a813",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "query",
+                        "description": "Idioma",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin - Categorias-Álbuns"
+                ],
+                "summary": "Criar associação categoria-álbum",
+                "operationId": "5831184e8a76d4a88498dfaf010815ea",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Criado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "422": {
+                        "description": "Validação falhou"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/categories_albums/{id}": {
+            "get": {
+                "tags": [
+                    "Admin - Categorias-Álbuns"
+                ],
+                "summary": "Buscar associação categoria-álbum por ID",
+                "operationId": "11ae41c4cc4ae210b4330521a869c2bf",
+                "responses": {
+                    "200": {
+                        "description": "Dados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Não encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin - Categorias-Álbuns"
+                ],
+                "summary": "Atualizar associação categoria-álbum",
+                "operationId": "1c90d0463e5237d1abe039a2b7a8a577",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Atualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "422": {
+                        "description": "Validação falhou"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin - Categorias-Álbuns"
+                ],
+                "summary": "Excluir associação categoria-álbum",
+                "operationId": "4018dafd737a43357e2f20880f7efc19",
+                "responses": {
+                    "200": {
+                        "description": "Excluído"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Não encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/{lang}/categories": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Listagem de categorias (público)",
+                "description": "Retorna a listagem de categorias para o idioma informado",
+                "operationId": "45fa79e66b58bd25d0460df16146b2b6",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "path",
+                        "description": "Código do idioma",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "...",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/admin/categories": {
+            "get": {
+                "tags": [
+                    "Admin - Categorias"
+                ],
+                "summary": "Listar categorias",
+                "description": "Retorna lista paginada de categorias, com suporte a filtros por idioma e busca textual",
+                "operationId": "6072ee0d4f01268ba84981a78e569980",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "query",
+                        "description": "Idioma",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Busca textual",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Itens por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de categorias",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin - Categorias"
+                ],
+                "summary": "Criar categoria",
+                "description": "Cria um novo(a) categoria. Requer autenticação admin.",
+                "operationId": "fd033ad238d9b6ffbb7a3552dfea158b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Categoria criado(a) com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "422": {
+                        "description": "Dados de validação inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/categories/{id}": {
+            "get": {
+                "tags": [
+                    "Admin - Categorias"
+                ],
+                "summary": "Buscar categoria por ID",
+                "description": "Retorna os dados detalhados de um(a) categoria específico(a)",
+                "operationId": "b5c69436f2e878141086f2d8e6597daf",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do(a) categoria",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados do(a) categoria",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Categoria não encontrado(a)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin - Categorias"
+                ],
+                "summary": "Atualizar categoria",
+                "description": "Atualiza os dados de um(a) categoria existente",
+                "operationId": "78fd86c3f981b7d13128038646827438",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do(a) categoria",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Categoria atualizado(a) com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Categoria não encontrado(a)"
+                    },
+                    "422": {
+                        "description": "Dados de validação inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin - Categorias"
+                ],
+                "summary": "Excluir categoria",
+                "description": "Remove um(a) categoria pelo ID",
+                "operationId": "1dda5aaba5a792b98fec7d365d7c72b0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do(a) categoria",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Categoria excluído(a) com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Categoria não encontrado(a)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/{lang}/config": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Listar configurações",
+                "description": "Retorna configurações do sistema para o idioma informado",
+                "operationId": "7b31ae387ba29dd85a581da07c566efb",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "path",
+                        "description": "Código do idioma",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Configurações",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/{lang}/configs": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Listar configurações (alias)",
+                "description": "Alias para /{lang}/config. Retorna configurações do sistema",
+                "operationId": "45ee4467b24b5e0c7e6bb53a93d3ce8a",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "path",
+                        "description": "Código do idioma",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Configurações",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/json_db": {
+            "get": {
+                "tags": [
+                    "Database"
+                ],
+                "summary": "Listar arquivos JSON disponíveis",
+                "description": "Retorna nome e tamanho de cada arquivo JSON na pasta public/db/json/",
+                "operationId": "d593023f85c1026ae0bf2fa43767040f",
+                "responses": {
+                    "200": {
+                        "description": "Lista de arquivos JSON",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                },
+                                "example": "{\"files\":[{\"name\":\"config\",\"size\":1024}],\"total\":1}"
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/json_db/{file}": {
+            "get": {
+                "tags": [
+                    "Database"
+                ],
+                "summary": "Obter arquivo JSON exportado",
+                "description": "Retorna o conteudo de um arquivo JSON especifico da pasta public/db/json/",
+                "operationId": "5c607d2e3a8b8ce46990e2a52ed4788f",
+                "parameters": [
+                    {
+                        "name": "file",
+                        "in": "path",
+                        "description": "Nome do arquivo (sem extensao .json)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "config"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Conteudo do JSON"
+                    },
+                    "404": {
+                        "description": "Arquivo nao encontrado"
+                    }
+                },
+                "security": []
+            }
+        },
+        "/download": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Informações de download",
+                "description": "Retorna informações para download do aplicativo desktop",
+                "operationId": "cfdf8fb0400afc2cc594de357da6ebb9",
+                "responses": {
+                    "200": {
+                        "description": "Informações de download",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/{lang}/download": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Informações de download (por idioma)",
+                "description": "Retorna informações para download do aplicativo desktop para o idioma informado",
+                "operationId": "937e4605ab69d410993b1c49792a22dd",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "path",
+                        "description": "Código do idioma",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Informações de download",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/{lang}/files": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Listar arquivos (público)",
+                "description": "Retorna lista paginada de arquivos para o idioma informado",
+                "operationId": "b6615d73ad7bb8f4a6a1dea67ce32699",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "path",
+                        "description": "Código do idioma",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Busca textual",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Tipo do arquivo",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de arquivos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/admin/files": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Listar arquivos",
+                "description": "Retorna lista paginada de arquivos, com filtros por idioma e tipo",
+                "operationId": "5f5d7a9f14764b7a00b1a6d263730e0a",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "query",
+                        "description": "Idioma",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Busca textual",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Tipo do arquivo",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de arquivos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/admin/files/{id}": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Buscar arquivo por ID",
+                "description": "Retorna os metadados de um arquivo específico",
+                "operationId": "2351d0c1b6cb1f82d6295fdb0aaabe11",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do arquivo",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados do arquivo",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Arquivo não encontrado"
+                    }
+                },
+                "security": []
+            }
+        },
+        "/file/{path}": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Abrir arquivo",
+                "description": "Retorna o conteúdo ou redireciona para o arquivo no caminho informado",
+                "operationId": "b0b33be53b26502903295e6b13d7136c",
+                "parameters": [
+                    {
+                        "name": "path",
+                        "in": "path",
+                        "description": "Caminho do arquivo",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Conteúdo do arquivo ou redirecionamento"
+                    },
+                    "404": {
+                        "description": "Arquivo não encontrado"
+                    }
+                },
+                "security": []
+            }
+        },
+        "/ftp": {
+            "get": {
+                "tags": [
+                    "API"
+                ],
+                "summary": "Dados de conexão FTP",
+                "description": "Retorna credenciais FTP codificadas em base64, protegidas por token Firebase JWT via query param",
+                "operationId": "b1676ab2ff3a8bfe4f74bc61e40301a6",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "query",
+                        "description": "Idioma",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "token",
+                        "in": "query",
+                        "description": "Firebase JWT token",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "data",
+                        "in": "query",
+                        "description": "Dados adicionais codificados em base64",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados FTP codificados em base64",
+                        "content": {
+                            "text/plain": {}
+                        }
+                    },
+                    "401": {
+                        "description": "Token inválido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Token inválido"
+                                        },
+                                        "details": {
+                                            "type": "string"
+                                        },
+                                        "token": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/{lang}/hymnal": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Listar hinários",
+                "description": "Retorna lista de hinários disponíveis para o idioma informado",
+                "operationId": "edfe5848bd8358778ff0ecb386fc082e",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "path",
+                        "description": "Código do idioma",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de hinários",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/{lang}/languages": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Listar idiomas disponíveis",
+                "description": "Retorna todos os idiomas cadastrados no sistema",
+                "operationId": "5a4d9d16acae8a2735c5755f85c1af1d",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "path",
+                        "description": "Código do idioma",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de idiomas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/{lang}/lyrics": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Listar letras (público)",
+                "description": "Retorna lista paginada de letras para o idioma informado",
+                "operationId": "597fb2ba441099b2a131c1489001fd51",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "path",
+                        "description": "Código do idioma",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Busca textual",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Itens por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de letras",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/admin/lyrics": {
+            "get": {
+                "tags": [
+                    "Admin - Letras"
+                ],
+                "summary": "Listar letras",
+                "description": "Retorna lista paginada de letras, com suporte a filtros por idioma e busca textual",
+                "operationId": "c642b9bd1013a1b7ce103b4f91b68877",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "query",
+                        "description": "Idioma",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Busca textual",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Itens por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de letras",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin - Letras"
+                ],
+                "summary": "Criar letra",
+                "description": "Cria um novo(a) letra. Requer autenticação admin.",
+                "operationId": "341fa731cea2f57442382eaef8db72b9",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Letra criado(a) com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "422": {
+                        "description": "Dados de validação inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/lyrics/{id}": {
+            "get": {
+                "tags": [
+                    "Admin - Letras"
+                ],
+                "summary": "Buscar letra por ID",
+                "description": "Retorna os dados detalhados de um(a) letra específico(a)",
+                "operationId": "8ac666a56c64f2f78e35a748fc2b643c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do(a) letra",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados do(a) letra",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Letra não encontrado(a)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin - Letras"
+                ],
+                "summary": "Atualizar letra",
+                "description": "Atualiza os dados de um(a) letra existente",
+                "operationId": "4b0376f36aa6d2309bb22d80d862e623",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do(a) letra",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Letra atualizado(a) com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Letra não encontrado(a)"
+                    },
+                    "422": {
+                        "description": "Dados de validação inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin - Letras"
+                ],
+                "summary": "Excluir letra",
+                "description": "Remove um(a) letra pelo ID",
+                "operationId": "8d93722615c56f87158d76486c009991",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do(a) letra",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Letra excluído(a) com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Letra não encontrado(a)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/metadata": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Metadados da Bíblia",
+                "description": "Retorna estatísticas e versículos ausentes por versão bíblica",
+                "operationId": "getBibleMetadata",
+                "responses": {
+                    "200": {
+                        "description": "Sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "bible": {
+                                            "properties": {
+                                                "total_versions": {
+                                                    "type": "integer"
+                                                },
+                                                "versions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "missing_verses": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor"
+                    }
+                },
+                "security": []
+            }
+        },
+        "/{lang}/musics": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Listar músicas (público)",
+                "description": "Retorna lista paginada de músicas para o idioma informado",
+                "operationId": "3c07a8f6d87ec71fb07c45906fd0b3d7",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "path",
+                        "description": "Código do idioma",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Busca textual",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Itens por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de músicas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/admin/musics": {
+            "get": {
+                "tags": [
+                    "Admin - Músicas"
+                ],
+                "summary": "Listar músicas",
+                "description": "Retorna lista paginada de músicas, com suporte a filtros por idioma e busca textual",
+                "operationId": "56577e44c7b3cb3db68364026ab431da",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "query",
+                        "description": "Idioma",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Busca textual",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Itens por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de músicas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin - Músicas"
+                ],
+                "summary": "Criar música",
+                "description": "Cria um novo(a) música. Requer autenticação admin.",
+                "operationId": "8604a2ce686245f39620a6f2e3e63f63",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Música criado(a) com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "422": {
+                        "description": "Dados de validação inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/{lang}/musics/{id}": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Buscar música por ID (público)",
+                "description": "Retorna os dados detalhados de uma música para o idioma informado",
+                "operationId": "f343bb8dec0b848fdacb1707c12b5425",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "path",
+                        "description": "Código do idioma",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da música",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados da música",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Música não encontrada"
+                    }
+                },
+                "security": []
+            }
+        },
+        "/{lang}/music/{id}": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Buscar música por ID (alias singular)",
+                "description": "Alias para /{lang}/musics/{id}",
+                "operationId": "e1f03483dc250c0f54f2842721c1d7ee",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "path",
+                        "description": "Código do idioma",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da música",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados da música",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Música não encontrada"
+                    }
+                },
+                "security": []
+            }
+        },
+        "/admin/musics/{id}": {
+            "get": {
+                "tags": [
+                    "Admin - Músicas"
+                ],
+                "summary": "Buscar música por ID",
+                "description": "Retorna os dados detalhados de um(a) música específico(a)",
+                "operationId": "252c1e9bdcc5ac724adf35d2e6ea7326",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do(a) música",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados do(a) música",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Música não encontrado(a)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin - Músicas"
+                ],
+                "summary": "Atualizar música",
+                "description": "Atualiza os dados de um(a) música existente",
+                "operationId": "f693ff5965ac6339dde5748724986082",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do(a) música",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Música atualizado(a) com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Música não encontrado(a)"
+                    },
+                    "422": {
+                        "description": "Dados de validação inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin - Músicas"
+                ],
+                "summary": "Excluir música",
+                "description": "Remove um(a) música pelo ID",
+                "operationId": "d6e20537e6e32c465b130516aba00a6f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do(a) música",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Música excluído(a) com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Música não encontrado(a)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/onlinevideos": {
+            "get": {
+                "tags": [
+                    "API"
+                ],
+                "summary": "Listar vídeos online",
+                "description": "Retorna canais, playlists e vídeos online em formato SQL ou JSON. O formato SQL usa pipe (|) como separador e é compatível com o app desktop legado.",
+                "operationId": "e53b820b0190fafc1dcd3b8b572adab8",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "query",
+                        "description": "Idioma",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "tipo",
+                        "in": "query",
+                        "description": "Tipo de conteúdo",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "tudo",
+                            "enum": [
+                                "tudo",
+                                "canais",
+                                "playlists",
+                                "videos"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "ID do canal ou playlist para filtrar",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "format",
+                        "in": "query",
+                        "description": "Formato de resposta",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "sql",
+                            "enum": [
+                                "sql",
+                                "json"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Canais, playlists e vídeos (formato depende do parâmetro format)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "channels": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "channel_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "custom_url": {
+                                                        "type": "string"
+                                                    },
+                                                    "default_image": {
+                                                        "type": "string"
+                                                    },
+                                                    "default_image_base64": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "playlists": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "playlist_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "channel_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "default_image": {
+                                                        "type": "string"
+                                                    },
+                                                    "default_image_base64": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "videos": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "video_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "playlist_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "sequence": {
+                                                        "type": "string"
+                                                    },
+                                                    "default_image": {
+                                                        "type": "string"
+                                                    },
+                                                    "default_image_base64": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/openapi.json": {
+            "get": {
+                "tags": [
+                    "Documentação"
+                ],
+                "summary": "Especificação OpenAPI",
+                "description": "Retorna a especificação OpenAPI (Swagger) em formato JSON",
+                "operationId": "fe2f06ffb87d93722b9485ffef2c911a",
+                "responses": {
+                    "200": {
+                        "description": "Spec OpenAPI JSON"
+                    },
+                    "404": {
+                        "description": "Arquivo não encontrado"
+                    }
+                },
+                "security": []
+            }
+        },
+        "/documentation": {
+            "get": {
+                "tags": [
+                    "Documentação"
+                ],
+                "summary": "Interface Swagger UI",
+                "description": "Retorna a página HTML com Swagger UI para visualização interativa da documentação da API",
+                "operationId": "333676552461b372b0047766aba71c5d",
+                "responses": {
+                    "200": {
+                        "description": "Página HTML do Swagger UI"
+                    }
+                },
+                "security": []
+            }
+        },
+        "/params": {
+            "get": {
+                "tags": [
+                    "API"
+                ],
+                "summary": "Parâmetros da aplicação",
+                "description": "Retorna parâmetros de configuração da aplicação em formato JSON ou .env",
+                "operationId": "acf56879ddfe5518383c015c261ed844",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Formato de resposta",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "json",
+                            "enum": [
+                                "json",
+                                "env"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Parâmetros da aplicação (formato depende do parâmetro type)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/player": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Player de vídeo YouTube",
+                "description": "Retorna HTML com iframe embed do YouTube para o vídeo informado",
+                "operationId": "getYouTubePlayer",
+                "parameters": [
+                    {
+                        "name": "v",
+                        "in": "query",
+                        "description": "ID do vídeo no YouTube",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML do player"
+                    }
+                },
+                "security": []
+            }
+        },
+        "/tasks": {
+            "get": {
+                "tags": [
+                    "Admin - Tarefas"
+                ],
+                "summary": "Listar tarefas",
+                "description": "Retorna lista de tarefas administrativas disponíveis",
+                "operationId": "6a93d54730cde509d735e538ab6800f6",
+                "responses": {
+                    "200": {
+                        "description": "Lista de tarefas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/tasks/refresh_files_size": {
+            "get": {
+                "tags": [
+                    "Admin - Tarefas"
+                ],
+                "summary": "Recalcular tamanho dos arquivos",
+                "description": "Recalcula o tamanho de todos os arquivos de mídia armazenados",
+                "operationId": "76cfb61bf23c46322fc5d2e15b6e34ee",
+                "responses": {
+                    "200": {
+                        "description": "Tamanhos atualizados"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/tasks/refresh_files_duration": {
+            "get": {
+                "tags": [
+                    "Admin - Tarefas"
+                ],
+                "summary": "Recalcular duração dos áudios",
+                "description": "Recalcula a duração de todos os arquivos de áudio",
+                "operationId": "3f66d2368ca15bd0814e496e5467f428",
+                "responses": {
+                    "200": {
+                        "description": "Durações atualizadas"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/tasks/refresh_online_videos": {
+            "get": {
+                "tags": [
+                    "Admin - Tarefas"
+                ],
+                "summary": "Recarregar vídeos online",
+                "description": "Atualiza dados de vídeos online do YouTube",
+                "operationId": "a55f655fab7ec6b584bcbdb3971f0e6c",
+                "responses": {
+                    "200": {
+                        "description": "Vídeos atualizados"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/tasks/refresh_configs": {
+            "get": {
+                "tags": [
+                    "Admin - Tarefas"
+                ],
+                "summary": "Recarregar configurações",
+                "description": "Recarrega o cache de configurações do sistema",
+                "operationId": "d0fe5cd403bb39812547fbf056bdfa77",
+                "responses": {
+                    "200": {
+                        "description": "Configurações recarregadas"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/tasks/export_database": {
+            "get": {
+                "tags": [
+                    "Admin - Tarefas"
+                ],
+                "summary": "Exportar banco de dados (SQL)",
+                "description": "Gera exportação SQL do banco de dados para o desktop app",
+                "operationId": "4e7b24b851ca3008fb33be0ec34cc38d",
+                "responses": {
+                    "200": {
+                        "description": "Exportação concluída",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/tasks/export_database_json": {
+            "get": {
+                "tags": [
+                    "Admin - Tarefas"
+                ],
+                "summary": "Exportar banco de dados (JSON)",
+                "description": "Gera exportação JSON do banco de dados",
+                "operationId": "cc1a7a173f261fe256e695b726a97700",
+                "responses": {
+                    "200": {
+                        "description": "Exportação concluída",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/tasks/send_database_ftp": {
+            "get": {
+                "tags": [
+                    "Admin - Tarefas"
+                ],
+                "summary": "Enviar banco via FTP",
+                "description": "Envia exportação do banco de dados para os servidores FTP configurados",
+                "operationId": "3dc1b42695f193e478ee3d60081be062",
+                "responses": {
+                    "200": {
+                        "description": "Envio concluído"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/tasks/import_slides": {
+            "get": {
+                "tags": [
+                    "Admin - Tarefas"
+                ],
+                "summary": "Importar slides",
+                "description": "Importa slides de apresentações de um diretório configurado",
+                "operationId": "56deaad868763b40820db828cc432a9e",
+                "responses": {
+                    "200": {
+                        "description": "Importação concluída"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/users": {
+            "get": {
+                "tags": [
+                    "Admin - Usuários"
+                ],
+                "summary": "Listar usuários",
+                "description": "Retorna lista paginada de usuários, com suporte a filtros por idioma e busca textual",
+                "operationId": "b2c82e7c972ca4c5910b82f3c498d9ea",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "query",
+                        "description": "Idioma",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Busca textual",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Itens por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de usuários",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin - Usuários"
+                ],
+                "summary": "Criar usuário",
+                "description": "Cria um novo(a) usuário. Requer autenticação admin.",
+                "operationId": "024e0e9203cd7c7d366cd21586f7daea",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Usuário criado(a) com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "422": {
+                        "description": "Dados de validação inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/users/{id}": {
+            "get": {
+                "tags": [
+                    "Admin - Usuários"
+                ],
+                "summary": "Buscar usuário por ID",
+                "description": "Retorna os dados detalhados de um(a) usuário específico(a)",
+                "operationId": "0ead61a33021b5f24adbf6743a6851b5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do(a) usuário",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados do(a) usuário",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Usuário não encontrado(a)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin - Usuários"
+                ],
+                "summary": "Atualizar usuário",
+                "description": "Atualiza os dados de um(a) usuário existente",
+                "operationId": "bdf7e60c1017f3e5977baa6059f2cba8",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do(a) usuário",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Usuário atualizado(a) com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Usuário não encontrado(a)"
+                    },
+                    "422": {
+                        "description": "Dados de validação inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin - Usuários"
+                ],
+                "summary": "Excluir usuário",
+                "description": "Remove um(a) usuário pelo ID",
+                "operationId": "43b774a128c5c627bfbec03bd329cf2e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do(a) usuário",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Usuário excluído(a) com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Usuário não encontrado(a)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/version": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Informações de versão da API",
+                "description": "Retorna versão da API, versão mínima do cliente, versão PHP e versão do framework",
+                "operationId": "5f95dade7899d5479b5ac2ce6910f732",
+                "responses": {
+                    "200": {
+                        "description": "Informações de versão",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "api_version": {
+                                            "description": "Versão da API",
+                                            "type": "string"
+                                        },
+                                        "min_client_version": {
+                                            "description": "Versão mínima do cliente",
+                                            "type": "string"
+                                        },
+                                        "php_version": {
+                                            "description": "Versão do PHP",
+                                            "type": "string"
+                                        },
+                                        "lumen_version": {
+                                            "description": "Versão do framework Lumen",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/version_log": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Changelog de versão do desktop",
+                "description": "Busca release notes do GitHub para a versão informada e retorna como HTML formatado",
+                "operationId": "75e7376c06672974387d4d731734a902",
+                "parameters": [
+                    {
+                        "name": "version",
+                        "in": "query",
+                        "description": "Versão do app (ex: 2.5.0)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "versao",
+                        "in": "query",
+                        "description": "Versão do app (legado, mesmo que version)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "lang",
+                        "in": "query",
+                        "description": "Idioma",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML com release notes da versão",
+                        "content": {
+                            "text/html": {}
+                        }
+                    }
+                },
+                "security": []
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Autenticação JWT via header Authorization: Bearer {token}",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Public",
+            "description": "Public"
+        },
+        {
+            "name": "Admin - Álbuns",
+            "description": "Admin - Álbuns"
+        },
+        {
+            "name": "Admin - Álbuns-Músicas",
+            "description": "Admin - Álbuns-Músicas"
+        },
+        {
+            "name": "Auth",
+            "description": "Auth"
+        },
+        {
+            "name": "Admin - Categorias-Álbuns",
+            "description": "Admin - Categorias-Álbuns"
+        },
+        {
+            "name": "Admin - Categorias",
+            "description": "Admin - Categorias"
+        },
+        {
+            "name": "Database",
+            "description": "Database"
+        },
+        {
+            "name": "API",
+            "description": "API"
+        },
+        {
+            "name": "Admin - Letras",
+            "description": "Admin - Letras"
+        },
+        {
+            "name": "Admin - Músicas",
+            "description": "Admin - Músicas"
+        },
+        {
+            "name": "Documentação",
+            "description": "Documentação"
+        },
+        {
+            "name": "Admin - Tarefas",
+            "description": "Admin - Tarefas"
+        },
+        {
+            "name": "Admin - Usuários",
+            "description": "Admin - Usuários"
+        }
+    ]
+}
