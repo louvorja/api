@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenBlacklistedException;
 
 class AuthController extends Controller
 {
@@ -51,12 +52,20 @@ class AuthController extends Controller
                 ], 500);
             }
 
+            // Invalidate the OLD token immediately (refresh token rotation).
+            // This prevents token reuse if the old token was compromised.
+            JWTAuth::invalidate($currentToken);
+
             $user = auth()->user();
 
             return response()->json([
                 'token' => $newToken,
                 'user' => $user
             ]);
+        } catch (TokenBlacklistedException $e) {
+            return response()->json([
+                'error' => 'Token já foi invalidado. Faça login novamente.',
+            ], 401);
         } catch (JWTException $e) {
             return response()->json([
                 'error' => 'Token inválido ou expirado.',
@@ -67,12 +76,12 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         try {
-            // Obtém o token do cabeçalho Authorization
             $token = JWTAuth::getToken();
-
-            // Invalida o token
             JWTAuth::invalidate($token);
 
+            return response()->json([]);
+        } catch (TokenBlacklistedException $e) {
+            // Token was already blacklisted — logout is still successful.
             return response()->json([]);
         } catch (JWTException $e) {
             return response()->json([
@@ -113,6 +122,13 @@ class AuthController extends Controller
         $user->password = Hash::make($request->input('new_password'));
         $user->is_temporary_password = false;
         $user->save();
+
+        // Invalidate all existing tokens for this user after password change.
+        try {
+            JWTAuth::invalidate(JWTAuth::getToken());
+        } catch (JWTException $e) {
+            // Non-critical — password was still changed.
+        }
 
         return response()->json(['message' => 'Senha alterada com sucesso.']);
     }
