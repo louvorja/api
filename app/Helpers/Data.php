@@ -31,8 +31,6 @@ class Data
                 $data->where(DB::raw($field), $we['op'], $we['value']);
             }
         }
-        //echo PHP_EOL . $data->toSql();
-        //dd($data->toSql());
         return $data->paginate($request->limit);
     }
 
