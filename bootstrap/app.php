@@ -65,6 +65,7 @@ $app->configure('api');
 $app->configure('files');
 $app->configure('jwt');
 $app->configure('version');
+$app->configure('logging');
 
 /* Validate required environment variables after config loads */
 App\Helpers\EnvValidator::check();
@@ -93,6 +94,7 @@ $app->routeMiddleware([
     'access' => App\Http\Middleware\AccessMiddleware::class,
     'general' => \App\Http\Middleware\GeneralMiddleware::class,
     'rate_limit' => App\Http\Middleware\RateLimitMiddleware::class,
+    'request.log' => App\Http\Middleware\RequestLoggingMiddleware::class,
 ]);
 
 /*
