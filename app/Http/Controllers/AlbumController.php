@@ -8,6 +8,7 @@ use App\Models\Album;
 use App\Models\Music;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use OpenApi\Attributes as OA;
 
 class AlbumController extends Controller
 {
@@ -24,6 +25,39 @@ class AlbumController extends Controller
         return Validations::validationMessages();
     }
 
+    #[OA\Get(
+        path: '/{lang}/albums',
+        summary: 'Listar álbuns (público)',
+        description: 'Retorna lista paginada de álbuns para o idioma informado',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt')),
+            new OA\Parameter(name: 'q', description: 'Busca textual', in: 'query', required: false, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'page', description: 'Página', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 1)),
+            new OA\Parameter(name: 'per_page', description: 'Itens por página', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 15))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Lista de álbuns', content: new OA\JsonContent(type: 'array', items: new OA\Items(type: 'object')))
+        ]
+    )]
+    #[OA\Get(
+        path: '/admin/albums',
+        summary: 'Listar álbuns',
+        description: 'Retorna lista paginada de álbuns, com suporte a filtros por idioma e busca textual',
+        tags: ['Admin - Álbuns'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Idioma', in: 'query', required: false, schema: new OA\Schema(type: 'string', default: 'pt')),
+            new OA\Parameter(name: 'q', description: 'Busca textual', in: 'query', required: false, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'page', description: 'Página', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 1)),
+            new OA\Parameter(name: 'per_page', description: 'Itens por página', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 15))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Lista de álbuns', content: new OA\JsonContent(type: 'array', items: new OA\Items(type: 'object'))),
+            new OA\Response(response: 401, description: 'Não autenticado')
+        ]
+    )]
     public function index(Request $request)
     {
         $model = new Album;
@@ -63,6 +97,51 @@ class AlbumController extends Controller
         return response()->json(Data::data($data, $request, $fields));
     }
 
+    #[OA\Get(
+        path: '/{lang}/albums/{id}',
+        summary: 'Buscar álbum por ID (público)',
+        description: 'Retorna os dados detalhados de um álbum para o idioma informado',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt')),
+            new OA\Parameter(name: 'id', description: 'ID do álbum', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Dados do álbum', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 404, description: 'Álbum não encontrado')
+        ]
+    )]
+    #[OA\Get(
+        path: '/{lang}/album/{id}',
+        summary: 'Buscar álbum por ID (alias singular)',
+        description: 'Alias para /{lang}/albums/{id}',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt')),
+            new OA\Parameter(name: 'id', description: 'ID do álbum', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Dados do álbum', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 404, description: 'Álbum não encontrado')
+        ]
+    )]
+    #[OA\Get(
+        path: '/admin/albums/{id}',
+        summary: 'Buscar álbum por ID',
+        description: 'Retorna os dados detalhados de um(a) álbum específico(a)',
+        tags: ['Admin - Álbuns'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(name: 'id', description: 'ID do(a) álbum', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Dados do(a) álbum', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 401, description: 'Não autenticado'),
+            new OA\Response(response: 404, description: 'Álbum não encontrado(a)')
+        ]
+    )]
     public function show($id, Request $request)
     {
         $album = Album::select(
@@ -115,6 +194,22 @@ class AlbumController extends Controller
         return response()->json($data);
     }
 
+    #[OA\Post(
+        path: '/admin/albums',
+        summary: 'Criar álbum',
+        description: 'Cria um novo(a) álbum. Requer autenticação admin.',
+        tags: ['Admin - Álbuns'],
+        security: [['bearerAuth' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(type: 'object')
+        ),
+        responses: [
+            new OA\Response(response: 201, description: 'Álbum criado(a) com sucesso', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 401, description: 'Não autenticado'),
+            new OA\Response(response: 422, description: 'Dados de validação inválidos')
+        ]
+    )]
     public function store(Request $request)
     {
         $this->validate($request, $this->validationRules($request), $this->validationMessages());
@@ -127,6 +222,26 @@ class AlbumController extends Controller
         return response()->json($data, 201);
     }
 
+    #[OA\Put(
+        path: '/admin/albums/{id}',
+        summary: 'Atualizar álbum',
+        description: 'Atualiza os dados de um(a) álbum existente',
+        tags: ['Admin - Álbuns'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(name: 'id', description: 'ID do(a) álbum', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(type: 'object')
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Álbum atualizado(a) com sucesso', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 401, description: 'Não autenticado'),
+            new OA\Response(response: 404, description: 'Álbum não encontrado(a)'),
+            new OA\Response(response: 422, description: 'Dados de validação inválidos')
+        ]
+    )]
     public function update(Request $request, $id)
     {
         $this->validate($request, $this->validationRules($request, $id), $this->validationMessages());
@@ -146,6 +261,23 @@ class AlbumController extends Controller
         return response()->json($data);
     }
 
+    #[OA\Delete(
+        path: '/admin/albums/{id}',
+        summary: 'Excluir álbum',
+        description: 'Remove um(a) álbum pelo ID',
+        tags: ['Admin - Álbuns'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(name: 'id', description: 'ID do(a) álbum', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Álbum excluído(a) com sucesso', content: new OA\JsonContent(
+                properties: [new OA\Property(property: 'message', type: 'string')]
+            )),
+            new OA\Response(response: 401, description: 'Não autenticado'),
+            new OA\Response(response: 404, description: 'Álbum não encontrado(a)')
+        ]
+    )]
     public function destroy($id)
     {
         $album = Album::find($id);

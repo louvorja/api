@@ -233,7 +233,7 @@ class DatabaseJsonController extends Controller
         summary: 'Obter arquivo JSON exportado (legado)',
         description: 'Retorna o conteúdo de um arquivo JSON específico da pasta public/db/json/',
         tags: ['Database'],
-        security: [['ApiToken' => []]],
+        security: [],
         parameters: [
             new OA\Parameter(
                 name: 'file',

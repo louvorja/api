@@ -8,6 +8,7 @@ use App\Helpers\OnlineVideos;
 use App\Helpers\DataBase;
 use App\Helpers\Ftp;
 use Illuminate\Http\Request;
+use OpenApi\Attributes as OA;
 
 class TaskController extends Controller
 {
@@ -17,134 +18,17 @@ class TaskController extends Controller
         set_time_limit(60 * 60);
     }
 
-    public function refresh_files_size($check_version = true)
-    {
-        if ($check_version) {
-            $version = Configs::get("version");
-            $last_version = Configs::get("version_files_size");
-            if ($last_version == $version) {
-                return;
-            }
-        }
-        $ret = Files::refresh_size();
-        Configs::set("version_files_size", $version);
-        return $ret;
-    }
-
-    public function refresh_files_duration($check_version = true)
-    {
-        if ($check_version) {
-            $version = Configs::get("version");
-            $last_version = Configs::get("version_files_duration");
-            if ($last_version == $version) {
-                return;
-            }
-        }
-        $ret = Files::refresh_duration();
-        Configs::set("version_files_duration", $version);
-        return $ret;
-    }
-
-    public function refresh_online_videos()
-    {
-        $ret = OnlineVideos::refresh();
-        if ($ret["status"] == "") {
-            $ret = [];
-        }
-        return $ret;
-    }
-
-    public function refresh_configs()
-    {
-        $ret = Configs::refresh();
-        if ($ret["status"] <> "") {
-            $data = Configs::get();
-            $ret["data"] = $data;
-        } else {
-            $ret = [];
-        }
-
-        return $ret;
-    }
-
-    public function export_database($check_version = true)
-    {
-        if ($check_version) {
-            $version = Configs::get("version");
-            $last_version = Configs::get("version_export_database");
-            if ($last_version == $version) {
-                return;
-            }
-        }
-
-        $ret = DataBase::export();
-        if ($ret["error"] && $ret["error"] <> "") {
-            Configs::set("version_export_database", -1);
-        } else {
-            Configs::set("version_export_database", $version);
-        }
-        return $ret;
-    }
-
-    public function export_database_json($check_version = true)
-    {
-        if (request("force") && request("force") == "true") {
-            $check_version = false;
-        }
-
-        if ($check_version) {
-            $version = Configs::get("version");
-            $last_version = Configs::get("version_export_database_json");
-            if ($last_version == $version) {
-                return [];
-            }
-        }
-
-        $ret = DataBase::export_json();
-        if ($check_version) {
-            Configs::set("version_export_database_json", $version);
-        }
-        return $ret;
-    }
-
-    public function send_database_ftp($check_version = true)
-    {
-        if ($check_version) {
-            $version = Configs::get("version");
-            $last_version = Configs::get("version_send_database_ftp");
-            if ($last_version == $version) {
-                return;
-            }
-        }
-
-        Files::permissions(config("files.dir"), 0644, 0755);
-        $ret = Ftp::send_database();
-        Files::permissions(config("files.dir"), 0444, 0555);
-        if ($ret["status"] == true) {
-            Configs::set("version_send_database_ftp", $version);
-        }
-        return $ret;
-    }
-
-    public function import_slides()
-    {
-        $dir = app()->basePath('public') . DIRECTORY_SEPARATOR . 'import' . DIRECTORY_SEPARATOR;
-
-        $files = Files::list_files($dir);
-
-        if (isset($files["error"])) {
-            return response()->json($files);
-        }
-
-        $log = [];
-        foreach ($files as $file) {
-            $ret = DataBase::import_file($file["path"]);
-            $log[] = ['file' => $file['name'], 'status' => $ret];
-        }
-
-        return response()->json($log);
-    }
-
+    #[OA\Get(
+        path: '/tasks',
+        summary: 'Listar tarefas',
+        description: 'Retorna lista de tarefas administrativas disponíveis',
+        tags: ['Admin - Tarefas'],
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Lista de tarefas', content: new OA\JsonContent(type: 'array', items: new OA\Items(type: 'object'))),
+            new OA\Response(response: 401, description: 'Não autenticado')
+        ]
+    )]
     public function index(Request $request)
     {
         /*  Configs::refresh();
@@ -173,5 +57,221 @@ class TaskController extends Controller
         return response()->json(["logs" => $logs, "data" => $data]);*/
 
         return response()->json([]);
+    }
+
+    #[OA\Get(
+        path: '/tasks/refresh_files_size',
+        summary: 'Recalcular tamanho dos arquivos',
+        description: 'Recalcula o tamanho de todos os arquivos de mídia armazenados',
+        tags: ['Admin - Tarefas'],
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Tamanhos atualizados'),
+            new OA\Response(response: 401, description: 'Não autenticado')
+        ]
+    )]
+    public function refresh_files_size($check_version = true)
+    {
+        if ($check_version) {
+            $version = Configs::get("version");
+            $last_version = Configs::get("version_files_size");
+            if ($last_version == $version) {
+                return;
+            }
+        }
+        $ret = Files::refresh_size();
+        Configs::set("version_files_size", $version);
+        return $ret;
+    }
+
+    #[OA\Get(
+        path: '/tasks/refresh_files_duration',
+        summary: 'Recalcular duração dos áudios',
+        description: 'Recalcula a duração de todos os arquivos de áudio',
+        tags: ['Admin - Tarefas'],
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Durações atualizadas'),
+            new OA\Response(response: 401, description: 'Não autenticado')
+        ]
+    )]
+    public function refresh_files_duration($check_version = true)
+    {
+        if ($check_version) {
+            $version = Configs::get("version");
+            $last_version = Configs::get("version_files_duration");
+            if ($last_version == $version) {
+                return;
+            }
+        }
+        $ret = Files::refresh_duration();
+        Configs::set("version_files_duration", $version);
+        return $ret;
+    }
+
+    #[OA\Get(
+        path: '/tasks/refresh_online_videos',
+        summary: 'Recarregar vídeos online',
+        description: 'Atualiza dados de vídeos online do YouTube',
+        tags: ['Admin - Tarefas'],
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Vídeos atualizados'),
+            new OA\Response(response: 401, description: 'Não autenticado')
+        ]
+    )]
+    public function refresh_online_videos()
+    {
+        $ret = OnlineVideos::refresh();
+        if ($ret["status"] == "") {
+            $ret = [];
+        }
+        return $ret;
+    }
+
+    #[OA\Get(
+        path: '/tasks/refresh_configs',
+        summary: 'Recarregar configurações',
+        description: 'Recarrega o cache de configurações do sistema',
+        tags: ['Admin - Tarefas'],
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Configurações recarregadas'),
+            new OA\Response(response: 401, description: 'Não autenticado')
+        ]
+    )]
+    public function refresh_configs()
+    {
+        $ret = Configs::refresh();
+        if ($ret["status"] <> "") {
+            $data = Configs::get();
+            $ret["data"] = $data;
+        } else {
+            $ret = [];
+        }
+
+        return $ret;
+    }
+
+    #[OA\Get(
+        path: '/tasks/export_database',
+        summary: 'Exportar banco de dados (SQL)',
+        description: 'Gera exportação SQL do banco de dados para o desktop app',
+        tags: ['Admin - Tarefas'],
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Exportação concluída', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 401, description: 'Não autenticado')
+        ]
+    )]
+    public function export_database($check_version = true)
+    {
+        if ($check_version) {
+            $version = Configs::get("version");
+            $last_version = Configs::get("version_export_database");
+            if ($last_version == $version) {
+                return;
+            }
+        }
+
+        $ret = DataBase::export();
+        if ($ret["error"] && $ret["error"] <> "") {
+            Configs::set("version_export_database", -1);
+        } else {
+            Configs::set("version_export_database", $version);
+        }
+        return $ret;
+    }
+
+    #[OA\Get(
+        path: '/tasks/export_database_json',
+        summary: 'Exportar banco de dados (JSON)',
+        description: 'Gera exportação JSON do banco de dados',
+        tags: ['Admin - Tarefas'],
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Exportação concluída', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 401, description: 'Não autenticado')
+        ]
+    )]
+    public function export_database_json($check_version = true)
+    {
+        if (request("force") && request("force") == "true") {
+            $check_version = false;
+        }
+
+        if ($check_version) {
+            $version = Configs::get("version");
+            $last_version = Configs::get("version_export_database_json");
+            if ($last_version == $version) {
+                return [];
+            }
+        }
+
+        $ret = DataBase::export_json();
+        if ($check_version) {
+            Configs::set("version_export_database_json", $version);
+        }
+        return $ret;
+    }
+
+    #[OA\Get(
+        path: '/tasks/send_database_ftp',
+        summary: 'Enviar banco via FTP',
+        description: 'Envia exportação do banco de dados para os servidores FTP configurados',
+        tags: ['Admin - Tarefas'],
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Envio concluído'),
+            new OA\Response(response: 401, description: 'Não autenticado')
+        ]
+    )]
+    public function send_database_ftp($check_version = true)
+    {
+        if ($check_version) {
+            $version = Configs::get("version");
+            $last_version = Configs::get("version_send_database_ftp");
+            if ($last_version == $version) {
+                return;
+            }
+        }
+
+        Files::permissions(config("files.dir"), 0644, 0755);
+        $ret = Ftp::send_database();
+        Files::permissions(config("files.dir"), 0444, 0555);
+        if ($ret["status"] == true) {
+            Configs::set("version_send_database_ftp", $version);
+        }
+        return $ret;
+    }
+
+    #[OA\Get(
+        path: '/tasks/import_slides',
+        summary: 'Importar slides',
+        description: 'Importa slides de apresentações de um diretório configurado',
+        tags: ['Admin - Tarefas'],
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Importação concluída'),
+            new OA\Response(response: 401, description: 'Não autenticado')
+        ]
+    )]
+    public function import_slides()
+    {
+        $dir = app()->basePath('public') . DIRECTORY_SEPARATOR . 'import' . DIRECTORY_SEPARATOR;
+
+        $files = Files::list_files($dir);
+
+        if (isset($files["error"])) {
+            return response()->json($files);
+        }
+
+        $log = [];
+        foreach ($files as $file) {
+            $ret = DataBase::import_file($file["path"]);
+            $log[] = ['file' => $file['name'], 'status' => $ret];
+        }
+
+        return response()->json($log);
     }
 }
