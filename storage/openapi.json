@@ -3601,6 +3601,12 @@
     },
     "components": {
         "securitySchemes": {
+            "ApiToken": {
+                "type": "apiKey",
+                "description": "Token de autenticacao enviado via header Api-Token",
+                "name": "Api-Token",
+                "in": "header"
+            },
             "bearerAuth": {
                 "type": "http",
                 "description": "Autenticação JWT via header Authorization: Bearer {token}",
