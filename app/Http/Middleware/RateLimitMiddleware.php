@@ -32,14 +32,16 @@ class RateLimitMiddleware
         if ($attempts >= $maxRequests) {
             $retryAfter = Cache::get("{$key}:reset_at", Carbon::now()->addSeconds($decaySeconds)->timestamp);
 
-            return response()->json([
+            $response = response()->json([
                 'error' => 'Too Many Requests',
                 'message' => 'Limite de requisições excedido. Tente novamente em breve.',
                 'retry_after' => $retryAfter - Carbon::now()->timestamp,
-            ], 429)
-                ->header('X-RateLimit-Limit', (string) $maxRequests)
-                ->header('X-RateLimit-Remaining', '0')
-                ->header('Retry-After', (string) ($retryAfter - Carbon::now()->timestamp));
+            ], 429);
+            $response->headers->set('X-RateLimit-Limit', (string) $maxRequests);
+            $response->headers->set('X-RateLimit-Remaining', '0');
+            $response->headers->set('Retry-After', (string) ($retryAfter - Carbon::now()->timestamp));
+
+            return $response;
         }
 
         Cache::put($key, $attempts + 1, $decaySeconds);
@@ -53,8 +55,11 @@ class RateLimitMiddleware
 
         $response = $next($request);
 
-        return $response
-            ->header('X-RateLimit-Limit', (string) $maxRequests)
-            ->header('X-RateLimit-Remaining', (string) max($remaining, 0));
+        // StreamedResponse não tem ->header() (Symfony 6.4+).
+        // Usa ->headers->set() que funciona em qualquer Response.
+        $response->headers->set('X-RateLimit-Limit', (string) $maxRequests);
+        $response->headers->set('X-RateLimit-Remaining', (string) max($remaining, 0));
+
+        return $response;
     }
 }
