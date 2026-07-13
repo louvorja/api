@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Data;
 use App\Helpers\Validations;
+use App\Models\Album;
 use App\Models\Category;
+use App\Models\Music;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use OpenApi\Attributes as OA;
 
 class CategoryController extends Controller
@@ -65,6 +69,139 @@ class CategoryController extends Controller
             $data->where('id_language', $request->id_language);
         }
         return response()->json(Data::data($data, $request, [$model->getKeyName(), ...$model->getFillable()]));
+    }
+
+    #[OA\Get(
+        path: '/{lang}/categories/{id}/albums',
+        summary: 'Álbuns de uma categoria (público)',
+        description: 'Retorna lista paginada de álbuns pertencentes a uma categoria específica',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt')),
+            new OA\Parameter(name: 'id', description: 'ID da categoria', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'page', description: 'Página', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 1)),
+            new OA\Parameter(name: 'per_page', description: 'Itens por página', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 15))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Lista de álbuns', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 404, description: 'Categoria não encontrada')
+        ]
+    )]
+    public function albums(Request $request, $id)
+    {
+        // Validate category exists (404 if not)
+        Category::where('id_category', $id)
+            ->where('id_language', $request->id_language)
+            ->firstOrFail();
+
+        $cacheKey = "categories.{$request->lang}.{$id}.albums.{$request->get('page', 1)}";
+        return Cache::remember($cacheKey, 300, function () use ($request, $id) {
+            $fields = [
+                'albums.id_album',
+                'albums.name',
+                'albums.id_file_image',
+                DB::raw('concat("' . config("files.url") . '",files.dir,"/",files.file_name) as url_image'),
+                'files.version as image_version',
+                'albums.id_language',
+                'albums.color',
+                'categories_albums.order',
+                'albums.created_at',
+                'albums.updated_at',
+            ];
+            $data = (new Album)->select($fields)
+                ->join('categories_albums', 'categories_albums.id_album', 'albums.id_album')
+                ->join('categories', 'categories.id_category', 'categories_albums.id_category')
+                ->leftJoin('files', 'albums.id_file_image', 'files.id_file')
+                ->where('categories.id_category', $id)
+                ->where('albums.id_language', $request->id_language)
+                ->orderBy('categories_albums.order');
+
+            return response()->json(Data::data($data, $request, $fields));
+        });
+    }
+
+    #[OA\Get(
+        path: '/{lang}/categories/{id}/albums-with-musics',
+        summary: 'Álbuns com músicas de uma categoria (público)',
+        description: 'Retorna uma categoria com seus álbuns e respectivas músicas em estrutura aninhada',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt')),
+            new OA\Parameter(name: 'id', description: 'ID da categoria', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Estrutura aninhada', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 404, description: 'Categoria não encontrada')
+        ]
+    )]
+    public function albumsWithMusics(Request $request, $id)
+    {
+        $category = Category::where('id_category', $id)
+            ->where('id_language', $request->id_language)
+            ->firstOrFail();
+
+        $cacheKey = "categories.{$request->lang}.{$id}.awm";
+        return Cache::remember($cacheKey, 300, function () use ($request, $id, $category) {
+            // Get albums for this category
+            $albums = (new Album)->select([
+                'albums.id_album',
+                'albums.name',
+                'albums.id_file_image',
+                DB::raw('concat("' . config("files.url") . '",files.dir,"/",files.file_name) as url_image'),
+                'files.version as image_version',
+                'albums.id_language',
+                'albums.color',
+                'categories_albums.order',
+            ])
+                ->join('categories_albums', 'categories_albums.id_album', 'albums.id_album')
+                ->join('categories', 'categories.id_category', 'categories_albums.id_category')
+                ->leftJoin('files', 'albums.id_file_image', 'files.id_file')
+                ->where('categories.id_category', $id)
+                ->where('albums.id_language', $request->id_language)
+                ->orderBy('categories_albums.order')
+                ->get();
+
+            // Batch query for musics (avoids N+1)
+            $albumIds = $albums->pluck('id_album')->toArray();
+            $musicsByAlbum = collect();
+            if (!empty($albumIds)) {
+                $musicsByAlbum = Music::select([
+                    'albums_musics.id_album',
+                    'musics.id_music',
+                    'albums_musics.track',
+                    'musics.name',
+                    'musics.id_file_image',
+                    DB::raw('concat("' . config("files.url") . '",files_image.dir,"/",files_image.file_name) as url_image'),
+                    'files_image.version as image_version',
+                    'musics.id_file_music',
+                    DB::raw('concat("' . config("files.url") . '",files_music.dir,"/",files_music.file_name) as url_music'),
+                    'files_music.version as music_version',
+                    'musics.id_file_instrumental_music',
+                    DB::raw('concat("' . config("files.url") . '",files_instrumental_music.dir,"/",files_instrumental_music.file_name) as url_instrumental_music'),
+                    'files_instrumental_music.version as instrumental_music_version',
+                ])
+                    ->leftJoin('albums_musics', 'albums_musics.id_music', 'musics.id_music')
+                    ->leftJoin('files as files_image', 'musics.id_file_image', 'files_image.id_file')
+                    ->leftJoin('files as files_music', 'musics.id_file_music', 'files_music.id_file')
+                    ->leftJoin('files as files_instrumental_music', 'musics.id_file_instrumental_music', 'files_instrumental_music.id_file')
+                    ->whereIn('albums_musics.id_album', $albumIds)
+                    ->orderBy('albums_musics.track')
+                    ->get()
+                    ->groupBy('id_album');
+            }
+
+            // Nest musics into albums
+            foreach ($albums as $album) {
+                $album->musics = $musicsByAlbum->get($album->id_album, collect())->values();
+            }
+
+            return response()->json([
+                'category' => $category,
+                'albums' => $albums,
+            ]);
+        });
     }
 
     #[OA\Get(

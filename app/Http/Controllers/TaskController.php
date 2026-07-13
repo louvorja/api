@@ -6,6 +6,7 @@ use App\Helpers\Configs;
 use App\Helpers\Files;
 use App\Helpers\OnlineVideos;
 use App\Helpers\DataBase;
+use App\Helpers\GenerateStaticJsons;
 use App\Helpers\Ftp;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
@@ -273,5 +274,55 @@ class TaskController extends Controller
         }
 
         return response()->json($log);
+    }
+
+    #[OA\Get(
+        path: '/tasks/generate_static_jsons',
+        summary: 'Gerar JSONs estáticos do banco',
+        description: 'Gera arquivos JSON estáticos (categorias, albums, musics, hinario, collections online) a partir do banco de dados para uso offline pelo app desktop/web. Os arquivos são salvos em public/db/json/ com hash MD5 para versionamento via ETag.',
+        tags: ['Admin - Tarefas'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(
+                name: 'force',
+                in: 'query',
+                schema: new OA\Schema(type: 'string', enum: ['true', 'false']),
+                description: 'Força regeneração ignorando version check'
+            ),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'JSONs gerados com sucesso', content: new OA\JsonContent(
+                type: 'object',
+                properties: [
+                    new OA\Property(property: 'status', type: 'string', example: 'success'),
+                    new OA\Property(property: 'files_generated', type: 'integer', example: 42),
+                    new OA\Property(property: 'logs', type: 'array', items: new OA\Items(type: 'object')),
+                ]
+            )),
+            new OA\Response(response: 401, description: 'Não autenticado')
+        ]
+    )]
+    public function generate_static_jsons()
+    {
+        $force = request('force') === 'true';
+        $checkVersion = !$force;
+
+        if ($checkVersion) {
+            $version = Configs::get("version");
+            $lastVersion = Configs::get("version_generate_static_jsons");
+            if ($lastVersion == $version) {
+                return [];
+            }
+        }
+
+        $logs = GenerateStaticJsons::generate();
+        Configs::set("version_generate_static_jsons", Configs::get("version"));
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'JSONs estáticos gerados com sucesso',
+            'files_generated' => count($logs),
+            'logs' => $logs,
+        ]);
     }
 }

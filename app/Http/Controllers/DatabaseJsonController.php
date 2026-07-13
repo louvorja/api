@@ -37,6 +37,7 @@ class DatabaseJsonController extends Controller
                             new OA\Property(property: 'file', type: 'string', example: 'config.json'),
                             new OA\Property(property: 'table', type: 'string', example: 'config'),
                             new OA\Property(property: 'path', type: 'string', example: '/db/config'),
+                            new OA\Property(property: 'hash', type: 'string', description: 'MD5 hash do arquivo para cache ETag', example: 'a1b2c3d4e5f6...'),
                         ]
                     )
                 )
@@ -50,10 +51,13 @@ class DatabaseJsonController extends Controller
             $files = [];
             if (File::exists($jsonDir)) {
                 foreach (File::files($jsonDir) as $file) {
+                    $filename = $file->getFilename();
+                    $hash = \App\Helpers\GenerateStaticJsons::getHash($filename);
                     $files[] = [
-                        'file' => $file->getFilename(),
+                        'file' => $filename,
                         'table' => $file->getFilenameWithoutExtension(),
                         'path' => '/db/' . $file->getFilenameWithoutExtension(),
+                        'hash' => $hash,
                     ];
                 }
             }
@@ -97,6 +101,9 @@ class DatabaseJsonController extends Controller
             new OA\Response(
                 response: 200,
                 description: 'Registros paginados',
+                headers: [
+                    new OA\Header(header: 'ETag', description: 'MD5 hash do arquivo para cache condicional', schema: new OA\Schema(type: 'string')),
+                ],
                 content: new OA\JsonContent(
                     type: 'object',
                     properties: [
@@ -118,39 +125,119 @@ class DatabaseJsonController extends Controller
                     ]
                 )
             ),
+            new OA\Response(response: 304, description: 'Não modificado (ETag coincide com If-None-Match)'),
             new OA\Response(response: 404, description: 'Arquivo não encontrado')
         ]
     )]
     public function table(Request $request, string $table)
     {
-        $cacheKey = "db.table.{$table}.page.{$request->get('page', 1)}.per_page.{$request->get('per_page', 50)}";
+        $jsonDir = base_path('public/db/json');
+        $filename = "{$table}.json";
+        $filePath = "{$jsonDir}/{$filename}";
 
-        return Cache::remember($cacheKey, 300, function () use ($request, $table) {
+        if (!File::exists($filePath)) {
+            return response()->json(['error' => 'Table not found'], 404);
+        }
+
+        // ETag cache condicional: se o hash do arquivo bate com If-None-Match, retorna 304
+        $hash = \App\Helpers\GenerateStaticJsons::getHash($filename);
+        if ($hash && $request->header('If-None-Match') === $hash) {
+            return response('', 304);
+        }
+
+        $data = json_decode(File::get($filePath), true);
+
+        // Extrai campo 'data' se existir como array (JSONs gerados pelo GenerateStaticJsons
+        // possuem envelope _meta + data). Remove _meta e usa data diretamente.
+        if (isset($data['data']) && is_array($data['data'])) {
+            $data = $data['data'];
+        }
+
+        $perPage = (int) $request->get('per_page', 50);
+        $page = (int) $request->get('page', 1);
+        $total = count($data);
+        $offset = ($page - 1) * $perPage;
+        $items = array_slice($data, $offset, $perPage);
+
+        $response = response()->json([
+            'data' => $items,
+            'meta' => [
+                'total' => $total,
+                'per_page' => $perPage,
+                'current_page' => $page,
+                'last_page' => (int) ceil($total / $perPage),
+            ]
+        ]);
+
+        if ($hash) {
+            $response->header('ETag', $hash);
+        }
+
+        return $response;
+    }
+
+    /**
+     * Bundle ZIP de todos os arquivos JSON.
+     * Gera um ZIP em memória com todos os .json de public/db/json.
+     * Cache por 1 hora (3600s).
+     */
+    #[OA\Get(
+        path: '/db/bundle',
+        summary: 'Bundle ZIP de todos os JSON',
+        description: 'Gera e baixa um arquivo ZIP contendo todos os arquivos JSON da pasta public/db/json.',
+        tags: ['Database'],
+        security: [['ApiToken' => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Arquivo ZIP',
+                content: new OA\MediaType(mediaType: 'application/zip')
+            ),
+            new OA\Response(response: 404, description: 'Nenhum arquivo JSON encontrado')
+        ]
+    )]
+    public function bundle()
+    {
+        $cacheKey = 'db.bundle.zip';
+
+        $zipContent = Cache::remember($cacheKey, 3600, function () {
             $jsonDir = base_path('public/db/json');
-            $filePath = "{$jsonDir}/{$table}.json";
 
-            if (!File::exists($filePath)) {
-                return response()->json(['error' => 'Table not found'], 404);
+            if (!File::exists($jsonDir)) {
+                return null;
             }
 
-            $data = json_decode(File::get($filePath), true);
+            $files = File::files($jsonDir);
+            $jsonFiles = array_filter($files, fn ($f) => $f->getExtension() === 'json');
 
-            $perPage = (int) $request->get('per_page', 50);
-            $page = (int) $request->get('page', 1);
-            $total = count($data);
-            $offset = ($page - 1) * $perPage;
-            $items = array_slice($data, $offset, $perPage);
+            if (empty($jsonFiles)) {
+                return null;
+            }
 
-            return response()->json([
-                'data' => $items,
-                'meta' => [
-                    'total' => $total,
-                    'per_page' => $perPage,
-                    'current_page' => $page,
-                    'last_page' => (int) ceil($total / $perPage),
-                ]
-            ]);
+            $zip = new \ZipArchive();
+            $tempFile = tempnam(sys_get_temp_dir(), 'louvorja_bundle_');
+            $zip->open($tempFile, \ZipArchive::OVERWRITE);
+
+            foreach ($jsonFiles as $file) {
+                $zip->addFile($file->getPathname(), $file->getFilename());
+            }
+
+            $zip->close();
+            $content = file_get_contents($tempFile);
+            unlink($tempFile);
+
+            return $content;
         });
+
+        if ($zipContent === null) {
+            return response()->json(['error' => 'Nenhum arquivo JSON encontrado'], 404);
+        }
+
+        return response($zipContent, 200, [
+            'Content-Type' => 'application/zip',
+            'Content-Disposition' => 'attachment; filename="louvorja-db-bundle.zip"',
+            'Content-Length' => strlen($zipContent),
+        ]);
     }
 
     /**
@@ -269,6 +356,17 @@ class DatabaseJsonController extends Controller
      * Recria todos os arquivos JSON estaticos gerados do banco.
      * Chama DataBase::export_json() para gerar pt_categories.json, pt_musics.json, etc.
      */
+    #[OA\Get(
+        path: '/db/export',
+        summary: 'Recriar JSONs do banco',
+        description: 'Recria todos os arquivos JSON estáticos gerados a partir do banco de dados.',
+        tags: ['Database'],
+        security: [['ApiToken' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'JSONs recriados com sucesso'),
+            new OA\Response(response: 500, description: 'Erro ao recriar arquivos'),
+        ]
+    )]
     public function export()
     {
         try {

@@ -37,6 +37,7 @@ $router->group(['middleware' => 'general'], function () use ($router) {
         $router->get('/json_db/{file}', 'DatabaseJsonController@index');
 
         $router->get('/db/manifest', 'DatabaseJsonController@manifest');
+        $router->get('/db/bundle', 'DatabaseJsonController@bundle');
         $router->get('/db/{table}', 'DatabaseJsonController@table');
         $router->get('/db/{table}/categories', 'DatabaseJsonController@categories');
 
@@ -134,6 +135,7 @@ $router->group(['middleware' => 'general'], function () use ($router) {
                 $router->get('/refresh_online_videos', 'TaskController@refresh_online_videos');
                 $router->get('/import_slides', 'TaskController@import_slides');
                 $router->get('/export_database_json', 'TaskController@export_database_json');
+                $router->get('/generate_static_jsons', 'TaskController@generate_static_jsons');
             });
 
             $router->group(['prefix' => '{lang}', 'middleware' =>  'lang'], function () use ($router) {
@@ -156,8 +158,16 @@ $router->group(['middleware' => 'general'], function () use ($router) {
                 $router->get('/categories_albums', 'CategoryAlbumController@index');
 
                 $router->get('/albums', 'AlbumController@index');
+                $router->get('/albums/category/{slug}', 'AlbumController@byCategorySlug');
                 $router->get('/albums/{id}', 'AlbumController@show');
                 $router->get('/album/{id}', 'AlbumController@show');
+
+                $router->get('/categories/{id}/albums', 'CategoryController@albums');
+                $router->get('/categories/{id}/albums-with-musics', 'CategoryController@albumsWithMusics');
+
+                $router->get('/collections/online', 'CollectionController@online');
+
+                $router->get('/hymnal/{id}', 'HymnalController@show');
 
                 $router->get('/albums_musics', 'AlbumMusicController@index');
 

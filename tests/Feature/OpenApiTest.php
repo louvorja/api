@@ -31,7 +31,7 @@ class OpenApiTest extends TestCase
 
         $this->assertArrayHasKey('components', $spec);
         $this->assertArrayHasKey('securitySchemes', $spec['components']);
-        $this->assertArrayHasKey('ApiToken', $spec['components']['securitySchemes']);
+        $this->assertArrayHasKey('bearerAuth', $spec['components']['securitySchemes']);
     }
 
     public function test_openapi_spec_documents_json_db_endpoint()

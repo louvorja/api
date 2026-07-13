@@ -55,11 +55,27 @@ class DatabaseJsonControllerExportTest extends TestCase
         $this->assertArrayHasKey('file', $entry);
         $this->assertArrayHasKey('table', $entry);
         $this->assertArrayHasKey('path', $entry);
+        $this->assertArrayHasKey('hash', $entry);
 
         $musicEntry = collect($data)->first(fn ($e) => $e['table'] === 'musics');
         $this->assertNotNull($musicEntry, 'musics deve estar no manifest');
         $this->assertSame('musics.json', $musicEntry['file']);
         $this->assertSame('/db/musics', $musicEntry['path']);
+    }
+
+    public function test_manifest_hash_is_32_char_md5(): void
+    {
+        $this->get('/db/manifest');
+        $this->seeStatusCode(200);
+
+        $data = $this->response->json();
+        $musicEntry = collect($data)->first(fn ($e) => $e['table'] === 'musics');
+        $this->assertNotNull($musicEntry);
+
+        $hash = $musicEntry['hash'];
+        $this->assertNotNull($hash);
+        $this->assertEquals(32, strlen($hash));
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{32}$/', $hash);
     }
 
     public function test_manifest_caches_response(): void
@@ -106,14 +122,14 @@ class DatabaseJsonControllerExportTest extends TestCase
         $this->assertEquals(3, $data['meta']['last_page']);
     }
 
-    public function test_table_caches_response(): void
+    public function test_table_includes_etag_header(): void
     {
-        Cache::flush();
+        $this->get('/db/musics');
+        $this->seeStatusCode(200);
 
-        $this->get('/db/musics?page=1&per_page=50');
-        $this->assertTrue(Cache::has('db.table.musics.page.1.per_page.50'));
-
-        Cache::flush();
+        $etag = $this->response->headers->get('ETag');
+        $this->assertNotNull($etag, 'table() deve incluir ETag header');
+        $this->assertEquals(32, strlen($etag));
     }
 
     // ── Categories ─────────────────────────────────────────────

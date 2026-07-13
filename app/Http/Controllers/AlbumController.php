@@ -98,6 +98,48 @@ class AlbumController extends Controller
     }
 
     #[OA\Get(
+        path: '/{lang}/albums/category/{slug}',
+        summary: 'Álbuns por slug de categoria (público)',
+        description: 'Retorna lista paginada de álbuns pertencentes a uma categoria identificada por slug. Slug inexistente retorna lista vazia.',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt')),
+            new OA\Parameter(name: 'slug', description: 'Slug da categoria', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'page', description: 'Página', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 1)),
+            new OA\Parameter(name: 'per_page', description: 'Itens por página', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 15))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Lista de álbuns', content: new OA\JsonContent(type: 'object'))
+        ]
+    )]
+    public function byCategorySlug(Request $request, $slug)
+    {
+        $model = new Album;
+        $fields = [
+            'albums.id_album',
+            'albums.name',
+            'albums.id_file_image',
+            DB::raw('concat("' . config("files.url") . '",files.dir,"/",files.file_name) as url_image'),
+            DB::raw('files.version as image_version'),
+            'albums.id_language',
+            'albums.color',
+            'categories_albums.order',
+            'albums.created_at',
+            'albums.updated_at',
+        ];
+        $data = $model->select($fields)
+            ->join('categories_albums', 'categories_albums.id_album', 'albums.id_album')
+            ->join('categories', 'categories.id_category', 'categories_albums.id_category')
+            ->leftJoin('files', 'albums.id_file_image', 'files.id_file')
+            ->where('categories.slug', $slug)
+            ->where('albums.id_language', $request->id_language)
+            ->orderBy('categories_albums.order');
+
+        return response()->json(Data::data($data, $request, $fields));
+    }
+
+    #[OA\Get(
         path: '/{lang}/albums/{id}',
         summary: 'Buscar álbum por ID (público)',
         description: 'Retorna os dados detalhados de um álbum para o idioma informado',

@@ -2,7 +2,7 @@
 require __DIR__ . '/vendor/autoload.php';
 
 $g = new \OpenApi\Generator();
-$openapi = $g->scan(['app']);
+$openapi = $g->generate([__DIR__ . '/app']);
 
 $json = $openapi->toJson();
 file_put_contents(__DIR__ . '/storage/openapi.json', $json);

@@ -202,6 +202,70 @@
                 ]
             }
         },
+        "/{lang}/albums/category/{slug}": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Álbuns por slug de categoria (público)",
+                "description": "Retorna lista paginada de álbuns pertencentes a uma categoria identificada por slug. Slug inexistente retorna lista vazia.",
+                "operationId": "a17003ca10060f55378565425c7ccc38",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "path",
+                        "description": "Código do idioma",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Slug da categoria",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Itens por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de álbuns",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
         "/{lang}/albums/{id}": {
             "get": {
                 "tags": [
@@ -1292,6 +1356,120 @@
                 ]
             }
         },
+        "/{lang}/categories/{id}/albums": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Álbuns de uma categoria (público)",
+                "description": "Retorna lista paginada de álbuns pertencentes a uma categoria específica",
+                "operationId": "b9918ec07ef48c1c50258e0521b0b693",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "path",
+                        "description": "Código do idioma",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da categoria",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Itens por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de álbuns",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Categoria não encontrada"
+                    }
+                },
+                "security": []
+            }
+        },
+        "/{lang}/categories/{id}/albums-with-musics": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Álbuns com músicas de uma categoria (público)",
+                "description": "Retorna uma categoria com seus álbuns e respectivas músicas em estrutura aninhada",
+                "operationId": "b7cf8046b8f5c46da7dab5da2a95bc92",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "path",
+                        "description": "Código do idioma",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da categoria",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Estrutura aninhada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Categoria não encontrada"
+                    }
+                },
+                "security": []
+            }
+        },
         "/admin/categories/{id}": {
             "get": {
                 "tags": [
@@ -1438,6 +1616,41 @@
                 ]
             }
         },
+        "/{lang}/collections/online": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Coleção de conteúdo online (público)",
+                "description": "Retorna canais, playlists e vídeos online estruturados, com cache de 10 minutos",
+                "operationId": "92b75d20b0de544e0d86944b5a507440",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "path",
+                        "description": "Código do idioma",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Conteúdo online",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
         "/{lang}/config": {
             "get": {
                 "tags": [
@@ -1508,28 +1721,234 @@
                 "security": []
             }
         },
-        "/json_db": {
+        "/db/manifest": {
             "get": {
                 "tags": [
                     "Database"
                 ],
-                "summary": "Listar arquivos JSON disponíveis",
-                "description": "Retorna nome e tamanho de cada arquivo JSON na pasta public/db/json/",
-                "operationId": "d593023f85c1026ae0bf2fa43767040f",
+                "summary": "Manifest de arquivos JSON",
+                "description": "Lista todos os arquivos JSON disponíveis em public/db/json com nome, tabela e path de acesso.",
+                "operationId": "3cf90931a697db0625f6a69acbb1f360",
                 "responses": {
                     "200": {
-                        "description": "Lista de arquivos JSON",
+                        "description": "Lista de arquivos JSON disponíveis",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
-                                },
-                                "example": "{\"files\":[{\"name\":\"config\",\"size\":1024}],\"total\":1}"
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "file": {
+                                                "type": "string",
+                                                "example": "config.json"
+                                            },
+                                            "table": {
+                                                "type": "string",
+                                                "example": "config"
+                                            },
+                                            "path": {
+                                                "type": "string",
+                                                "example": "/db/config"
+                                            },
+                                            "hash": {
+                                                "description": "MD5 hash do arquivo para cache ETag",
+                                                "type": "string",
+                                                "example": "a1b2c3d4e5f6..."
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
                             }
                         }
                     }
                 },
-                "security": []
+                "security": [
+                    {
+                        "ApiToken": []
+                    }
+                ]
+            }
+        },
+        "/db/{table}": {
+            "get": {
+                "tags": [
+                    "Database"
+                ],
+                "summary": "Registros de uma tabela JSON",
+                "description": "Retorna registros paginados de um arquivo JSON específico. Suporta paginação via query params.",
+                "operationId": "d1af8531b38e332f3446bf819af8fcd7",
+                "parameters": [
+                    {
+                        "name": "table",
+                        "in": "path",
+                        "description": "Nome da tabela (arquivo JSON sem extensão)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Número da página",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Itens por página",
+                        "schema": {
+                            "type": "integer",
+                            "default": 50
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Registros paginados",
+                        "headers": {
+                            "ETag": {
+                                "description": "MD5 hash do arquivo para cache condicional",
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 100
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 50
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "304": {
+                        "description": "Não modificado (ETag coincide com If-None-Match)"
+                    },
+                    "404": {
+                        "description": "Arquivo não encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiToken": []
+                    }
+                ]
+            }
+        },
+        "/db/bundle": {
+            "get": {
+                "tags": [
+                    "Database"
+                ],
+                "summary": "Bundle ZIP de todos os JSON",
+                "description": "Gera e baixa um arquivo ZIP contendo todos os arquivos JSON da pasta public/db/json.",
+                "operationId": "35c225703d4ac77f22ab32fe1de74730",
+                "responses": {
+                    "200": {
+                        "description": "Arquivo ZIP",
+                        "content": {
+                            "application/zip": {}
+                        }
+                    },
+                    "404": {
+                        "description": "Nenhum arquivo JSON encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiToken": []
+                    }
+                ]
+            }
+        },
+        "/db/{table}/categories": {
+            "get": {
+                "tags": [
+                    "Database"
+                ],
+                "summary": "Categorias únicas de uma coluna",
+                "description": "Retorna array de valores únicos de uma coluna específica em um arquivo JSON, ordenados alfabeticamente.",
+                "operationId": "6600cca444ceda9e5692d30654b70ff8",
+                "parameters": [
+                    {
+                        "name": "table",
+                        "in": "path",
+                        "description": "Nome da tabela",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "column",
+                        "in": "query",
+                        "description": "Nome da coluna para extrair categorias únicas",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array de categorias únicas ordenadas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Parâmetro column obrigatório"
+                    },
+                    "404": {
+                        "description": "Tabela não encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiToken": []
+                    }
+                ]
             }
         },
         "/json_db/{file}": {
@@ -1537,14 +1956,14 @@
                 "tags": [
                     "Database"
                 ],
-                "summary": "Obter arquivo JSON exportado",
-                "description": "Retorna o conteudo de um arquivo JSON especifico da pasta public/db/json/",
+                "summary": "Obter arquivo JSON exportado (legado)",
+                "description": "Retorna o conteúdo de um arquivo JSON específico da pasta public/db/json/",
                 "operationId": "5c607d2e3a8b8ce46990e2a52ed4788f",
                 "parameters": [
                     {
                         "name": "file",
                         "in": "path",
-                        "description": "Nome do arquivo (sem extensao .json)",
+                        "description": "Nome do arquivo (sem extensão .json)",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -1554,13 +1973,36 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Conteudo do JSON"
+                        "description": "Conteúdo do JSON"
                     },
                     "404": {
-                        "description": "Arquivo nao encontrado"
+                        "description": "Arquivo não encontrado"
                     }
                 },
                 "security": []
+            }
+        },
+        "/db/export": {
+            "get": {
+                "tags": [
+                    "Database"
+                ],
+                "summary": "Recriar JSONs do banco",
+                "description": "Recria todos os arquivos JSON estáticos gerados a partir do banco de dados.",
+                "operationId": "d24f92e46c4d3b46b57800babe555bab",
+                "responses": {
+                    "200": {
+                        "description": "JSONs recriados com sucesso"
+                    },
+                    "500": {
+                        "description": "Erro ao recriar arquivos"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiToken": []
+                    }
+                ]
             }
         },
         "/download": {
@@ -1893,6 +2335,82 @@
                 "security": []
             }
         },
+        "/health": {
+            "get": {
+                "tags": [
+                    "System"
+                ],
+                "summary": "Health check da API",
+                "description": "Retorna o status de saúde da API verificando database, cache e storage.",
+                "operationId": "13b4295a5c3966b06a2806ab5a31e14d",
+                "responses": {
+                    "200": {
+                        "description": "API saudável",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "ok"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "version": {
+                                            "type": "string",
+                                            "example": "1.0.0"
+                                        },
+                                        "services": {
+                                            "properties": {
+                                                "database": {
+                                                    "type": "string",
+                                                    "example": "ok"
+                                                },
+                                                "cache": {
+                                                    "type": "string",
+                                                    "example": "ok"
+                                                },
+                                                "storage": {
+                                                    "type": "string",
+                                                    "example": "ok"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Serviço indisponível",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "degraded"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/{lang}/hymnal": {
             "get": {
                 "tags": [
@@ -1926,6 +2444,53 @@
                                 }
                             }
                         }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/{lang}/hymnal/{id}": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Buscar hino por ID",
+                "description": "Retorna um hino específico do hinário por ID",
+                "operationId": "b433c7d8af34e006ed519cc8f5ef62af",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "path",
+                        "description": "Código do idioma",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "pt"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do hino",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados do hino",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Hino não encontrado"
                     }
                 },
                 "security": []
@@ -3247,6 +3812,66 @@
                 ]
             }
         },
+        "/tasks/generate_static_jsons": {
+            "get": {
+                "tags": [
+                    "Admin - Tarefas"
+                ],
+                "summary": "Gerar JSONs estáticos do banco",
+                "description": "Gera arquivos JSON estáticos (categorias, albums, musics, hinario, collections online) a partir do banco de dados para uso offline pelo app desktop/web. Os arquivos são salvos em public/db/json/ com hash MD5 para versionamento via ETag.",
+                "operationId": "b7879db5ff0e29a5598ba721f047519f",
+                "parameters": [
+                    {
+                        "name": "force",
+                        "in": "query",
+                        "description": "Força regeneração ignorando version check",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "true",
+                                "false"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "JSONs gerados com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "files_generated": {
+                                            "type": "integer",
+                                            "example": 42
+                                        },
+                                        "logs": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/admin/users": {
             "get": {
                 "tags": [
@@ -3601,12 +4226,6 @@
     },
     "components": {
         "securitySchemes": {
-            "ApiToken": {
-                "type": "apiKey",
-                "description": "Token de autenticacao enviado via header Api-Token",
-                "name": "Api-Token",
-                "in": "header"
-            },
             "bearerAuth": {
                 "type": "http",
                 "description": "Autenticação JWT via header Authorization: Bearer {token}",
@@ -3647,6 +4266,10 @@
         {
             "name": "API",
             "description": "API"
+        },
+        {
+            "name": "System",
+            "description": "System"
         },
         {
             "name": "Admin - Letras",

@@ -12,23 +12,9 @@ class HymnalController extends Controller
 {
     public function __construct() {}
 
-    #[OA\Get(
-        path: '/{lang}/hymnal',
-        summary: 'Listar hinários',
-        description: 'Retorna lista de hinários disponíveis para o idioma informado',
-        tags: ['Public'],
-        security: [],
-        parameters: [
-            new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt'))
-        ],
-        responses: [
-            new OA\Response(response: 200, description: 'Lista de hinários', content: new OA\JsonContent(type: 'array', items: new OA\Items(type: 'object')))
-        ]
-    )]
-    public function index(Request $request)
+    private function hymnalFields(): array
     {
-        $model = new Music;
-        $fields = [
+        return [
             'musics.id_music',
             'musics.name',
             'albums_musics.track',
@@ -45,7 +31,12 @@ class HymnalController extends Controller
             'musics.created_at',
             'musics.updated_at',
         ];
-        $data = $model->select($fields)
+    }
+
+    private function hymnalQuery(Request $request)
+    {
+        $fields = $this->hymnalFields();
+        return (new Music)->select($fields)
             ->where('musics.id_language', $request->id_language)
             ->join('albums_musics', 'albums_musics.id_music', 'musics.id_music')
             ->join('categories_albums', 'categories_albums.id_album', 'albums_musics.id_album')
@@ -55,6 +46,53 @@ class HymnalController extends Controller
             ->leftJoin('files as files_instrumental_music', 'musics.id_file_instrumental_music', 'files_instrumental_music.id_file')
             ->where('categories.slug', 'hymnal')
             ->where('categories.id_language', $request->id_language);
+    }
+
+    #[OA\Get(
+        path: '/{lang}/hymnal',
+        summary: 'Listar hinários',
+        description: 'Retorna lista de hinários disponíveis para o idioma informado',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Lista de hinários', content: new OA\JsonContent(type: 'array', items: new OA\Items(type: 'object')))
+        ]
+    )]
+    public function index(Request $request)
+    {
+        $fields = $this->hymnalFields();
+        $data = $this->hymnalQuery($request);
         return response()->json(Data::data($data, $request, $fields));
+    }
+
+    #[OA\Get(
+        path: '/{lang}/hymnal/{id}',
+        summary: 'Buscar hino por ID',
+        description: 'Retorna um hino específico do hinário por ID',
+        tags: ['Public'],
+        security: [],
+        parameters: [
+            new OA\Parameter(name: 'lang', description: 'Código do idioma', in: 'path', required: true, schema: new OA\Schema(type: 'string', default: 'pt')),
+            new OA\Parameter(name: 'id', description: 'ID do hino', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Dados do hino', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 404, description: 'Hino não encontrado')
+        ]
+    )]
+    public function show(Request $request, $id)
+    {
+        $data = $this->hymnalQuery($request)
+            ->where('musics.id_music', $id)
+            ->first();
+
+        if (!$data) {
+            return response()->json(['error' => 'Not found'], 404);
+        }
+
+        return response()->json($data);
     }
 }
