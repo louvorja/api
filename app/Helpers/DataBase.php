@@ -165,6 +165,7 @@ class DataBase
                         'albums.id_album',
                         'albums.name',
                         'albums.color',
+                        DB::raw("files_image.host as host_image"),
                         DB::raw("concat(files_image.dir,'/',files_image.file_name) as url_image"),
                         DB::raw("categories_albums.name as subtitle"),
                         'categories_albums.order'
@@ -216,9 +217,12 @@ class DataBase
             'musics.name',
             DB::raw("files_music.duration as duration"),
             DB::raw("files_instrumental_music.duration as instrumental_duration"),
+            DB::raw("files_image.host as host_image"),
             DB::raw("concat(files_image.dir,'/',files_image.file_name) as url_image"),
             DB::raw("files_image.image_position"),
+            DB::raw("files_music.host as host_music"),
             DB::raw("concat(files_music.dir,'/',files_music.file_name) as url_music"),
+            DB::raw("files_instrumental_music.host as host_instrumental_music"),
             DB::raw("concat(files_instrumental_music.dir,'/',files_instrumental_music.file_name) as url_instrumental_music"),
         ])
             ->leftJoin('files as files_image', 'musics.id_file_image', 'files_image.id_file')
@@ -230,6 +234,7 @@ class DataBase
                     'lyrics.id_music',
                     'lyrics.lyric',
                     'lyrics.aux_lyric',
+                    DB::raw("files_image.host as host_image"),
                     DB::raw("concat(files_image.dir,'/',files_image.file_name) as url_image"),
                     DB::raw("files_image.image_position"),
                     'lyrics.time',
@@ -245,6 +250,7 @@ class DataBase
                     'albums.id_album',
                     'albums.name',
                     'albums_musics.track',
+                    DB::raw("files_image.host as host_image"),
                     DB::raw("concat(files_image.dir,'/',files_image.file_name) as url_image"),
                     DB::raw('min(categories.order) as `order`'),
                 ])
@@ -271,6 +277,7 @@ class DataBase
             'albums.id_album',
             'albums.name',
             'albums.color',
+            DB::raw("files_image.host as host_image"),
             DB::raw("concat(files_image.dir,'/',files_image.file_name) as url_image"),
             DB::raw("(
                 select group_concat(concat(type,'.',slug) separator '|') from categories
