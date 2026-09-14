@@ -11,11 +11,11 @@ class File extends BaseModel
         'name',
         'type',
         'size',
-        'base_dir',
-        'base_url',
-        'subdirectory',
+        'host',
+        'dir',
         'file_name',
         'image_position',
+        'duration',
         'version',
     ];
 
@@ -25,6 +25,6 @@ class File extends BaseModel
 
     public function getUrlAttribute()
     {
-        return config("files.url") . $this->dir . "/" . $this->file_name;
+        return $this->host . $this->dir . "/" . $this->file_name;
     }
 }

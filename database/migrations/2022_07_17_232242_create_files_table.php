@@ -18,6 +18,7 @@ class CreateFilesTable extends Migration
             $table->string('name', 100);
             $table->string('type');
             $table->integer('size');
+            $table->string('host', 200);
             $table->string('dir', 100);
             $table->string('file_name', 100);
             $table->integer('image_position')->nullable();
