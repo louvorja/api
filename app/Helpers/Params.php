@@ -19,11 +19,27 @@ class Params
 
         $params = [];
 
+        $url = 'https://api.github.com/repos/louvorja/desktop/releases/latest';
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Accept: application/vnd.github+json',
+                'User-Agent: LouvorJA',
+            ],
+            CURLOPT_TIMEOUT => 15,
+        ]);
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        $release = json_decode($response, true);
+        $version = str_replace('v', '', $release['tag_name']);
+
         $langs = Language::all();
         foreach ($langs as $lang) {
             $id_language = $lang->id_language;
 
-            $version = Configs::get($id_language . "_delphi_version"); // mudar depois para ser 2 digitos ex.: 26.0
             $params["versao" . strtoupper($id_language)] = $version . ".0.0"; // remover depois -- adaptar no Delphi primeiro (removido na versao 26)
             $params["instalador" . strtoupper($id_language)] = "setup\Output\\" . $file_name[$id_language] . $version . ".exe"; // remover depois -- adaptar no Delphi primeiro  (removido na versao 26)
 
