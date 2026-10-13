@@ -42,7 +42,6 @@ class GenerateStaticJsons
     {
         $logs = [];
         $path = self::jsonDir();
-        $filesUrl = config('files.url');
 
         // 1. Categorias com álbuns (por idioma) - para navegacao principal do app
         $langs = Language::orderBy('id_language', 'desc')->get();
@@ -59,12 +58,12 @@ class GenerateStaticJsons
                 ->where('type', 'collection')
                 ->where('id_language', $l)
                 ->orderBy('order')
-                ->with(['albums' => function ($query) use ($filesUrl) {
+                ->with(['albums' => function ($query) {
                     $query->select([
                         'albums.id_album',
                         'albums.name',
                         'albums.color',
-                        DB::raw("concat('{$filesUrl}',files_image.dir,'/',files_image.file_name) as url_image"),
+                        DB::raw("concat(files_image.host,files_image.dir,'/',files_image.file_name) as url_image"),
                         DB::raw("categories_albums.name as subtitle"),
                         'categories_albums.order',
                     ])
@@ -84,7 +83,7 @@ class GenerateStaticJsons
                     'albums.id_album',
                     'albums.name',
                     'albums.id_file_image',
-                    DB::raw("concat('{$filesUrl}',files.dir,'/',files.file_name) as url_image"),
+                    DB::raw("concat(files.host,files.dir,'/',files.file_name) as url_image"),
                     DB::raw('files.version as image_version'),
                     'albums.id_language',
                     'albums.color',
@@ -103,12 +102,12 @@ class GenerateStaticJsons
                 $logs[] = self::saveStaticJson($path, "{$l}_category_{$category->id_category}_albums.json", $albums);
 
                 // 1c. Albums com musicas aninhadas (para detalhe offline)
-                $albumsWithMusics = self::getCategoryAlbumsWithMusics($category->id_category, $l, $filesUrl);
+                $albumsWithMusics = self::getCategoryAlbumsWithMusics($category->id_category, $l);
                 $logs[] = self::saveStaticJson($path, "{$l}_category_{$category->id_category}_albums_with_musics.json", $albumsWithMusics);
             }
 
             // 2. Hinario (musicas da categoria "hymnal")
-            $hymnal = self::getHymnalMusics($l, $filesUrl);
+            $hymnal = self::getHymnalMusics($l);
             $logs[] = self::saveStaticJson($path, "{$l}_hymnal.json", $hymnal);
 
             // 3. Collections online (canais, playlists, videos)
@@ -120,7 +119,7 @@ class GenerateStaticJsons
                 'albums.id_album',
                 'albums.name',
                 'albums.id_file_image',
-                DB::raw("concat('{$filesUrl}',files.dir,'/',files.file_name) as url_image"),
+                DB::raw("concat(files.host,files.dir,'/',files.file_name) as url_image"),
                 DB::raw('files.version as image_version'),
                 'albums.id_language',
                 'albums.color',
@@ -139,13 +138,13 @@ class GenerateStaticJsons
                 'musics.id_music',
                 'musics.name',
                 'musics.id_file_image',
-                DB::raw("concat('{$filesUrl}',files_image.dir,'/',files_image.file_name) as url_image"),
+                DB::raw("concat(files_image.host,files_image.dir,'/',files_image.file_name) as url_image"),
                 'files_image.version as image_version',
                 'musics.id_file_music',
-                DB::raw("concat('{$filesUrl}',files_music.dir,'/',files_music.file_name) as url_music"),
+                DB::raw("concat(files_music.host,files_music.dir,'/',files_music.file_name) as url_music"),
                 'files_music.version as music_version',
                 'musics.id_file_instrumental_music',
-                DB::raw("concat('{$filesUrl}',files_instrumental_music.dir,'/',files_instrumental_music.file_name) as url_instrumental_music"),
+                DB::raw("concat(files_instrumental_music.host,files_instrumental_music.dir,'/',files_instrumental_music.file_name) as url_instrumental_music"),
                 'files_instrumental_music.version as instrumental_music_version',
                 'musics.id_language',
                 'musics.created_at',
@@ -171,7 +170,7 @@ class GenerateStaticJsons
     /**
      * Retorna dados de albums com musicas aninhadas para uma categoria.
      */
-    private static function getCategoryAlbumsWithMusics(int $categoryId, string $lang, string $filesUrl): array
+    private static function getCategoryAlbumsWithMusics(int $categoryId, string $lang): array
     {
         $category = Category::where('id_category', $categoryId)
             ->where('id_language', $lang)
@@ -185,7 +184,7 @@ class GenerateStaticJsons
             'albums.id_album',
             'albums.name',
             'albums.id_file_image',
-            DB::raw("concat('{$filesUrl}',files.dir,'/',files.file_name) as url_image"),
+            DB::raw("concat(files.host',files.dir,'/',files.file_name) as url_image"),
             DB::raw('files.version as image_version'),
             'albums.id_language',
             'albums.color',
@@ -208,13 +207,13 @@ class GenerateStaticJsons
                 'albums_musics.track',
                 'musics.name',
                 'musics.id_file_image',
-                DB::raw("concat('{$filesUrl}',files_image.dir,'/',files_image.file_name) as url_image"),
+                DB::raw("concat(files_image.host,files_image.dir,'/',files_image.file_name) as url_image"),
                 'files_image.version as image_version',
                 'musics.id_file_music',
-                DB::raw("concat('{$filesUrl}',files_music.dir,'/',files_music.file_name) as url_music"),
+                DB::raw("concat(files_music.host,files_music.dir,'/',files_music.file_name) as url_music"),
                 'files_music.version as music_version',
                 'musics.id_file_instrumental_music',
-                DB::raw("concat('{$filesUrl}',files_instrumental_music.dir,'/',files_instrumental_music.file_name) as url_instrumental_music"),
+                DB::raw("concat(files_instrumental_music.host,files_instrumental_music.dir,'/',files_instrumental_music.file_name) as url_instrumental_music"),
                 'files_instrumental_music.version as instrumental_music_version',
             ])
                 ->leftJoin('albums_musics', 'albums_musics.id_music', 'musics.id_music')
@@ -243,20 +242,20 @@ class GenerateStaticJsons
     /**
      * Retorna todas as musicas do hinario (categoria slug=hymnal) para um idioma.
      */
-    private static function getHymnalMusics(string $lang, string $filesUrl): array
+    private static function getHymnalMusics(string $lang): array
     {
         return (new Music)->select([
             'musics.id_music',
             'musics.name',
             'albums_musics.track',
             'musics.id_file_image',
-            DB::raw("concat('{$filesUrl}',files_image.dir,'/',files_image.file_name) as url_image"),
+            DB::raw("concat(files_image.host,files_image.dir,'/',files_image.file_name) as url_image"),
             'files_image.version as image_version',
             'musics.id_file_music',
-            DB::raw("concat('{$filesUrl}',files_music.dir,'/',files_music.file_name) as url_music"),
+            DB::raw("concat(files_music.host,files_music.dir,'/',files_music.file_name) as url_music"),
             'files_music.version as music_version',
             'musics.id_file_instrumental_music',
-            DB::raw("concat('{$filesUrl}',files_instrumental_music.dir,'/',files_instrumental_music.file_name) as url_instrumental_music"),
+            DB::raw("concat(files_instrumental_music.host,files_instrumental_music.dir,'/',files_instrumental_music.file_name) as url_instrumental_music"),
             'files_instrumental_music.version as instrumental_music_version',
             'musics.id_language',
             'musics.created_at',
