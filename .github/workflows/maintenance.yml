@@ -206,8 +206,11 @@ jobs:
 
       # Não depende do banco: publicar um lançamento final do Delphi no GitHub
       # é o que faz o programa avisar que há versão nova.
-      - name: Versão do Delphi
-        run: npm run delphi:version -- --write
+      - name: Testar versões dos aplicativos
+        run: npm run test:apps-versions
+
+      - name: Versões dos aplicativos
+        run: npm run apps:versions -- --write
 
       - name: Concluir manutenção do catálogo
         if: steps.gate.outputs.changed == 'true'

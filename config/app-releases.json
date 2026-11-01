@@ -1,0 +1,8 @@
+{
+  "apps": [
+    { "id": "classic", "repository": "louvorja/desktop", "versionKey": "classic-version" },
+    { "id": "violin", "repository": "louvorja/violin-app", "versionKey": "violin-version" },
+    { "id": "piano", "repository": "Piano-Louvor-JA/app", "versionKey": "piano-version" },
+    { "id": "flute", "repository": "louvorja/flute-app", "versionKey": "flute-version" }
+  ]
+}
