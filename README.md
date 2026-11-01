@@ -506,3 +506,30 @@ por este mesmo Worker.
 ## Licença
 
 Projeto proprietário.
+
+## Versões dos aplicativos em /params
+
+Configure repositórios e chaves em `config/app-releases.json`. Já inclui Classic,
+Violin, Piano e Flute. Para adicionar outro, acrescente um objeto com `id`,
+`repository` (owner/repo) e `versionKey` (terminado em `-version`). IDs e chaves
+precisam ser únicos. Repositórios privados exigem acesso de leitura via GITHUB_TOKEN.
+
+```bash
+npm run apps:versions             # consulta e simula, sem gravar
+npm run apps:versions -- --write  # atualiza o R2 configurado no .env
+npm run test:apps-versions
+```
+
+Usa o último release estável, remove apenas o prefixo v e preserva as partes
+numéricas da versão. Não anuncia versões anteriores. Tags inválidas, pré-lançamentos
+e falhas preservam os valores anteriores; chaves novas sem release válido ficam
+ausentes. Falhas retornam status 1 depois de processar os demais aplicativos.
+Sem --write não grava. O destino é o R2 do .env, não o armazenamento local do Wrangler.
+
+A manutenção executa o comando geral e preserva todos os parâmetros antigos.
+Os aliases e instaladores do Delphi continuam usando as regras anteriores.
+`npm run delphi:version` permanece disponível, restrito ao Classic;
+`DELPHI_RELEASES_REPO` continua sobrescrevendo o repositório do Classic.
+Retirar um aplicativo da configuração não apaga sua chave já publicada.
+O documento é relido antes da gravação; publicadores concorrentes ainda precisam
+ser serializados, como já ocorre pelo concurrency do workflow.

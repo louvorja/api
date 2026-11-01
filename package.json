@@ -47,7 +47,9 @@
     "online-videos:refresh": "node --env-file-if-exists=.env --experimental-strip-types scripts/refresh-online-videos.ts",
     "test:online-videos-refresh": "node --experimental-strip-types --test test/refresh-online-videos.node.ts",
     "slides:import": "node --env-file-if-exists=.env --experimental-strip-types scripts/import-slides.ts",
-    "test:slides-import": "node --experimental-strip-types --test test/import-slides.node.ts"
+    "test:slides-import": "node --experimental-strip-types --test test/import-slides.node.ts",
+    "apps:versions": "node --env-file-if-exists=.env --experimental-strip-types scripts/apps-versions.ts",
+    "test:apps-versions": "node --experimental-strip-types --test test/app-releases.node.ts test/delphi-version.node.ts"
   },
   "dependencies": {
     "hono": "^4.13.13"
