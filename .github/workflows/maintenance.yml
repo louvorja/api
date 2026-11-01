@@ -218,15 +218,6 @@ jobs:
           FULL_MAINTENANCE: ${{ steps.task.outputs.task == 'refresh_files_all' }}
         run: npm run publish:gate -- --mark-complete --full="$FULL_MAINTENANCE" --write
 
-      # Também roda após falha parcial e sem versão nova, permitindo repetir uma
-      # limpeza que falhou depois de o JSON já ter sido gravado no R2.
-      - name: Limpar cache dos parâmetros
-        if: ${{ !cancelled() }}
-        env:
-          CLOUDFLARE_ZONE_ID: ${{ vars.CLOUDFLARE_ZONE_ID }}
-          CLOUDFLARE_CACHE_PURGE_TOKEN: ${{ secrets.CLOUDFLARE_CACHE_PURGE_TOKEN }}
-        run: node --experimental-strip-types scripts/purge-params-cache.ts
-
       - name: Relatórios
         if: always()
         uses: actions/upload-artifact@v7
