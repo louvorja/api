@@ -1,0 +1,23 @@
+name: Validar limpeza de cache dos parâmetros
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run type-check
+      - run: npx biome check scripts/lib/params-cache.ts scripts/purge-params-cache.ts test/params-cache.node.ts
+      - run: node --experimental-strip-types --test test/params-cache.node.ts test/delphi-version.node.ts

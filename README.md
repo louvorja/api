@@ -59,6 +59,33 @@ O app acrescenta a data à URL de `/json_db` e um carimbo único quando o
 operador pede para atualizar, então o cache não segura conteúdo velho além do
 dia.
 
+### Limpeza automática de `/params`
+
+Ao final de cada manutenção, `scripts/purge-params-cache.ts` limpa o prefixo
+`api.louvorja.com.br/params` no cache da Cloudflare. Isso inclui as variantes
+JSON e INI (`?type=env`) e demais query strings, depois das gravações no R2.
+A limpeza é restrita a esse prefixo; não limpa o restante do site.
+
+Em **Settings → Secrets and variables → Actions** deste repositório, configure:
+
+- variável `CLOUDFLARE_ZONE_ID`: Zone ID de **louvorja.com.br**, disponível na
+  página inicial da zona na Cloudflare (não é o Account ID);
+- segredo `CLOUDFLARE_CACHE_PURGE_TOKEN`: token dedicado com permissão
+  **Zone → Cache Purge**, restrito à zona **louvorja.com.br**.
+
+Sem essa configuração ou se a Cloudflare recusar a limpeza, o passo falha com
+uma mensagem explícita. Os arquivos já publicados permanecem no R2. O passo
+roda também após falhas parciais e em manutenções sem alterações, para repetir
+uma limpeza pendente; não roda após cancelamento. A limpeza não depende de
+novo deploy do Worker e não remove cópias já guardadas no navegador dos apps.
+
+Para executar manualmente com as variáveis exportadas no ambiente:
+
+```bash
+node --env-file-if-exists=.env --experimental-strip-types scripts/purge-params-cache.ts
+node --experimental-strip-types --test test/params-cache.node.ts
+```
+
 ### O programa Delphi
 
 O Delphi lê tudo de `https://api.louvorja.com.br/params?type=env` e precisa de
