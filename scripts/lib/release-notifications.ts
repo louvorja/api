@@ -9,6 +9,13 @@ type Storage = {
 type Config = { token?: string; chatId?: string; threadId?: string }
 type Entry = { repository: string; version: string; releaseId?: number; sentAt: string }
 const key = 'meta/release-notifications.json'
+class TelegramSendError extends Error {}
+function safeDescription(value: unknown, token: string): string {
+  return (typeof value === 'string' ? value : 'sem descrição')
+    .split(token).join('[TOKEN]')
+    .replace(/https?:\/\/api\.telegram\.org\/[^\s]+/gi, '[URL Telegram]')
+    .replace(/[\r\n\x00-\x1f]/g, ' ').slice(0, 500)
+}
 
 /** Compose Markdown; conversion to safe Telegram HTML happens before sending. */
 export function releaseMessage(result: ReleaseResult): string {
@@ -76,12 +83,30 @@ export async function notifyReleases(
           }),
           signal: AbortSignal.timeout(20_000),
         })
-        const payload = await response.json() as { ok?: boolean }
-        if (!response.ok || payload.ok !== true) throw new Error(`Telegram recusou envio (HTTP ${response.status})`)
+        let payload: { ok?: boolean; error_code?: number; description?: string; parameters?: { retry_after?: number; migrate_to_chat_id?: number } }
+        try {
+          payload = await response.json() as typeof payload
+        } catch {
+          throw new TelegramSendError(`HTTP ${response.status}: resposta não JSON do Telegram`)
+        }
+        if (!response.ok || payload?.ok !== true) {
+          const details = [
+            `HTTP ${response.status}`,
+            payload?.error_code ? `código ${payload.error_code}` : '',
+            safeDescription(payload?.description, config.token),
+            payload?.parameters?.retry_after ? `tente após ${payload.parameters.retry_after}s` : '',
+            payload?.parameters?.migrate_to_chat_id ? `grupo migrado: novo chat_id ${payload.parameters.migrate_to_chat_id}` : '',
+          ].filter(Boolean).join('; ')
+          throw new TelegramSendError(details)
+        }
       }
-    } catch {
-      // Never log fetch errors containing the bot token in the request URL.
-      report.errors.push(`${app.id}: falha ao enviar; nova tentativa na próxima manutenção`)
+    } catch (error) {
+      // Only our response errors can expose descriptions; arbitrary fetch messages may contain tokens.
+      const cause = error instanceof TelegramSendError ? error.message
+        : error instanceof Error && ['TimeoutError', 'AbortError'].includes(error.name)
+          ? 'tempo limite ou requisição cancelada'
+          : 'falha de rede/conexão com o Telegram'
+      report.errors.push(`${app.id}: falha ao enviar (chat_id=${config.chatId}, tópico=${thread || 'geral'}): ${cause}; nova tentativa na próxima manutenção`)
       continue
     }
     state[app.id] = {
