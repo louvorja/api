@@ -50,6 +50,7 @@
     "test:slides-import": "node --experimental-strip-types --test test/import-slides.node.ts",
     "apps:versions": "node --env-file-if-exists=.env --experimental-strip-types scripts/apps-versions.ts",
     "test:apps-versions": "node --experimental-strip-types --test test/app-releases.node.ts test/delphi-version.node.ts",
+    "test:release-notifications": "node --experimental-strip-types --test test/release-notifications.node.ts",
     "test:public-params": "node --experimental-strip-types --test test/public-params.node.ts"
   },
   "dependencies": {
