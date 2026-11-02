@@ -20,6 +20,8 @@ export type Bindings = {
   GITHUB_TASK_REPO?: string
   TELEGRAM_BOT_TOKEN?: string
   TELEGRAM_CHAT_ID?: string
+  /** Tópico opcional do grupo; ausente ou vazio mantém o envio geral. */
+  TELEGRAM_MESSAGE_THREAD_ID?: string
 }
 
 export type Variables = {
