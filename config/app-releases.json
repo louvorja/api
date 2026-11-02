@@ -6,7 +6,7 @@
       "versionKey": "classic_version",
       "name": "LouvorJA Classic",
       "notifyRelease": true,
-      "downloadUrl": ""
+      "downloadUrl": "https://louvorja.com.br/download"
     },
     {
       "id": "violin",
@@ -14,7 +14,7 @@
       "versionKey": "violin_version",
       "name": "LouvorJA Violin",
       "notifyRelease": true,
-      "downloadUrl": ""
+      "downloadUrl": "https://louvorja.com.br/comunidade/violin"
     },
     {
       "id": "piano",
@@ -22,7 +22,7 @@
       "versionKey": "piano_version",
       "name": "LouvorJA Piano",
       "notifyRelease": true,
-      "downloadUrl": ""
+      "downloadUrl": "https://pianolouvorja.com.br/download"
     },
     {
       "id": "flute",
@@ -30,7 +30,7 @@
       "versionKey": "flute_version",
       "name": "LouvorJA Flute",
       "notifyRelease": true,
-      "downloadUrl": ""
+      "downloadUrl": "https://louvorja.com.br/comunidade/flute"
     }
   ]
 }
