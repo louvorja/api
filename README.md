@@ -572,8 +572,10 @@ confirmação de todas as partes pelo Telegram. Sem token ou grupo, nada envia.
 Falhas de envio preservam o controle e permitem os outros apps; a manutenção
 sinaliza erro para permitir diagnóstico. Releases ausentes não são anunciados.
 
-A descrição original é mantida como texto, sem interpretar Markdown do GitHub;
-título e rótulos usam negrito. Mensagens longas são divididas.
+A descrição do release é convertida de Markdown para HTML compatível com Telegram:
+títulos em negrito, listas com marcadores, negrito, itálico, tachado, links HTTP/HTTPS
+e código. HTML bruto é escapado. Recursos não suportados permanecem como texto.
+Mensagens longas são divididas preservando tags, entidades e emojis.
 Execuções Actions compartilham o grupo de concorrência maintenance; evite
 rodar publicadores locais simultaneamente. Se o envio for aceito e a gravação
 do R2 falhar, ou parte de uma mensagem longa falhar, a próxima tentativa pode
