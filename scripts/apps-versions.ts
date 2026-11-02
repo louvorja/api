@@ -1,6 +1,7 @@
 /** Sem --write apenas consulta e mostra o plano; o R2 usado é o configurado no .env. */
 import { readFileSync } from 'node:fs'
 import { fetchAppReleases, parseAppReleases, publishReleaseVersions, releaseUpdates } from './lib/app-releases.ts'
+import { notifyReleases } from './lib/release-notifications.ts'
 import * as r2 from './lib/r2.ts'
 
 const apps = parseAppReleases(JSON.parse(readFileSync(new URL('../config/app-releases.json', import.meta.url), 'utf8')))
@@ -28,5 +29,12 @@ if (process.argv.includes('--write')) {
 } else {
   console.log(changed.length ? 'Simulação: nada foi gravado (use --write).' : 'Nada a anunciar.')
 }
+const notifications = await notifyReleases(results, r2, {
+  token: process.env.TELEGRAM_RELEASES_BOT_TOKEN,
+  chatId: process.env.TELEGRAM_RELEASES_CHAT_ID,
+  threadId: process.env.TELEGRAM_RELEASES_MESSAGE_THREAD_ID,
+}, process.argv.includes('--write'))
+for (const error of notifications.errors) console.error(error)
+if (notifications.errors.length) process.exitCode = 1
 // Atualiza os aplicativos disponíveis, mas torna falhas visíveis no workflow.
 if (results.some(result => result.error)) process.exitCode = 1
