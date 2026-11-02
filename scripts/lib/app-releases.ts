@@ -1,3 +1,4 @@
+import { publicParams } from '../../src/lib/public-params.ts'
 import { compareVersions, delphiVersionParams, type GithubRelease, parseVersion } from './delphi-version.ts'
 
 export type AppRelease = { id: string; repository: string; versionKey: string }
@@ -82,9 +83,10 @@ export async function publishReleaseVersions(results: ReleaseResult[], storage: 
   const key = 'meta/params.json'
   const body = await storage.get(key)
   if (body === null) throw new Error(`${key} não existe no bucket`)
-  const current = JSON.parse(new TextDecoder().decode(body)) as Params
+  const stored = JSON.parse(new TextDecoder().decode(body)) as Params
+  const current = publicParams(stored)
   const updates = releaseUpdates(results, current)
-  if (Object.entries(updates).some(([name, value]) => current[name] !== value)) {
+  if (Object.keys(stored).length !== Object.keys(current).length || Object.entries(updates).some(([name, value]) => current[name] !== value)) {
     await storage.put(key, JSON.stringify({ ...current, ...updates }), 'application/json')
   }
   return updates

@@ -22,6 +22,7 @@ import { join } from 'node:path'
 import { buildBundleArtifacts } from './lib/bundle-variants.ts'
 import { fetchLegacy, pool } from './lib/legacy.ts'
 import { mediaPath, normalizedMediaPath } from './lib/media.ts'
+import { publicParams } from '../src/lib/public-params.ts'
 import { publicApiUrl } from './lib/public-api.ts'
 import * as r2 from './lib/r2.ts'
 import * as pipeline from './lib/state.ts'
@@ -80,9 +81,7 @@ async function ingestMeta() {
   const res = await fetchLegacy('/params?type=json')
   if (res.status === 200) {
     const raw = JSON.parse(new TextDecoder().decode(res.body)) as Record<string, unknown>
-    // A URL da origem carrega autorização própria e não pode ser espelhada; o
-    // download por FTP foi descontinuado nesta API.
-    const { conn_ftp: _drop, ...rest } = raw
+    const rest = publicParams(raw)
     // Só string é reapontada. Coagir tudo com String() transformava valores
     // numéricos como db_version=185 em "185", e o cliente compara com ===.
     const params = Object.fromEntries(

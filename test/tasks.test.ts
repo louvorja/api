@@ -200,7 +200,7 @@ describe('tasks', () => {
   })
 
   it('não despacha nomes fora da lista', async () => {
-    const response = await call('/tasks/send_database_ftp', { token: adminToken })
+    const response = await call('/tasks/unknown_task', { token: adminToken })
     expect(response.status).toBe(404)
     expect(fetchMock).not.toHaveBeenCalled()
   })

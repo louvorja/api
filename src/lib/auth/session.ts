@@ -48,8 +48,7 @@ export const requireAuth: MiddlewareHandler<App> = async (c, next) => {
   const header = c.req.header('Authorization') ?? ''
   const token = header.startsWith('Bearer ') ? header.slice(7).trim() : ''
   const claims = token ? await verify(token, c.env.JWT_SECRET, now()) : null
-  // Só token de usuário (sub numérico) chega ao banco: o do aperto de mão do
-  // FTP é assinado com o mesmo segredo e qualquer um o obtém em /params.
+  // Só tokens de usuário com identificador numérico chegam ao banco.
   if (!claims || !/^\d+$/.test(claims.sub)) return unauthorized(c)
 
   const [blocked, found] = await c.env.DB.batch<Record<string, unknown>>([

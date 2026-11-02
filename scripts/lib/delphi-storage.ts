@@ -1,3 +1,4 @@
+import { publicParams } from '../../src/lib/public-params.ts'
 import { FILES_URL } from '../../src/lib/media-urls.ts'
 
 export const DELPHI_LANGUAGES = ['pt', 'es'] as const
@@ -57,7 +58,7 @@ export async function publishDelphiDatabases(
       ? fallbackParams
       : (JSON.parse(new TextDecoder().decode(freshBody)) as Record<string, unknown>)
   const params: Record<string, unknown> = {
-    ...fresh,
+    ...publicParams(fresh),
     ...delphiHttpsParams(),
     https_db_version: version,
   }

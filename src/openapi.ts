@@ -85,8 +85,6 @@ export const openapi = {
       '- O `404` não expõe o caminho do arquivo no servidor.',
       '- `Access-Control-Allow-Credentials` foi removido: junto de',
       '  `Allow-Origin: *` ele é rejeitado por qualquer navegador.',
-      '- `/ftp` faz o aperto de mão do programa Delphi: devolve o servidor de FTP',
-      '  de onde ele baixa o acervo. O Worker não fala FTP; só entrega o endereço.',
     ].join('\n'),
   },
   servers: [{ url: 'https://api.louvorja.com.br', description: 'Produção' }],
@@ -209,7 +207,7 @@ export const openapi = {
         tags: ['Sistema'],
         summary: 'Parâmetros da aplicação',
         description:
-          'JSON por padrão; `?type=env` devolve INI com CRLF. `conn_ftp` aponta para `/ftp`, que avisa as versões antigas do Delphi de que o FTP acabou.',
+          'JSON por padrão; `?type=env` devolve INI com CRLF.',
         parameters: [
           {
             name: 'type',
@@ -254,26 +252,6 @@ export const openapi = {
         tags: ['Sistema'],
         summary: 'Metadados da Bíblia',
         responses: { 200: { description: 'Versões e contagem de versículos.' } },
-      },
-    },
-    '/ftp': {
-      get: {
-        tags: ['Sistema'],
-        summary: 'Aperto de mão do FTP (Delphi)',
-        description:
-          'O FTP foi desligado. Devolve, em Base64, o INI `ftp_msg=...`, que o Delphi anterior à 27.0 mostra ao usuário no lugar do download.',
-        parameters: [
-          { name: 'data', in: 'query', required: false, schema: { type: 'string' } },
-          {
-            name: 'lang',
-            in: 'query',
-            required: false,
-            schema: { type: 'string', enum: ['pt', 'es'] },
-          },
-        ],
-        responses: {
-          200: { description: 'INI com `ftp_msg`, codificado em Base64.' },
-        },
       },
     },
     '/auth/login': {

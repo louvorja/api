@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { COMMON_HEADERS, notFound } from '../lib/http.ts'
 import type { App } from '../types.ts'
-import { FTP_HANDSHAKE_ORIGIN } from './ftp.ts'
+import { publicParams } from '../lib/public-params.ts'
 
 /**
  * O instalador Delphi consome INI; o app Electron consome JSON. Mesmo conteúdo.
@@ -15,6 +15,7 @@ function toIni(params: Record<string, unknown>): string {
 }
 
 const WORKERS_DEV_ORIGIN = 'https://api.louvorja.workers.dev'
+const PUBLIC_API_ORIGIN = 'https://api.louvorja.com.br'
 
 export const params = new Hono<App>()
 // É por aqui que o app descobre que há catálogo novo (`db_version`). Uma hora,
@@ -25,18 +26,15 @@ params.on(['GET', 'HEAD'], '/params', async (c) => {
   const object = await c.env.FILES.get('meta/params.json')
   if (object === null) return notFound(c)
 
-  const data = await object.json<Record<string, unknown>>()
+  const data = publicParams(await object.json<Record<string, unknown>>())
   // O Delphi chama os endereços que lê daqui (vídeos online, por exemplo), e a
   // Cloudflare recusa a identificação dele no workers.dev. Tudo que aponta para
   // esta API sai com o domínio antigo, que os apps novos também alcançam.
   for (const [key, value] of Object.entries(data)) {
     if (typeof value === 'string' && value.startsWith(`${WORKERS_DEV_ORIGIN}/`)) {
-      data[key] = FTP_HANDSHAKE_ORIGIN + value.slice(WORKERS_DEV_ORIGIN.length)
+      data[key] = PUBLIC_API_ORIGIN + value.slice(WORKERS_DEV_ORIGIN.length)
     }
   }
-  // Sem `conn_ftp`, o Delphi anterior à 27.0 recusa o download com um erro
-  // genérico; com ele, recebe de /ftp o aviso de que o FTP acabou.
-  data.conn_ftp = `${FTP_HANDSHAKE_ORIGIN}/ftp`
   const headers = new Headers(COMMON_HEADERS)
   headers.set('Cache-Control', PARAMS_CACHE)
 

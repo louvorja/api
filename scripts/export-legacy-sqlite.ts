@@ -11,8 +11,7 @@
  * `--audio=stored` grava o `file_name` realmente armazenado para áudio
  * (`.opus`/`.mp3`). Imagens e capas usam os BMP do Delphi tanto em files
  * quanto nas views; nomes e tamanhos precisam descrever o mesmo download.
- * Gere cada modo em um `--out` diferente e publique-os em raízes FTP distintas
- * até que a versão mínima aceita do Delphi tenha suporte a Opus.
+ * Gere cada modo em um `--out` diferente para manter os artefatos separados.
  *
  * O seed normal do D1 não contém `bible_verse`. Nesse caso o gerador nunca
  * publica um banco sem Bíblia: ele preserva as linhas do `<lang>_database.db`
@@ -119,8 +118,6 @@ const SYSTEM_TABLES = [
   'configs',
   'users',
   'download_logs',
-  'ftp_logs',
-  'ftp',
   'logs',
   'jwt_blacklist',
   'row_counts',
@@ -1222,7 +1219,7 @@ function cli() {
         '[--audio=legacy|stored] [--version=187] ' +
         '[--materialize-music-lists] ' +
         '[--bible-source=/backup/db_{lang}_186.db]\n' +
-        'Use raízes FTP distintas para legacy e stored até exigir Delphi com suporte a Opus.',
+        'Use diretórios distintos para os modos legacy e stored.',
     )
     return
   }

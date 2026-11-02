@@ -3,7 +3,6 @@ import { admin } from './features/admin.ts'
 import { auth } from './features/auth.ts'
 import { db } from './features/db.ts'
 import { files } from './features/files.ts'
-import { ftp } from './features/ftp.ts'
 import { jsonDb } from './features/json-db.ts'
 import { legacy } from './features/legacy.ts'
 import { onlineVideos } from './features/online-videos.ts'
@@ -64,7 +63,7 @@ app.get('/', async (c) => {
       '/db/catalog-bundle': 'ZIP com o catálogo sem capítulos bíblicos, para a instalação inicial.',
       '/db/bundle': 'ZIP com todas as tabelas do catálogo (álbuns, músicas, hinário e Bíblia).',
     },
-    // O `db_version` de /params ficou no número do banco do FTP, desligado.
+    // A versão atual do catálogo é anunciada por https_db_version.
     db_version: current.https_db_version ?? null,
   })
 })
@@ -73,7 +72,6 @@ app.route('/', jsonDb)
 app.route('/', db)
 app.route('/', files)
 app.route('/', params)
-app.route('/', ftp)
 app.route('/', onlineVideos)
 app.route('/', legacy)
 // Antes do rest: /auth/me, /admin/musics e /tasks/* casariam com /:lang/:collection.

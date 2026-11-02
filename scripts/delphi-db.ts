@@ -11,7 +11,7 @@
  * que por isso é baixado antes de gerar o novo.
  *
  * Atualiza `https_db_version` após publicar os dois bancos. `db_version`
- * pertence ao banco FTP e não é alterado por este script.
+ * é um valor legado e não é alterado por este script.
  */
 import { createHash } from 'node:crypto'
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
