@@ -52,6 +52,13 @@ export async function notifyTelegram(
 ): Promise<void> {
   if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID) return
 
+  const thread = env.TELEGRAM_MESSAGE_THREAD_ID?.trim()
+  const threadId = thread ? Number(thread) : undefined
+  if (thread && (!/^\d+$/.test(thread) || !Number.isSafeInteger(threadId) || threadId! <= 0)) {
+    console.error('telegram: TELEGRAM_MESSAGE_THREAD_ID deve ser um inteiro positivo')
+    return
+  }
+
   const title =
     action === 'insert'
       ? '🟩🟩🟩 Novo Registro 🟩🟩🟩'
@@ -87,6 +94,7 @@ export async function notifyTelegram(
       // O Telegram recusa mensagens acima de 4096 caracteres.
       body: JSON.stringify({
         chat_id: env.TELEGRAM_CHAT_ID,
+        ...(threadId === undefined ? {} : { message_thread_id: threadId }),
         text: text.slice(0, 4096),
         parse_mode: 'HTML',
       }),
