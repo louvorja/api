@@ -3,7 +3,7 @@ import { compareVersions, delphiVersionParams, type GithubRelease, parseVersion 
 
 export type AppRelease = { id: string; repository: string; versionKey: string }
 type Params = Record<string, unknown>
-export type ReleaseResult = { app: AppRelease; release?: GithubRelease; error?: string }
+export type ReleaseResult = { app: AppRelease; release?: GithubRelease; error?: string; noRelease?: boolean }
 
 /** Chaves novas não podem sobrescrever configurações ou aliases legados. */
 export function parseAppReleases(value: unknown): AppRelease[] {
@@ -30,7 +30,11 @@ export function parseAppReleases(value: unknown): AppRelease[] {
 
 export function releaseUpdates(results: ReleaseResult[], current: Params): Record<string, string> {
   const updates: Record<string, string> = {}
-  for (const { app, release } of results) {
+  for (const { app, release, noRelease } of results) {
+    if (noRelease) {
+      updates[app.versionKey] = ''
+      continue
+    }
     if (!release || release.draft || release.prerelease) continue
     const next = parseVersion(release.tag_name)
     if (!next) continue
@@ -60,6 +64,8 @@ export async function fetchAppReleases(
         },
         signal: AbortSignal.timeout(20_000),
       })
+      // GitHub retorna 404 quando não há release estável disponível.
+      if (response.status === 404) return { app, noRelease: true }
       if (!response.ok) throw new Error(`GitHub respondeu ${response.status}`)
       const release = await response.json() as GithubRelease
       if (typeof release.tag_name !== 'string' || !Array.isArray(release.assets) ||
