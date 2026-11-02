@@ -523,3 +523,30 @@ ser serializados, como já ocorre pelo concurrency do workflow.
 Os clientes usam exclusivamente os bancos e arquivos por HTTPS. Parâmetros de
 transportes descontinuados são filtrados na resposta e removidos na próxima
 gravação dos publicadores, preservando as versões e os demais campos.
+
+
+### Telegram: envio para tópico opcional
+
+As notificações de alterações no catálogo usam `TELEGRAM_BOT_TOKEN` e
+`TELEGRAM_CHAT_ID`. Sem uma dessas configurações, não há envio.
+
+Para direcionar ao tópico do grupo, configure também
+`TELEGRAM_MESSAGE_THREAD_ID` com o ID numérico positivo do tópico.
+Sem essa variável, ou com valor vazio, o envio continua geral.
+Um ID malformado registra erro e não envia a notificação.
+
+Em produção, adicione `TELEGRAM_MESSAGE_THREAD_ID` como variável **Text**
+em Worker → Settings → Variables and Secrets e faça deploy.
+Mantenha o token como **Secret**. O tópico é opcional e não deve ser
+adicionado a `secrets.required`.
+
+Para desenvolvimento local, configure as variáveis do Telegram no
+`.dev.vars` (não versionado), garantindo que a configuração do Wrangler
+permita carregá-las. Exemplo:
+
+```dotenv
+TELEGRAM_BOT_TOKEN=token_do_bot
+TELEGRAM_CHAT_ID=-1000000000000
+# Opcional: remova ou deixe vazio para envio geral
+TELEGRAM_MESSAGE_THREAD_ID=123
+```
