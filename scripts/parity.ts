@@ -1,3 +1,4 @@
+import { publicParams } from '../src/lib/public-params.ts'
 /**
  * Paridade: compara a API nova com api.louvorja.com.br endpoint a endpoint.
  *
@@ -124,8 +125,7 @@ console.log('\nparams e legado')
     )
   const oldKeys = keysOf(a)
   const newKeys = keysOf(b)
-  // conn_ftp fica de fora: o download por FTP foi descontinuado nesta API.
-  const missing = [...oldKeys].filter((k) => k !== 'conn_ftp' && !newKeys.has(k))
+  const missing = Object.keys(publicParams(Object.fromEntries([...oldKeys].map(key => [key, true])))).filter((k) => !newKeys.has(k))
   check(
     'params?type=env',
     oldResponse.ok && newResponse.ok && missing.length === 0,
@@ -204,10 +204,7 @@ const SIZE_DIVERGE =
   'repetir o da origem marcaria todo download como corrompido (ver ingest-rest.ts)'
 
 const DELIBERADAS: Record<string, Isencao> = {
-  '/params': {
-    motivo: 'conn_ftp só existe na origem: o download por FTP foi descontinuado',
-    limpa: semChaves('conn_ftp'),
-  },
+  '/params': { motivo: 'parâmetros públicos sem transportes descontinuados', limpa: (body: string) => JSON.stringify(publicParams(JSON.parse(body))) },
   '/pt/files': { motivo: SIZE_DIVERGE, limpa: semCamposDosItens('size') },
   '/es/files': { motivo: SIZE_DIVERGE, limpa: semCamposDosItens('size') },
   '/pt/config': {
@@ -222,10 +219,6 @@ const DELIBERADAS: Record<string, Isencao> = {
   },
   '/health': { motivo: 'diagnóstico do próprio runtime', incomparavel: true },
   '/version': { motivo: 'versão desta API, não do Lumen', incomparavel: true },
-  '/ftp': {
-    motivo: 'descontinuado: esta API responde 410 e manda baixar por HTTPS em /file',
-    incomparavel: true,
-  },
   '/player': { motivo: 'o id do vídeo é validado antes de entrar no HTML', incomparavel: true },
 }
 DELIBERADAS['/pt/configs'] = DELIBERADAS['/pt/config'] as Isencao
@@ -244,7 +237,6 @@ const ROTAS_PUBLICAS = [
   '/health',
   '/version',
   '/player',
-  '/ftp',
   '/pt/albums/category/aym',
   '/pt/collections/online',
   '/es/collections/online',
@@ -306,16 +298,9 @@ async function compararCorpo(rota: string) {
     )
     return
   }
-  const semLinhas = (t: string) =>
-    isencao?.limpa === undefined
-      ? t
-      : t
-          .split('\n')
-          .filter((l) => !l.startsWith('conn_ftp='))
-          .join('\n')
   check(
     rota,
-    neutraliza(semLinhas(ta)) === neutraliza(semLinhas(tb)),
+    neutraliza(ta) === neutraliza(tb),
     `texto difere (${ta.length} vs ${tb.length})`,
   )
 }

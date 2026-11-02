@@ -310,7 +310,7 @@ test('modo stored usa áudio físico e preserva imagens BMP', (context) => {
   context.after(() => rmSync(root, { recursive: true, force: true }))
   const [result] = exportLegacyDatabases({
     exportSql: writeExport(root, 'replica.sql'),
-    outDir: join(root, 'stored-ftp-root'),
+    outDir: join(root, 'stored-output'),
     languages: ['pt'],
     audio: 'stored',
     versionOverride: 187,

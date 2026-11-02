@@ -64,18 +64,7 @@ dia.
 O Delphi lê tudo de `https://api.louvorja.com.br/params?type=env` e precisa de
 endereços nesse domínio: no `workers.dev` a Cloudflare recusa a identificação
 dele ("Indy Library", erro 1010), e isso não é configurável. Por isso `/params`
-sempre entrega com o domínio antigo os endereços desta API (`conn_ftp`,
-`coletaneas_online`, `version_log`).
-
-**FTP desligado (versões anteriores à 27.0).** Essas versões baixam banco e
-mídias só por FTP, a partir de um aperto de mão HTTPS: `/params` anuncia
-`conn_ftp` e o programa pede a `/ftp` os dados do servidor. O FTP foi
-desligado; `/ftp` responde com `ftp_msg`, que o programa mostra no lugar do
-download, mandando instalar a versão nova pelo site. Sem `conn_ftp` o Delphi
-recusaria o download com um erro genérico. A atualização do programa em si
-(v25.0 em diante) não usa FTP: vem de `pt_download`/`es_download`, no GitHub.
-`db_version` fica no número em que o PHP deixou o banco do FTP, para essas
-instalações não tentarem atualizar a cada abertura.
+sempre entrega com o domínio antigo os endereços desta API (`coletaneas_online`, `version_log`).
 
 **Atualização por HTTPS, com suporte a Opus.** Os arquivos públicos ficam em
 `files.louvorja.com.br` (bucket `files`), e `/params` diz onde:
@@ -100,7 +89,7 @@ O banco preserva as tabelas e visões do PHP. O modo padrão `stored` usa o áud
 realmente publicado (Opus ou MP3), mantém BMP nas imagens do Delphi e confere
 os tamanhos contra `files`. `npm run delphi:db` gera os bancos a partir do D1
 quando o catálogo passa de `https_db_version`, e só anuncia a versão depois de
-publicar ambos. O banco FTP e `db_version` permanecem independentes. As cópias
+publicar ambos. O campo legado `db_version` permanece independente. As cópias
 anteriores em `files-original` são preservadas; `--audio=legacy` existe apenas
 para operações explícitas de compatibilidade e exige todos os originais no
 destino anunciado.
@@ -189,8 +178,7 @@ e na resposta de capítulo inexistente.
 `routes`, no `wrangler.jsonc`). O registro de DNS do endereço ainda aponta
 para o servidor PHP, porque as rotas precisam dele, mas nenhum pedido chega lá
 por HTTP: `/auth`, `/admin`, `/tasks` e `/health` desse domínio também são
-os daqui. O FTP daquela máquina, que o Delphi anterior à 27.0 usava direto no
-IP, não é mais anunciado.
+os daqui.
 
 Quem pede `/file/musics/<faixa>.mp3` recebe um redirecionamento para `files`
 somente quando esse MP3 existe lá. A API não entrega Opus com nome de MP3.
@@ -290,7 +278,7 @@ representa a base interna, e `meta/manifest-files.json`/`meta/manifest-legacy.js
 as variantes atual e legada; ambas as APIs selecionam a atual.
 
 `npm run bundle:variants -- --write` regenera todos esses artefatos a partir da
-base publicada, sem incrementar a versão do catálogo nem alterar os bancos FTP.
+base publicada, sem incrementar a versão do catálogo nem alterar os bancos anteriores.
 O app web `louvorja/app` lê `/json_db/{key}` individualmente e não depende do nome
 do objeto ZIP. A rota `/db/bundle` continua completa para clientes existentes.
 
@@ -298,13 +286,11 @@ O app novo aceita endereço completo desde a beta.12; versões anteriores
 montavam o endereço por conta própria e ficam sem capa e sem áudio. A versão
 web precisa ter `files.louvorja.com.br` na política de conteúdo dela.
 
-Enquanto os dois sistemas existirem, `db_version` em `/params` precisa
-acompanhar o banco que está no FTP: o Delphi compara esse número com o dele e
-tenta atualizar quando o da API é maior.
+Clientes atuais comparam `https_db_version` para decidir quando atualizar o banco.
 
 ## Contratos atendidos
 
-As rotas públicas incluem `/params`, `/ftp`, `/onlinevideos`, `/file/*`, `/json_db/*`,
+As rotas públicas incluem `/params`, `/onlinevideos`, `/file/*`, `/json_db/*`,
 `/db/*`, `/metadata`, `/download`, `/version`, `/version_log`, `/player` e as
 coleções sob `/{pt,es}/...`.
 
@@ -533,3 +519,7 @@ Os aliases e instaladores do Delphi continuam usando as regras anteriores.
 Retirar um aplicativo da configuração não apaga sua chave já publicada.
 O documento é relido antes da gravação; publicadores concorrentes ainda precisam
 ser serializados, como já ocorre pelo concurrency do workflow.
+
+Os clientes usam exclusivamente os bancos e arquivos por HTTPS. Parâmetros de
+transportes descontinuados são filtrados na resposta e removidos na próxima
+gravação dos publicadores, preservando as versões e os demais campos.

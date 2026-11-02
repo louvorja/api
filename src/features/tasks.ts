@@ -17,7 +17,7 @@ type TaskName = (typeof TASK_NAMES)[number]
 
 /**
  * A publicação substitui quatro etapas da API PHP por uma única geração dos
- * snapshots JSON. O banco SQLite do Delphi e o envio por FTP não existem aqui.
+ * snapshots JSON. A geração dos bancos SQLite ocorre no workflow de manutenção.
  */
 export const WORKFLOW_TASK: Record<TaskName, string> = {
   refresh_configs: 'publish',

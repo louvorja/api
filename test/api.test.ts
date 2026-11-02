@@ -260,12 +260,29 @@ describe('file', () => {
 })
 
 describe('params', () => {
+  it('remove configurações antigas do snapshot no JSON e no INI', async () => {
+    await env.FILES.put('meta/params.json', JSON.stringify({
+      db_version: 185, conn_ftp: 'https://api.louvorja.com.br/ftp', FTP_HOST: 'old',
+    }))
+    try {
+      expect(await (await call('/params')).json()).toEqual({ db_version: 185 })
+      expect(await (await call('/params?type=env')).text()).toBe('db_version=185\r\n')
+    } finally {
+      await env.FILES.put('meta/params.json', JSON.stringify({ db_version: '185', help: 'x' }))
+    }
+  })
+
+  it('não atende os endpoints do transporte descontinuado', async () => {
+    for (const path of ['/ftp', '/pt/ftp', '/es/ftp']) {
+      expect((await call(path)).status).toBe(404)
+    }
+  })
+
   it('devolve JSON por padrão', async () => {
     const res = await call('/params')
     expect(await res.json()).toEqual({
       db_version: '185',
       help: 'x',
-      conn_ftp: 'https://api.louvorja.com.br/ftp',
     })
     expect(res.headers.get('cache-control')).toBe(
       'public, max-age=3600, stale-while-revalidate=86400',
@@ -275,7 +292,7 @@ describe('params', () => {
   it('devolve INI com CRLF, como o parser Delphi espera', async () => {
     const res = await call('/params?type=env')
     expect(await res.text()).toBe(
-      'db_version=185\r\nhelp=x\r\nconn_ftp=https://api.louvorja.com.br/ftp\r\n',
+      'db_version=185\r\nhelp=x\r\n',
     )
   })
 
@@ -286,7 +303,7 @@ describe('params', () => {
     expect(typeof body.db_version).toBe('number')
   })
 
-  it('mostra na raiz e em /version a versão do banco por HTTPS, não a do FTP', async () => {
+  it('mostra na raiz e em /version a versão do banco por HTTPS, não o valor legado', async () => {
     await env.FILES.put(
       'meta/params.json',
       JSON.stringify({ db_version: 185, https_db_version: 186, help: 'x' }),

@@ -4,7 +4,6 @@
 -- boolean -> INTEGER; json -> TEXT; enum -> TEXT com CHECK. Índices únicos e
 -- chaves estrangeiras são os da origem. Datas ficam em UTC, 'YYYY-MM-DD HH:MM:SS'.
 --
--- Ficaram de fora `ftp` e `ftp_logs`: o download por FTP foi descontinuado.
 
 CREATE TABLE languages (
   id_language TEXT PRIMARY KEY,

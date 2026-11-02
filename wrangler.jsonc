@@ -11,8 +11,7 @@
 
   // api.louvorja.com.br inteiro é atendido por este Worker. O registro de DNS
   // do endereço continua existindo (as rotas precisam dele), mas o servidor
-  // PHP que ele aponta não recebe mais pedido nenhum por aqui: quem ainda fala
-  // com aquela máquina é só o Delphi, por FTP, direto no IP.
+  // PHP que ele aponta não recebe mais pedidos por este domínio.
   // A zona vai pelo identificador: existe outra com o mesmo nome (a antiga, já
   // movida, em outra conta), e pelo nome as rotas caíam nela e não valiam.
   "routes": [
