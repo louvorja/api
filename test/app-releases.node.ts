@@ -25,19 +25,19 @@ test('preserva aliases legados do Classic e versão completa nas chaves novas', 
   const latest = release('v27.1.3')
   const legacy = delphiVersionParams(latest, {})
   const changes = releaseUpdates([{ app: classic, release: latest }], {})
-  assert.deepEqual(changes, { 'classic-version': '27.1.3', ...legacy })
+  assert.deepEqual(changes, { 'classic_version': '27.1.3', ...legacy })
   assert.equal(changes.versaoPT, '27.1.0.0')
-  assert.equal(releaseUpdates([{ app: flute, release: { tag_name: 'v1.10.2', assets: [] } }], { 'flute-version': '1.9.9' })['flute-version'], '1.10.2')
+  assert.equal(releaseUpdates([{ app: flute, release: { tag_name: 'v1.10.2', assets: [] } }], { 'flute_version': '1.9.9' })['flute_version'], '1.10.2')
 })
 
 test('não regride, ignora versões iguais, inválidas e pré-lançamentos; não exige instalador para chave nova', () => {
   for (const tag of ['v1.9', 'v1.10.0', 'banana']) {
-    assert.deepEqual(releaseUpdates([{ app: flute, release: release(tag) }], { 'flute-version': '1.10' }), {})
+    assert.deepEqual(releaseUpdates([{ app: flute, release: release(tag) }], { 'flute_version': '1.10' }), {})
   }
   for (const extra of [{ prerelease: true }, { draft: true }]) {
     assert.deepEqual(releaseUpdates([{ app: flute, release: { ...release('v2.0'), ...extra } }], {}), {})
   }
-  assert.deepEqual(releaseUpdates([{ app: classic, release: { tag_name: 'v28.0', assets: [] } }], {}), { 'classic-version': '28.0' })
+  assert.deepEqual(releaseUpdates([{ app: classic, release: { tag_name: 'v28.0', assets: [] } }], {}), { 'classic_version': '28.0' })
 })
 
 test('isola falhas HTTP, rede e payload inválido de outros aplicativos', async () => {
@@ -50,12 +50,12 @@ test('isola falhas HTTP, rede e payload inválido de outros aplicativos', async 
   }
   const results = await fetchAppReleases(apps, request)
   assert.equal(results.filter(item => item.error).length, 3)
-  assert.ok(releaseUpdates(results, {})['classic-version'])
-  assert.equal(releaseUpdates(results, {})['flute-version'], undefined)
+  assert.ok(releaseUpdates(results, {})['classic_version'])
+  assert.equal(releaseUpdates(results, {})['flute_version'], undefined)
 })
 
 test('publica uma vez sobre o JSON relido, preserva campos e evita regressão concorrente', async () => {
-  let current: Record<string, unknown> = { db_version: 185, https_db_version: 190, custom: 'preserve', 'flute-version': '2.1' }
+  let current: Record<string, unknown> = { db_version: 185, https_db_version: 190, custom: 'preserve', 'flute_version': '2.1' }
   let writes = 0
   const storage = {
     get: async () => new TextEncoder().encode(JSON.stringify(current)),
@@ -68,6 +68,21 @@ test('publica uma vez sobre o JSON relido, preserva campos e evita regressão co
   assert.equal(current.custom, 'preserve')
   assert.equal(current.db_version, 185)
   assert.equal(current.https_db_version, 190)
-  assert.equal(current['flute-version'], '2.1')
+  assert.equal(current['flute_version'], '2.1')
   await assert.rejects(publishReleaseVersions([], { ...storage, get: async () => null }))
+})
+
+test('aceita underscore e hífen sem renomear a chave configurada', () => {
+  for (const versionKey of ['new_version', 'new-version']) {
+    const [app] = parseAppReleases({ apps: [{ id: 'new', repository: 'org/new', versionKey }] })
+    assert.equal(app!.versionKey, versionKey)
+    assert.deepEqual(releaseUpdates([{ app: app!, release: release('v2.0') }], {}), { [versionKey]: '2.0' })
+  }
+  for (const versionKey of ['db_version', 'https_db_version', 'pt_version', 'es_version', 'name', '_version', 'new.version']) {
+    assert.throws(() => parseAppReleases({ apps: [{ id: 'new', repository: 'org/new', versionKey }] }))
+  }
+})
+
+test('a configuração atual mantém as quatro chaves com underscore', () => {
+  assert.deepEqual(apps.map(app => app.versionKey), ['classic_version', 'violin_version', 'piano_version', 'flute_version'])
 })
