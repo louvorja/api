@@ -1,3 +1,4 @@
+import { telegramMarkdown, telegramHtmlParts } from './telegram-markdown.ts'
 import type { ReleaseResult } from './app-releases.ts'
 import { compareVersions, parseVersion } from './delphi-version.ts'
 
@@ -9,16 +10,16 @@ type Config = { token?: string; chatId?: string; threadId?: string }
 type Entry = { repository: string; version: string; releaseId?: number; sentAt: string }
 const key = 'meta/release-notifications.json'
 
-/** Plain text preserves the release body without interpreting untrusted markup. */
+/** Compose Markdown; conversion to safe Telegram HTML happens before sending. */
 export function releaseMessage(result: ReleaseResult): string {
   const { app, release } = result
   if (!release) throw new Error('release ausente')
   const body = release.body?.trim()
   const link = app.downloadUrl || release.html_url ||
     `https://github.com/${app.repository}/releases/tag/${encodeURIComponent(release.tag_name)}`
-  return `🎉 ${app.name || app.id} | Nova versão disponível\n\n🏷 Versão ${release.tag_name.replace(/^v/i, '')}\n\n` +
-    (body ? `Novidades desta versão:\n\n${body}\n\n` : '') +
-    `🔗 Baixe aqui:\n${link}`
+  return `# 🎉 ${app.name || app.id} | Nova versão disponível\n\n🏷 Versão ${release.tag_name.replace(/^v/i, '')}\n\n` +
+    (body ? `## Novidades desta versão:\n\n${body}\n\n` : '') +
+    `## 🔗 Baixe aqui:\n${link}`
 }
 
 /** Keep Unicode characters intact; Telegram allows at most 4096 characters. */
@@ -63,16 +64,13 @@ export async function notifyReleases(
       continue
     }
     try {
-      for (const text of messageParts(releaseMessage(result))) {
+      for (const text of telegramHtmlParts(telegramMarkdown(releaseMessage(result)))) {
         const response = await request(`https://api.telegram.org/bot${config.token}/sendMessage`, {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({
             chat_id: config.chatId,
-            text: text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-              .replace(/^(🎉 [^\n]+)/, '<b>$1</b>')
-              .replace('Novidades desta versão:', '<b>Novidades desta versão:</b>')
-              .replace('🔗 Baixe aqui:', '🔗 <b>Baixe aqui:</b>'),
+            text,
             parse_mode: 'HTML',
             ...(thread ? { message_thread_id: Number(thread) } : {}),
           }),
