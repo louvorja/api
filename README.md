@@ -497,8 +497,8 @@ Projeto proprietário.
 
 Configure repositórios e chaves em `config/app-releases.json`. Já inclui Classic,
 Violin, Piano e Flute. Para adicionar outro, acrescente um objeto com `id`,
-`repository` (owner/repo) e `versionKey` (terminado em `-version`). IDs e chaves
-precisam ser únicos. Repositórios privados exigem acesso de leitura via GITHUB_TOKEN.
+`repository` (owner/repo) e `versionKey` (terminado em `_version` ou `-version`). IDs e chaves
+precisam ser únicos. A chave é publicada exatamente como configurada; as quatro\nentradas atuais usam underscore. Chaves legadas como `db_version` e `pt_version`\nsão reservadas. Repositórios privados exigem acesso de leitura via GITHUB_TOKEN.
 
 ```bash
 npm run apps:versions             # consulta e simula, sem gravar

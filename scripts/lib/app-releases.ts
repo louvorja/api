@@ -17,8 +17,9 @@ export function parseAppReleases(value: unknown): AppRelease[] {
     const { id, repository, versionKey } = item as Record<string, unknown>
     if (typeof id !== 'string' || !/^[a-z][a-z0-9-]*$/.test(id) ||
         typeof repository !== 'string' || !/^[\w.-]+\/[\w.-]+$/.test(repository) ||
-        typeof versionKey !== 'string' || !/^[a-z][a-z0-9-]*-version$/.test(versionKey)) {
-      throw new Error('aplicativo exige id, repository (owner/repo) e versionKey (*-version) válidos')
+        typeof versionKey !== 'string' || !/^[a-z][a-z0-9_-]*[-_]version$/.test(versionKey) ||
+        ['db_version', 'https_db_version', 'pt_version', 'es_version'].includes(String(versionKey))) {
+      throw new Error('aplicativo exige id, repository (owner/repo) e versionKey (*_version ou *-version, sem sobrescrever chaves legadas) válidos')
     }
     if (ids.has(id) || keys.has(versionKey)) throw new Error(`id ou versionKey duplicado: ${id}`)
     ids.add(id)
