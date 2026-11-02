@@ -97,3 +97,32 @@ test('envio real do template usa HTML convertido com rótulos e texto da release
     return Response.json({ ok: true })
   })
 })
+
+test('informa descrição, código, destino, migração e espera sem expor token', async () => {
+  for (const description of ['Bad Request: chat not found', 'Forbidden: bot is not a member', 'Bad Request: message thread not found']) {
+    const s = setup()
+    const report = await notifyReleases([item], s.storage, { ...config, threadId: '123' }, true,
+      async () => Response.json({ ok: false, error_code: 400, description, parameters: { retry_after: 10, migrate_to_chat_id: -100999 } }, { status: 400 }))
+    assert.ok(report.errors[0]!.includes(description))
+    assert.ok(report.errors[0]!.includes('HTTP 400; código 400'))
+    assert.ok(report.errors[0]!.includes('chat_id=-100, tópico=123'))
+    assert.ok(report.errors[0]!.includes('10s'))
+    assert.ok(report.errors[0]!.includes('-100999'))
+    assert.equal(s.writes(), 0)
+  }
+  const secret = '123:SECRET'
+  const report = await notifyReleases([item], setup().storage, { ...config, token: secret }, true,
+    async () => Response.json({ ok: false, description: 'error ' + secret }, { status: 400 }))
+  assert.ok(!report.errors.join('').includes(secret))
+})
+test('separa resposta não JSON, timeout e rede sem vazar URL do bot', async () => {
+  for (const [request, expected] of [
+    [async () => new Response('<html>bad gateway</html>', { status: 502 }), 'HTTP 502: resposta não JSON'],
+    [async () => { throw new DOMException('timeout', 'TimeoutError') }, 'tempo limite'],
+    [async () => { throw new Error('https://api.telegram.org/botfake/sendMessage') }, 'falha de rede'],
+  ] as const) {
+    const report = await notifyReleases([item], setup().storage, config, true, request)
+    assert.ok(report.errors[0]!.includes(expected))
+    assert.ok(!report.errors[0]!.includes('botfake'))
+  }
+})
