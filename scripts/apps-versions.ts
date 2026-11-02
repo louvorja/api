@@ -13,6 +13,7 @@ for (const app of selected) {
 const results = await fetchAppReleases(selected, fetch, process.env.GITHUB_TOKEN)
 for (const result of results) {
   if (result.error) console.error(`${result.app.id} (${result.app.repository}): ${result.error}; valor preservado.`)
+  else if (result.noRelease) console.log(`${result.app.id}: sem release estável disponível; versão vazia.`)
   else console.log(`${result.app.id}: ${result.release!.tag_name}`)
 }
 const body = await r2.get('meta/params.json')
