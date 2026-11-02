@@ -49,7 +49,7 @@ test('isola falhas HTTP, rede e payload inválido de outros aplicativos', async 
     return new Response(JSON.stringify({ tag_name: 'v2.0', assets: [null] }))
   }
   const results = await fetchAppReleases(apps, request)
-  assert.equal(results.filter(item => item.error).length, 3)
+  assert.equal(results.filter(item => item.error).length, 2)
   assert.ok(releaseUpdates(results, {})['classic_version'])
   assert.equal(releaseUpdates(results, {})['flute_version'], undefined)
 })
@@ -85,4 +85,36 @@ test('aceita underscore e hífen sem renomear a chave configurada', () => {
 
 test('a configuração atual mantém as quatro chaves com underscore', () => {
   assert.deepEqual(apps.map(app => app.versionKey), ['classic_version', 'violin_version', 'piano_version', 'flute_version'])
+})
+
+test('404 publica string vazia sem erro e mantém os outros aplicativos', async () => {
+  const violin = apps.find(app => app.id === 'violin')!
+  const results = await fetchAppReleases([violin, flute], async input =>
+    String(input).includes('violin')
+      ? new Response('{}', { status: 404 })
+      : new Response(JSON.stringify(release('v2.0.2'))))
+  assert.equal(results.some(result => result.error), false)
+  assert.equal(results[0]!.noRelease, true)
+  for (const current of [{}, { [violin.versionKey]: '1.0' }]) {
+    assert.deepEqual(releaseUpdates(results, current), {
+      [violin.versionKey]: '', [flute.versionKey]: '2.0.2',
+    })
+  }
+  let saved: Record<string, unknown> = { custom: 'keep', [violin.versionKey]: '1.0' }
+  await publishReleaseVersions(results, {
+    get: async () => new TextEncoder().encode(JSON.stringify(saved)),
+    put: async (_key, body) => { saved = JSON.parse(body) },
+  })
+  assert.equal(saved[violin.versionKey], '')
+  assert.equal(saved.custom, 'keep')
+  assert.equal(saved[flute.versionKey], '2.0.2')
+})
+
+test('erros de autenticação e servidor preservam valores e continuam sinalizados', async () => {
+  for (const status of [401, 403, 429, 500]) {
+    const results = await fetchAppReleases([flute], async () => new Response('{}', { status }))
+    assert.ok(results[0]!.error)
+    assert.equal(results[0]!.noRelease, undefined)
+    assert.deepEqual(releaseUpdates(results, { [flute.versionKey]: '2.0' }), {})
+  }
 })
