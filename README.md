@@ -550,3 +550,31 @@ TELEGRAM_CHAT_ID=-1000000000000
 # Opcional: remova ou deixe vazio para envio geral
 TELEGRAM_MESSAGE_THREAD_ID=123
 ```
+
+
+### Anúncios de releases no Telegram
+
+A manutenção (`npm run apps:versions -- --write`) anuncia os releases estáveis
+dos aplicativos habilitados em `config/app-releases.json`. Sem `--write`,
+apenas simula. Configure nos Secrets do GitHub Actions:
+`TELEGRAM_RELEASES_BOT_TOKEN`, `TELEGRAM_RELEASES_CHAT_ID` e, opcionalmente,
+`TELEGRAM_RELEASES_MESSAGE_THREAD_ID`. Localmente o comando lê o `.env`.
+São configurações independentes das notificações de auditoria do Worker.
+
+Cada app aceita `name`, `notifyRelease` (true habilita anúncios) e
+`downloadUrl` (HTTP/HTTPS). URL vazia ou ausente usa o release do GitHub.
+Os quatro apps estão habilitados; os links próprios ficam vazios até serem definidos.
+
+O controle fica em `meta/release-notifications.json` no R2, separado de params.
+Sem registro, envia o release atual; depois, somente versões superiores.
+Salvar params não marca o anúncio como enviado. O controle só é salvo após
+confirmação de todas as partes pelo Telegram. Sem token ou grupo, nada envia.
+Falhas de envio preservam o controle e permitem os outros apps; a manutenção
+sinaliza erro para permitir diagnóstico. Releases ausentes não são anunciados.
+
+A descrição original é mantida como texto, sem interpretar Markdown do GitHub;
+título e rótulos usam negrito. Mensagens longas são divididas.
+Execuções Actions compartilham o grupo de concorrência maintenance; evite
+rodar publicadores locais simultaneamente. Se o envio for aceito e a gravação
+do R2 falhar, ou parte de uma mensagem longa falhar, a próxima tentativa pode
+repetir mensagens. Não apague o controle, salvo se desejar reenviar a carga inicial.

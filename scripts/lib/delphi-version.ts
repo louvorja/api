@@ -7,6 +7,9 @@
  * instaladores seguem o mesmo padrão de nome que as chaves usam.
  */
 export type GithubRelease = {
+  id?: number
+  body?: string | null
+  html_url?: string
   tag_name: string
   draft?: boolean
   prerelease?: boolean

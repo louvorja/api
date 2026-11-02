@@ -3,22 +3,34 @@
     {
       "id": "classic",
       "repository": "louvorja/desktop",
-      "versionKey": "classic_version"
+      "versionKey": "classic_version",
+      "name": "LouvorJA Classic",
+      "notifyRelease": true,
+      "downloadUrl": ""
     },
     {
       "id": "violin",
       "repository": "louvorja/violin-app",
-      "versionKey": "violin_version"
+      "versionKey": "violin_version",
+      "name": "LouvorJA Violin",
+      "notifyRelease": true,
+      "downloadUrl": ""
     },
     {
       "id": "piano",
       "repository": "Piano-Louvor-JA/app",
-      "versionKey": "piano_version"
+      "versionKey": "piano_version",
+      "name": "LouvorJA Piano",
+      "notifyRelease": true,
+      "downloadUrl": ""
     },
     {
       "id": "flute",
       "repository": "louvorja/flute-app",
-      "versionKey": "flute_version"
+      "versionKey": "flute_version",
+      "name": "LouvorJA Flute",
+      "notifyRelease": true,
+      "downloadUrl": ""
     }
   ]
 }

@@ -1,7 +1,7 @@
 import { publicParams } from '../../src/lib/public-params.ts'
 import { compareVersions, delphiVersionParams, type GithubRelease, parseVersion } from './delphi-version.ts'
 
-export type AppRelease = { id: string; repository: string; versionKey: string }
+export type AppRelease = { id: string; repository: string; versionKey: string; name?: string; notifyRelease?: boolean; downloadUrl?: string }
 type Params = Record<string, unknown>
 export type ReleaseResult = { app: AppRelease; release?: GithubRelease; error?: string; noRelease?: boolean }
 
@@ -14,7 +14,7 @@ export function parseAppReleases(value: unknown): AppRelease[] {
   const keys = new Set<string>()
   return value.apps.map((item: unknown) => {
     if (!item || typeof item !== 'object') throw new Error('aplicativo inválido')
-    const { id, repository, versionKey } = item as Record<string, unknown>
+    const { id, repository, versionKey, name, notifyRelease, downloadUrl } = item as Record<string, unknown>
     if (typeof id !== 'string' || !/^[a-z][a-z0-9-]*$/.test(id) ||
         typeof repository !== 'string' || !/^[\w.-]+\/[\w.-]+$/.test(repository) ||
         typeof versionKey !== 'string' || !/^[a-z][a-z0-9_-]*[-_]version$/.test(versionKey) ||
@@ -24,7 +24,16 @@ export function parseAppReleases(value: unknown): AppRelease[] {
     if (ids.has(id) || keys.has(versionKey)) throw new Error(`id ou versionKey duplicado: ${id}`)
     ids.add(id)
     keys.add(versionKey)
-    return { id, repository, versionKey }
+    if (name !== undefined && (typeof name !== 'string' || !name.trim())) throw new Error('name inválido')
+    if (notifyRelease !== undefined && typeof notifyRelease !== 'boolean') throw new Error('notifyRelease inválido')
+    if (downloadUrl !== undefined && (typeof downloadUrl !== 'string' ||
+        (downloadUrl !== '' && !/^https?:\/\//i.test(downloadUrl)))) throw new Error('downloadUrl inválido')
+    if (downloadUrl) new URL(String(downloadUrl))
+    return { id, repository, versionKey,
+      ...(name === undefined ? {} : { name: name as string }),
+      ...(notifyRelease === undefined ? {} : { notifyRelease: notifyRelease as boolean }),
+      ...(downloadUrl === undefined ? {} : { downloadUrl: downloadUrl as string }),
+    }
   })
 }
 
