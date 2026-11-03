@@ -66,6 +66,12 @@ endereços nesse domínio: no `workers.dev` a Cloudflare recusa a identificaçã
 dele ("Indy Library", erro 1010), e isso não é configurável. Por isso `/params`
 sempre entrega com o domínio antigo os endereços desta API (`coletaneas_online`, `version_log`).
 
+O `/version_log` usa notas separadas por versão do programa no R2
+(`meta/version_log/v<major>.<minor>.txt`). A rotina `apps:versions --write`
+atualiza as notas da release estável do Classic, inclusive quando só o texto
+mudou. Se faltarem notas, o Worker consulta a tag no GitHub e guarda o resultado.
+Falhas externas não reutilizam o HTML genérico antigo nem ficam no cache HTTP.
+
 **Atualização por HTTPS, com suporte a Opus.** Os arquivos públicos ficam em
 `files.louvorja.com.br` (bucket `files`), e `/params` diz onde:
 

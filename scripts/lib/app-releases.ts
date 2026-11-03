@@ -1,4 +1,9 @@
 import { publicParams } from '../../src/lib/public-params.ts'
+import {
+  DESKTOP_RELEASES_REPO,
+  desktopSoftwareVersion,
+  versionLogKey,
+} from '../../src/lib/version-log.ts'
 import { compareVersions, delphiVersionParams, type GithubRelease, parseVersion } from './delphi-version.ts'
 
 export type AppRelease = { id: string; repository: string; versionKey: string; name?: string; notifyRelease?: boolean; downloadUrl?: string }
@@ -94,8 +99,28 @@ type Storage = {
   put: (key: string, body: string, type: string) => Promise<unknown>
 }
 
-/** Relê antes da única gravação para preservar campos alterados durante as consultas. */
+/** Publica as notas e relê os parâmetros antes de gravá-los, preservando alterações concorrentes. */
 export async function publishReleaseVersions(results: ReleaseResult[], storage: Storage): Promise<Params> {
+  // Publica as notas mesmo quando a versão não mudou: o texto pode ser editado.
+  // O Worker passa a atender a versão atual sem uma consulta anônima ao GitHub.
+  for (const { app, release } of results) {
+    if (
+      app.id !== 'classic' ||
+      app.repository !== DESKTOP_RELEASES_REPO ||
+      !release ||
+      release.draft ||
+      release.prerelease
+    ) continue
+    const notes = release.body === null ? '' : release.body
+    if (typeof notes !== 'string') continue
+    const version = release.tag_name.replace(/^v/, '')
+    if (desktopSoftwareVersion(version) !== version) continue
+    const key = versionLogKey(version)
+    const previous = await storage.get(key)
+    if (previous === null || new TextDecoder().decode(previous) !== notes) {
+      await storage.put(key, notes, 'text/plain; charset=UTF-8')
+    }
+  }
   const key = 'meta/params.json'
   const body = await storage.get(key)
   if (body === null) throw new Error(`${key} não existe no bucket`)

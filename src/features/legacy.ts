@@ -1,11 +1,10 @@
 import { type Context, Hono } from 'hono'
 import { COMMON_HEADERS } from '../lib/http.ts'
+import { DESKTOP_RELEASES_REPO, desktopSoftwareVersion, versionLogKey } from '../lib/version-log.ts'
 import { openapi } from '../openapi.ts'
 import type { App } from '../types.ts'
 
 export const legacy = new Hono<App>()
-
-const VERSION_RE = /^\d+\.\d+(?:\.\d+)*$/
 
 function escapeHtml(value: string): string {
   return value
@@ -24,44 +23,66 @@ async function versionLog(c: Context<App>) {
   const requested = c.req.query('version') ?? c.req.query('versao')
   const configured = params[`${lang}_version`]
   const version = String(requested ?? configured ?? '')
-  const validVersion = VERSION_RE.test(version)
-  const softwareVersion = validVersion ? version.split('.').slice(0, 2).join('.') : ''
+  const softwareVersion = desktopSoftwareVersion(version)
 
   let body = `Não foi possivel encontrar informações sobre a versão ${version || 'informada'}!`
+  let cacheControl = 'public, max-age=300, stale-while-revalidate=3600'
   if (softwareVersion) {
-    try {
-      const response = await fetch(
-        `https://api.github.com/repos/louvorja/desktop/releases/tags/v${softwareVersion}`,
-        {
-          headers: {
-            Accept: 'application/vnd.github+json',
-            'User-Agent': 'louvorja-api-workers',
-            'X-GitHub-Api-Version': '2022-11-28',
+    const key = versionLogKey(softwareVersion)
+    const saved = await c.env.FILES.get(key)
+    if (saved !== null) {
+      body = await saved.text()
+    } else {
+      let upstreamStatus: number | undefined
+      try {
+        const response = await fetch(
+          `https://api.github.com/repos/${DESKTOP_RELEASES_REPO}/releases/tags/v${softwareVersion}`,
+          {
+            headers: {
+              Accept: 'application/vnd.github+json',
+              'User-Agent': 'louvorja-api-workers',
+              'X-GitHub-Api-Version': '2022-11-28',
+            },
+            signal: AbortSignal.timeout(5_000),
           },
-          signal: AbortSignal.timeout(5_000),
-        },
-      )
-      if (response.ok) {
-        const release = await response.json<{ body?: unknown }>()
-        if (typeof release.body === 'string') body = release.body
-      } else if (response.status !== 404) {
-        throw new Error(`GitHub respondeu ${response.status}`)
-      }
-    } catch (reason) {
-      console.error('version_log_fetch_failed', reason)
-      const fallback = await c.env.FILES.get('meta/version_log.html')
-      if (fallback !== null) {
-        const headers = new Headers(COMMON_HEADERS)
-        headers.set('Content-Type', 'text/html; charset=UTF-8')
-        headers.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=3600')
-        return new Response(c.req.method === 'HEAD' ? null : fallback.body, { headers })
+        )
+        upstreamStatus = response.status
+        if (response.ok) {
+          const release = await response.json<{ body?: unknown }>()
+          // O GitHub usa null quando a release não tem descrição.
+          const notes = release.body === null ? '' : release.body
+          if (typeof notes !== 'string') throw new Error('Notas da release inválidas')
+          body = notes
+          c.executionCtx.waitUntil(
+            c.env.FILES.put(key, body, {
+              httpMetadata: { contentType: 'text/plain; charset=UTF-8' },
+            }).catch((reason: unknown) => {
+              console.error('version_log_store_failed', {
+                softwareVersion,
+                reason: reason instanceof Error ? reason.message : String(reason),
+              })
+            }),
+          )
+        } else if (response.status !== 404) {
+          throw new Error(`GitHub respondeu ${response.status}`)
+        }
+      } catch (reason) {
+        console.error('version_log_fetch_failed', {
+          softwareVersion,
+          upstreamStatus,
+          reason: reason instanceof Error ? reason.message : String(reason),
+        })
+        // O HTML importado da API antiga não identifica a versão solicitada.
+        // Não o reutilize: ele pode mostrar notas de outra release com HTTP 200.
+        body = `Não foi possível carregar as informações da versão ${version}. Tente novamente mais tarde.`
+        cacheControl = 'no-store'
       }
     }
   }
 
   const headers = new Headers(COMMON_HEADERS)
   headers.set('Content-Type', 'text/html; charset=UTF-8')
-  headers.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=3600')
+  headers.set('Cache-Control', cacheControl)
   const notes = escapeHtml(body).replaceAll('\n', '<br>')
   const html =
     '<!doctype html><html><head><meta charset="utf-8">' +

@@ -118,3 +118,51 @@ test('erros de autenticação e servidor preservam valores e continuam sinalizad
     assert.deepEqual(releaseUpdates(results, { [flute.versionKey]: '2.0' }), {})
   }
 })
+
+test('publica notas do Classic por versão e atualiza o texto mesmo sem nova versão', async () => {
+  const objects = new Map<string, string>([
+    ['meta/params.json', JSON.stringify({ classic_version: '27.0', pt_version: '27.0', es_version: '27.0', custom: 'keep' })],
+    ['meta/version_log/v26.10.txt', 'Notas antigas'],
+  ])
+  const writes: string[] = []
+  const storage = {
+    get: async (key: string) => objects.has(key) ? new TextEncoder().encode(objects.get(key)) : null,
+    put: async (key: string, body: string) => { writes.push(key); objects.set(key, body) },
+  }
+  const result = { app: classic, release: { ...release('v27.0'), body: 'Notas atuais' } }
+  await publishReleaseVersions([result], storage)
+  assert.deepEqual(writes, ['meta/version_log/v27.0.txt'])
+  assert.equal(objects.get('meta/version_log/v27.0.txt'), 'Notas atuais')
+  assert.equal(objects.get('meta/version_log/v26.10.txt'), 'Notas antigas')
+  await publishReleaseVersions([result], storage)
+  assert.equal(writes.length, 1)
+  result.release.body = 'Notas corrigidas'
+  await publishReleaseVersions([result], storage)
+  assert.equal(objects.get('meta/version_log/v27.0.txt'), 'Notas corrigidas')
+  result.release.body = ''
+  await publishReleaseVersions([result], storage)
+  assert.equal(objects.get('meta/version_log/v27.0.txt'), '')
+  objects.set('meta/version_log/v27.0.txt', 'Descrição removida')
+  await publishReleaseVersions([{ ...result, release: { ...result.release, body: null } }], storage)
+  assert.equal(objects.get('meta/version_log/v27.0.txt'), '')
+  assert.equal(JSON.parse(objects.get('meta/params.json')!).custom, 'keep')
+})
+
+test('não mistura notas de outros apps, repositórios ou tags com as do Classic', async () => {
+  const writes: string[] = []
+  const storage = {
+    get: async () => new TextEncoder().encode('{}'),
+    put: async (key: string) => { writes.push(key) },
+  }
+  const notes = { ...release('v27.0'), body: 'Notas' }
+  await publishReleaseVersions([
+    { app: flute, release: notes },
+    { app: { ...classic, repository: 'other/desktop' }, release: notes },
+    { app: classic, release: { ...notes, tag_name: 'v27.0.1' } },
+    { app: classic, release: { ...notes, draft: true } },
+    { app: classic, release: { ...notes, prerelease: true } },
+    { app: classic, release: { ...notes, body: undefined } },
+    { app: classic, error: 'GitHub respondeu 403' },
+  ], storage)
+  assert.ok(writes.every(key => key === 'meta/params.json'))
+})
