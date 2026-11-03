@@ -456,12 +456,19 @@ responde 429 antes de consultar R2, com `Retry-After` e
 `X-RateLimit-Reason: invalid-bible-queries`, sem a espera de 8 s do teto por minuto.
 Os critérios ficam em `src/lib/bible-abuse.ts`.
 
-A regra WAF `API - bloquear caminhos de scanner` está registrada em
-`config/waf-api-scanners.json` e é administrada separadamente no painel da
-Cloudflare (o `wrangler deploy` não a cria). Ela bloqueia caminhos de arquivos
-sensíveis e sondagens de WordPress exclusivamente em `api.louvorja.com.br`, antes
-do Worker. Não cobre `api.louvorja.workers.dev`, que continua ativo para os apps;
-a suspensão interna funciona nos dois endereços.
+Os caminhos de scanner ficam em `config/scanner-paths.json`: credenciais,
+configuração, depuração e rotas inexistentes sondadas pelos scanners. Rotas reais
+como `/openapi.json` e `/admin/users` permanecem disponíveis com sua proteção normal.
+O filtro ignora o IP e a query, compara o caminho em minúsculas após decodificar
+escapes percentuais e responde 403 antes dos limitadores e do armazenamento.
+Ele funciona também em `api.louvorja.workers.dev`, que continua ativo para os apps.
+
+`npm run waf:generate` gera as regras `API - bloquear caminhos de scanner` em
+`config/waf-api-scanners.json` a partir da mesma lista, dividindo as expressões no
+limite de 4096 caracteres. `npm run waf:check` verifica se o artefato está atualizado.
+As regras WAF bloqueiam antes do Worker em `api.louvorja.com.br` e são publicadas
+separadamente pela API/painel da Cloudflare; `wrangler deploy` publica apenas o
+filtro interno. Ao atualizar as regras, use o `id`/`ref` para preservar as existentes.
 
 Os jobs usam `CLOUDFLARE_API_TOKEN`, credenciais S3 do R2 e, no job mensal,
 `YOUTUBE_API_KEY`. Segredos não entram em `wrangler.jsonc`, no R2 ou no Git.

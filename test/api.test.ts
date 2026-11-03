@@ -79,7 +79,7 @@ describe('json_db', () => {
   })
 
   it('caminho que nenhuma rota atende manda o cliente para a documentação', async () => {
-    for (const path of ['/nao-existe', '/pt/musics', '/.env', '/json_db/a/b']) {
+    for (const path of ['/nao-existe', '/pt/musics', '/json_db/a/b']) {
       const res = await call(path)
       expect(res.status, path).toBe(404)
       expect(res.headers.get('cache-control'), path).toBe('no-store')

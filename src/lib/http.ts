@@ -51,8 +51,8 @@ export function notFound(c: Context): Response {
 
 /**
  * Caminho que nenhuma rota atende (um erro de digitação, uma rota removida, um
- * robô procurando `/.env`). Diferente de `notFound`: aqui o recurso não está
- * faltando, a rota é que não existe, então a resposta manda o cliente para a
+ * cliente chamando `/rota-desconhecida`). Diferente de `notFound`: aqui o recurso
+ * não está faltando, a rota é que não existe, então a resposta manda o cliente para a
  * documentação. Quem procura um arquivo ou chave que não existe continua
  * recebendo o 404 de sempre.
  */

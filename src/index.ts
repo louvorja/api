@@ -12,6 +12,7 @@ import { tasks } from './features/tasks.ts'
 import { requireSecret } from './lib/auth/session.ts'
 import { COMMON_HEADERS, isPrivatePath, PRIVATE_HEADERS, routeNotFound } from './lib/http.ts'
 import { applyRateLimit } from './lib/rate-limit.ts'
+import { blockScannerPaths } from './lib/scanner-paths.ts'
 import type { App } from './types.ts'
 
 // O wrangler exige que a classe do Durable Object saia do módulo principal.
@@ -25,6 +26,7 @@ app.use('*', async (c, next) => {
   for (const [k, v] of Object.entries(headers)) c.header(k, v)
 })
 
+app.use('*', blockScannerPaths)
 app.use('*', applyRateLimit)
 
 app.options('*', (c) => c.body(null, 204))

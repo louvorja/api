@@ -17,6 +17,8 @@
     "lint:fix": "biome check --write .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "waf:generate": "node --experimental-strip-types scripts/waf-scanners.ts",
+    "waf:check": "node --experimental-strip-types scripts/waf-scanners.ts --check",
     "ingest": "node --env-file=.env --experimental-strip-types scripts/ingest.ts",
     "covers": "node --env-file=.env --experimental-strip-types scripts/convert-covers.ts",
     "parity": "node --env-file=.env --experimental-strip-types scripts/parity.ts",
