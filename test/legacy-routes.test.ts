@@ -285,6 +285,8 @@ beforeAll(async () => {
   await env.FILES.put(
     'meta/params.json',
     JSON.stringify({
+      db_version: 185,
+      https_db_version: 189,
       pt_download: 'https://download.test/pt',
       es_download: 'https://download.test/es',
       pt_version: '26.11',
@@ -301,6 +303,15 @@ beforeAll(async () => {
 })
 
 describe('contratos legados complementares', () => {
+  it('anuncia a mesma versão do banco em JSON e INI', async () => {
+    const json = await call('/params')
+    expect(await json.json()).toMatchObject({ db_version: 189, https_db_version: 189 })
+
+    const ini = await call('/params?type=env')
+    const lines = (await ini.text()).split('\r\n')
+    expect(lines).toContain('db_version=189')
+    expect(lines).toContain('https_db_version=189')
+  })
   it('extrai categorias únicas de uma coluna do json_db', async () => {
     const res = await call('/db/catalog/categories?column=kind')
     expect(res.status).toBe(200)
