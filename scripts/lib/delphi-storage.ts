@@ -60,6 +60,7 @@ export async function publishDelphiDatabases(
   const params: Record<string, unknown> = {
     ...publicParams(fresh),
     ...delphiHttpsParams(),
+    db_version: version,
     https_db_version: version,
   }
   delete params.https_system_files
