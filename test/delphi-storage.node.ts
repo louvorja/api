@@ -87,7 +87,7 @@ test('publica os dois bancos e suas cópias antes de anunciar a versão HTTPS', 
   }
   assert.deepEqual(
     JSON.parse(new TextDecoder().decode(storage.objects.get(`files/${DELPHI_PARAMS_KEY}`))),
-    { ...latest, ...delphiHttpsParams(), https_db_version: 189 },
+    { ...latest, ...delphiHttpsParams(), db_version: 189, https_db_version: 189 },
   )
 })
 
