@@ -78,6 +78,7 @@ Falhas externas não reutilizam o HTML genérico antigo nem ficam no cache HTTP.
 | Chave de `/params` | O que é |
 | --- | --- |
 | `https_db_version` | Versão do banco disponível por HTTPS. Compare com a do banco local |
+| `db_version` | Alias de `https_db_version` para clientes que usam a chave legada |
 | `https_db_pt`, `https_db_es` | O banco SQLite de cada idioma (`config/<idioma>_database.db`) |
 | `https_files` | Base única de todos os arquivos: some `/` + `ARQUIVOS_SISTEMA.URL_DOWNLOAD` |
 
@@ -95,7 +96,7 @@ O banco preserva as tabelas e visões do PHP. O modo padrão `stored` usa o áud
 realmente publicado (Opus ou MP3), mantém BMP nas imagens do Delphi e confere
 os tamanhos contra `files`. `npm run delphi:db` gera os bancos a partir do D1
 quando o catálogo passa de `https_db_version`, e só anuncia a versão depois de
-publicar ambos. O campo legado `db_version` permanece independente. As cópias
+publicar ambos. As duas chaves são gravadas com o mesmo valor. As cópias
 anteriores em `files-original` são preservadas; `--audio=legacy` existe apenas
 para operações explícitas de compatibilidade e exige todos os originais no
 destino anunciado.
