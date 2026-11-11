@@ -10,8 +10,7 @@
  * A Bíblia não está no D1: os versículos são preservados do banco anterior,
  * que por isso é baixado antes de gerar o novo.
  *
- * Atualiza `https_db_version` após publicar os dois bancos. `db_version`
- * é um valor legado e não é alterado por este script.
+ * Atualiza `https_db_version` e `db_version` após publicar os dois bancos.
  */
 import { createHash } from 'node:crypto'
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
@@ -212,7 +211,7 @@ try {
         1,
       ),
     )
-    console.log(`Publicado: bancos na versão ${version} e https_db_version atualizado.`)
+    console.log(`Publicado: bancos na versão ${version} e parâmetros de versão atualizados.`)
   }
 } finally {
   rmSync(workdir, { recursive: true, force: true })
